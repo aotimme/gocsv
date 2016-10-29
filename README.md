@@ -2,7 +2,10 @@
 
 Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive.
 
+The tool is built for pipelining, so every command (other than [headers](#headers)) accepts a CSV from standard input, and every command outputs to standard out.
+
 Subcommands:
+
 - [headers](#headers) - View the headers from a CSV.
 - [behead](#behead) - Remove the header from a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
@@ -11,8 +14,6 @@ Subcommands:
 - [select](#select) - Extract specified columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
 
-
-Every subcommand (other than `headers`) is designed to accept either CSV files as arguments our via standard input for pipelining.
 
 ## Subcommands
 
