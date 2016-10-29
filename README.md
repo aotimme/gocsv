@@ -19,7 +19,7 @@ Subcommands:
 
 ### headers
 
-View the headers of a CSV.
+View the headers of a CSV along with the index of each header.
 
 Usage:
 
@@ -39,7 +39,7 @@ gocsv behead FILE
 
 ### stack
 
-Stack multiple CSVs to create a larger CSV
+Stack multiple CSVs to create a larger CSV. Optionally include an indication of which file a row came from in the final CSV.
 
 Usage:
 
@@ -47,15 +47,29 @@ Usage:
 gocsv stack [--filenames] [--groups GROUPS] [--group-name GROUP_NAME] FILE [FILES]
 ```
 
+Arguments:
+
+- `--filenames` (optional) Use the names of each file as the group variable. By default the column will be named "File".
+- `--groups` (optional) Comma-separated list to use as the names of the groups for each row. There must be as many groups as there are files. By default the column will be named "Group".
+- `--group-name` (optional) Name of the grouping column in the final CSV.
+
+Note that `--groups` and `--filenames` are mutually exclusive.
+
 ### sort
 
-Sort a CSV by multiple columns, with or without type inference.
+Sort a CSV by multiple columns, with or without type inference. The currently supported types are float, int, and string.
 
 Usage:
 
 ```shell
 gocsv sort --columns COLUMNS [--reverse] [--no-inference] FILE
 ```
+
+Arguments:
+
+- `--columns` A comma-separated list (in order) of the columns to sort against. See [Specifying Columns](#specifying-columns) for more details.
+- `--reverse` (optional) Reverse the order of sorting. By default the sort order is ascending.
+- `--no-inference` (optional) Skip type inference when sorting.
 
 ### filter
 
@@ -67,6 +81,11 @@ Usage:
 gocsv filter --column COLUMN --regex REGEX FILE
 ```
 
+Arguments:
+
+- `--column` Column to filter on. See [Specifying Columns](#specifying-columns) for more details.
+- `--regex` Regular expression to use to match against.
+
 ### select
 
 Select (or exclude) columns from a CSV
@@ -77,6 +96,11 @@ Usage:
 gocsv select --columns COLUMNS [--exclude] FILE
 ```
 
+Arguments:
+
+- `--columns` A comma-separated list (in order) of the columns to select. If you want to select a column multiple times, you can! See [Specifying Columns](#specifying-columns) for more details.
+- `--exclude` (optional) Exclude the specified columns (default is to include).
+
 ### join
 
 Join two CSVs using an inner (default), left, right, or outer join.
@@ -86,6 +110,21 @@ Usage:
 ```shell
 gocsv join --columns COLUMNS [--left] [--right] [--outer] LEFT_FILE RIGHT_FILE
 ```
+
+Arguments:
+
+- `--columns` A comma-separated list (in order) of the columns to use for joining. You must specify either 1 or 2 columns. When 1 is specified, it will join the CSVs using that column in both the left and right CSV. When 2 are specified, it will join using the first column on the left CSV and the second column on the right CSV. See [Specifying Columns](#specifying-columns) for more details.
+- `--left` (optional) Perform a left join.
+- `--right` (optional) Perform a right join.
+- `--outer` (optional) Perform an outer join.
+
+Note that by default it will perform an inner join. It will exit if you specify multiple types of join.
+
+## N.B.
+
+### Specifying Columns
+
+When specifying a column on the command line, you can specify either than name or the index of the column. The tool will _always_ try to interpret the column by index, and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the the _first_ column that matches.
 
 ## Pipelining
 
