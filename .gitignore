@@ -25,3 +25,4 @@ _testmain.go
 
 # Non-default ignores
 build
+.DS_Store
