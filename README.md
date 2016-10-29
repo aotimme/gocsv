@@ -140,7 +140,7 @@ cat test-files/left-table.csv \
 
 ## Installation
 
-See the [releases](/releases) page for pre-built binaries.
+See the [releases](https://github.com/DataFoxCo/gocsv/releases) page for pre-built binaries.
 
 TODO
 ----
