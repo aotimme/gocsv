@@ -141,19 +141,6 @@ cat test-files/left-table.csv \
 TODO
 ----
 
-- [x] Enable column specification by index.
-
-
-- [x] Guard against attempting to select element of row if row length is too short.
-
-
-- [x] Implement right join.
-- [x] Implement outer join.
-- [x] Implement `stack` for stacking two CSVs on top of one another (assuming the same headers.)
-
-
-- [x] Implement `sort` for sorting a CSV based on one or more columns (TBD whether it supports type inference to know when to sort a column as a string or as an int or float -- or a date even??).
-- [x] Implement filtering _out_ columns via the `filter` subcommand.
 - [ ] Support other delimiters (not just `,`). For reading and writing.
 
 
