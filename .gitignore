@@ -24,5 +24,6 @@ _testmain.go
 *.prof
 
 # Non-default ignores
-build
 .DS_Store
+bin
+dist
