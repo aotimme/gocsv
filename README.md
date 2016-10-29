@@ -142,7 +142,6 @@ TODO
 ----
 
 - [ ] Support other delimiters (not just `,`). For reading and writing.
-
-
+- [ ] Implement filtering by numeric types.
 - [ ] Package it up (with cross-compilation?)
 - [ ] Add subcommand autocomplete (for `zshell` at least)
