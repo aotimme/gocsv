@@ -101,7 +101,7 @@ func SelectColumns(inreader io.Reader, columns []string) {
 
 
 func RunSelect(args []string) {
-  fs := flag.NewFlagSet("select", flag.PanicOnError)
+  fs := flag.NewFlagSet("select", flag.ExitOnError)
   var columnsString string
   var exclude bool
   fs.StringVar(&columnsString, "columns", "", "Columns to select")

@@ -46,7 +46,7 @@ func FilterRegex(inreader io.Reader, column, expr string) {
 
 
 func RunFilter(args []string) {
-  fs := flag.NewFlagSet("filter", flag.PanicOnError)
+  fs := flag.NewFlagSet("filter", flag.ExitOnError)
   var regex, column string
   fs.StringVar(&regex, "regex", "", "Regular expression for filtering")
   fs.StringVar(&column, "column", "", "Column to filter against")

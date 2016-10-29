@@ -194,7 +194,7 @@ func OuterJoin(leftReader, rightReader io.Reader, leftColname, rightColname stri
 
 
 func RunJoin(args []string) {
-  fs := flag.NewFlagSet("join", flag.PanicOnError)
+  fs := flag.NewFlagSet("join", flag.ExitOnError)
   var columnsString string
   var left, right, outer bool
   fs.StringVar(&columnsString, "columns", "", "Columns to join on")

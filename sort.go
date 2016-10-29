@@ -40,7 +40,7 @@ func SortCsv(inreader io.Reader, columns []string, reverse, noInference bool) {
 
 
 func RunSort(args []string) {
-  fs := flag.NewFlagSet("sort", flag.PanicOnError)
+  fs := flag.NewFlagSet("sort", flag.ExitOnError)
   var columnsString string
   var reverse, noInference bool
   fs.StringVar(&columnsString, "columns", "", "Columns to sort on")

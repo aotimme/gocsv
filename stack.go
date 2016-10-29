@@ -67,7 +67,7 @@ func StackFiles(inreaders []io.Reader, groupName string, groups []string)  {
 
 
 func RunStack(args []string) {
-  fs := flag.NewFlagSet("stack", flag.PanicOnError)
+  fs := flag.NewFlagSet("stack", flag.ExitOnError)
   var groupName, groupsString string
   var useFilenames bool
   fs.StringVar(&groupName, "group-name", "", "Name of the column for grouping")
