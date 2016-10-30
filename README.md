@@ -12,7 +12,7 @@ Subcommands:
 - [autoincrement](#autoincrement) - Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [sort](#sort) - Sort a CSV based on one or more columns.
-- [filter](#filter) - Extract rows whose column matches a regular expression.
+- [filter](#filter) - Extract rows whose columns match a regular expression.
 - [select](#select) - Extract specified columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
 
@@ -109,18 +109,19 @@ Arguments:
 
 ### filter
 
-Filter a CSV by rows whose column matches a regular expression
+Filter a CSV by rows whose columns match a regular expression
 
 Usage:
 
 ```shell
-gocsv filter --column COLUMN --regex REGEX FILE
+gocsv filter --columns COLUMNS --regex REGEX [--exclude] FILE
 ```
 
 Arguments:
 
-- `--column` Column to filter on. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` Columns to filter on. If a row matches on any of the columns, it will be included. See [Specifying Columns](#specifying-columns) for more details.
 - `--regex` Regular expression to use to match against.
+- `--exclude` (optional) Exclude rows that match. Default is to include.
 
 ### select
 
