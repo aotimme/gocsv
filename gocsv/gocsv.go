@@ -12,6 +12,8 @@ func usage() string {
   Valid subcommands are:
   - clean
     Clean a CSV of common formatting issues.
+  - tsv
+    Transform a CSV into a TSV.
   - headers
     View the headers from a CSV.
   - head
@@ -49,6 +51,8 @@ func main() {
     RunHeaders(args[2:])
   } else if subcommand == "clean" {
     RunClean(args[2:])
+  } else if subcommand == "tsv" {
+    RunTsv(args[2:])
   } else if subcommand == "head" {
     RunHead(args[2:])
   } else if subcommand == "tail" {

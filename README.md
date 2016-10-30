@@ -18,6 +18,7 @@ The tool is built for [pipelining](#pipelining), so every command (other than [s
 Subcommands:
 
 - [clean](#clean) - Clean a CSV of common formatting issues.
+- [tsv](#tsv) - Transform a CSV into a TSV.
 - [head](#head) - Extract the first _N_ rows from a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
@@ -45,6 +46,16 @@ gocsv clean [--no-trim] FILE
 Arguments:
 
 - `--no-trim` (optional) Do not remove trailing rows that are empty.
+
+### tsv
+
+Transform a CSV into a TSV. This can very useful if you want to pipe the result to `pbpaste` (OS X) in order to paste it into a spreadsheet tool.
+
+Usage:
+
+```shell
+gocsv tsv FILE
+```
 
 ### head
 
@@ -277,8 +288,8 @@ Download `gocsv-windows-amd64.zip`. Then good luck.
 TODO
 ----
 
-- [ ] Support `-` as a filename specifying `stdin` like csvkit does.
-- [ ] Support other delimiters (not just `,`) for both reading and writing.
-- [ ] Implement filtering by numeric types.
-- [ ] Add subcommand autocomplete (for `zshell` at least).
+- Support `-` as a filename specifying `stdin` like csvkit does.
+- Support other delimiters (not just `,`) for both reading and writing.
+- Implement filtering by numeric types.
+- Add subcommand autocomplete (for `zshell` at least).
 
