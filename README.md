@@ -49,7 +49,7 @@ Arguments:
 
 ### tsv
 
-Transform a CSV into a TSV. This can very useful if you want to pipe the result to `pbpaste` (OS X) in order to paste it into a spreadsheet tool.
+Transform a CSV into a TSV. This can very useful if you want to pipe the result to `pbcopy` (OS X) in order to paste it into a spreadsheet tool.
 
 Usage:
 
@@ -284,6 +284,7 @@ You should see the `gocsv` help message.
 ### Windows
 
 Download `gocsv-windows-amd64.zip`. Then good luck.
+
 
 TODO
 ----
