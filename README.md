@@ -9,7 +9,7 @@ Subcommands:
 - [clean](#clean) - Clean a CSV of common formatting issues.
 - [headers](#headers) - View the headers from a CSV.
 - [behead](#behead) - Remove the header from a CSV.
-- [autoincrement](#autoincrement) - Add a column of incrementing integers to a CSV.
+- [autoincrement](#autoincrement) (alias: `autoinc`)- Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose columns match a regular expression.
