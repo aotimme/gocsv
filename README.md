@@ -9,6 +9,7 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 - [N.B.](#nb)
 - [Pipelining](#pipelining)
 - [Installation](#installation)
+- [Examples](#examples)
 - [TODO](#todo)
 
 ## Introduction
@@ -222,7 +223,7 @@ Because all of the subcommands (other than [stack](#stack)) support receiving a 
 ```shell
 cat test-files/left-table.csv \
   | gocsv join --left --columns LID,RID test-files/right-table.csv \
-  | gocsv filter --column XYZ --regex "[en]e" \
+  | gocsv filter --columns XYZ --regex "[ev]e-\d$" \
   | gocsv select --columns LID,XYZ \
   | gocsv sort --columns LID,XYZ
 ```
@@ -285,6 +286,61 @@ You should see the `gocsv` help message.
 
 Download `gocsv-windows-amd64.zip`. Then good luck.
 
+## Examples
+
+##### Copy Values
+
+```shell
+gocsv tsv test-files/left-table.csv | pbcopy
+```
+
+##### Reorder Columns
+
+```shell
+gocsv select --columns 2,1 test-files/left-table.csv
+```
+
+##### Duplicate Columns
+
+```shell
+gocsv select --columns 1,1,2,2 test-files/left-table.csv
+```
+
+##### VLOOKUP aka Join
+
+```shell
+gocsv join --left --columns LID,RID test-files/left-table.csv test-files/right-table.csv
+```
+
+##### Distinct Column Values
+
+```shell
+gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq | sort
+```
+
+##### Count of Distinct Column Values
+
+```shell
+gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq -c | sort -nr
+```
+
+##### Extract Rows Matching Regular Expression
+
+```shell
+gocsv filter --columns ABC --regex "-1$" test-files/left-table.csv
+```
+
+##### Sort by Multiple Columns
+
+```shell
+gocsv sort --columns LID,ABC --reverse test-files/left-table.csv
+```
+
+##### Combine Multiple CSVs
+
+```shell
+gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" test-files/stack-1.csv test-files/stack-2.csv test-files/stack-3.csv
+```
 
 TODO
 ----
