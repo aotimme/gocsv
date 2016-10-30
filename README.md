@@ -1,6 +1,17 @@
 # GoCSV
 
-Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive.
+Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive. And written in Go.
+
+### Table of Contents
+
+- [Introduction](#introduction)
+- [Subcommands](#subcommands)
+- [N.B.](#nb)
+- [Pipelining](#pipelining)
+- [Installation](#installation)
+- [TODO](#todo)
+
+## Introduction
 
 The tool is built for pipelining, so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
 
@@ -180,6 +191,18 @@ cat test-files/left-table.csv \
 For the latest pre-built binaries, see the [Latest Release](https://github.com/DataFoxCo/gocsv/releases/tag/latest) page.
 
 ### Apple OS X
+
+#### Simple Version
+
+Open a Terminal window and paste the following command:
+
+```shell
+/bin/bash <(curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install-latest-darwin-amd64.sh)
+```
+
+This will install `gocsv` at `/usr/local/bin/gocsv`.
+
+#### Detailed Version
 
 To install the pre-built binary for Apple OS X, download the `gocsv-darwin-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
 
