@@ -119,7 +119,7 @@ gocsv filter --columns COLUMNS --regex REGEX [--exclude] FILE
 
 Arguments:
 
-- `--columns` Columns to filter on. If a row matches on any of the columns, it will be included. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` A comma-separated list of the columns to filter against. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
 - `--regex` Regular expression to use to match against.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
 
