@@ -2,12 +2,14 @@
 
 Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive.
 
-The tool is built for pipelining, so every command (other than [headers](#headers) and [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
+The tool is built for pipelining, so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
 
 Subcommands:
 
+- [clean](#clean) - Clean a CSV of common formatting issues.
 - [headers](#headers) - View the headers from a CSV.
 - [behead](#behead) - Remove the header from a CSV.
+- [autoincrement](#autoincrement) - Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose column matches a regular expression.
@@ -16,6 +18,20 @@ Subcommands:
 
 
 ## Subcommands
+
+### clean
+
+Clean a CSV of common formatting issues. Currently this consists of making sure all rows are the same length (padding short rows and trimming long ones) and removing empty lines at the end.
+
+Usage:
+
+```shell
+gocsv clean [--no-trim] FILE
+```
+
+Arguments:
+
+- `--no-trim` (optional) Do not remove trailing rows that are empty.
 
 ### headers
 
@@ -37,6 +53,24 @@ Usage:
 gocsv behead FILE
 ```
 
+### autoincrement
+
+Append (or prepend) a column of incrementing integers to each row. This can be helpful to be able to map back to the original row after a number of transformations.
+
+Alias: `autoinc`
+
+Usage:
+
+```shell
+gocsv autoincrement [--prepend] [--name NAME] [--seed SEED] FILE
+```
+
+Arguments:
+
+- `--prepend` (optional) Prepend the new column rather than the default append.
+- `--name` (optional) Specify a name for the autoincrementing column. Defaults to `ID`.
+- `--seed` (optional) Specify the integer to begin incrementing from. Defaults to `1`.
+
 ### stack
 
 Stack multiple CSVs to create a larger CSV. Optionally include an indication of which file a row came from in the final CSV.
@@ -54,6 +88,8 @@ Arguments:
 - `--group-name` (optional) Name of the grouping column in the final CSV.
 
 Note that `--groups` and `--filenames` are mutually exclusive.
+
+Also note that the `stack` subcommand does not support piping from standard input.
 
 ### sort
 
@@ -128,7 +164,7 @@ When specifying a column on the command line, you can specify either than name o
 
 ## Pipelining
 
-Because all of the subcommands (other than [headers](#headers) and [stack](#stack)) support receiving a CSV from standard input, you can easily pipeline:
+Because all of the subcommands (other than [stack](#stack)) support receiving a CSV from standard input, you can easily pipeline:
 
 ```shell
 cat test-files/left-table.csv \
@@ -145,6 +181,8 @@ See the [releases](https://github.com/DataFoxCo/gocsv/releases) page for pre-bui
 TODO
 ----
 
-- [ ] Support other delimiters (not just `,`). For reading and writing.
+- [ ] Support `-` as a filename specifying `stdin` like csvkit does.
+- [ ] Support other delimiters (not just `,`) for both reading and writing.
 - [ ] Implement filtering by numeric types.
-- [ ] Add subcommand autocomplete (for `zshell` at least)
+- [ ] Add subcommand autocomplete (for `zshell` at least).
+

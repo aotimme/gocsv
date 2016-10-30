@@ -15,8 +15,12 @@ func main() {
   subcommand := args[1]
   if subcommand == "headers" {
     RunHeaders(args[2:])
+  } else if subcommand == "clean" {
+    RunClean(args[2:])
   } else if subcommand == "behead" {
     RunBehead(args[2:])
+  } else if subcommand == "autoinc" || subcommand == "autoincrement"{
+    RunAutoIncrement(args[2:])
   } else if subcommand == "stack" {
     RunStack(args[2:])
   } else if subcommand == "filter" {
