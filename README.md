@@ -6,10 +6,10 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 
 - [Introduction](#introduction)
 - [Subcommands](#subcommands)
-- [N.B.](#nb)
+- [Specifying Columns](#specifying-columns)
 - [Pipelining](#pipelining)
-- [Installation](#installation)
 - [Examples](#examples)
+- [Installation](#installation)
 - [TODO](#todo)
 
 ## Introduction
@@ -210,11 +210,9 @@ Arguments:
 
 Note that by default it will perform an inner join. It will exit if you specify multiple types of join.
 
-## N.B.
+## Specifying Columns
 
-### Specifying Columns
-
-When specifying a column on the command line, you can specify either than name or the index of the column. The tool will always try to interpret the column by index, and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the the first column that matches.
+When specifying a column on the command line, you can specify either the index or the name of the column. The tool will always try to interpret the column first by index and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the first column that is an exact case-sensitive match.
 
 ## Pipelining
 
@@ -226,6 +224,62 @@ cat test-files/left-table.csv \
   | gocsv filter --columns XYZ --regex "[ev]e-\d$" \
   | gocsv select --columns LID,XYZ \
   | gocsv sort --columns LID,XYZ
+```
+
+## Examples
+
+##### Copy Values
+
+```shell
+gocsv tsv test-files/left-table.csv | pbcopy
+```
+
+##### Reorder Columns
+
+```shell
+gocsv select --columns 2,1 test-files/left-table.csv
+```
+
+##### Duplicate Columns
+
+```shell
+gocsv select --columns 1,1,2,2 test-files/left-table.csv
+```
+
+##### VLOOKUP aka Join
+
+```shell
+gocsv join --left --columns LID,RID test-files/left-table.csv test-files/right-table.csv
+```
+
+##### Distinct Column Values
+
+```shell
+gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq | sort
+```
+
+##### Count of Distinct Column Values
+
+```shell
+gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq -c | sort -nr
+```
+
+##### Extract Rows Matching Regular Expression
+
+```shell
+gocsv filter --columns ABC --regex "-1$" test-files/left-table.csv
+```
+
+##### Sort by Multiple Columns
+
+```shell
+gocsv sort --columns LID,ABC --reverse test-files/left-table.csv
+```
+
+##### Combine Multiple CSVs
+
+```shell
+gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" test-files/stack-1.csv test-files/stack-2.csv test-files/stack-3.csv
 ```
 
 ## Installation
@@ -285,62 +339,6 @@ You should see the `gocsv` help message.
 ### Windows
 
 Download `gocsv-windows-amd64.zip`. Then good luck.
-
-## Examples
-
-##### Copy Values
-
-```shell
-gocsv tsv test-files/left-table.csv | pbcopy
-```
-
-##### Reorder Columns
-
-```shell
-gocsv select --columns 2,1 test-files/left-table.csv
-```
-
-##### Duplicate Columns
-
-```shell
-gocsv select --columns 1,1,2,2 test-files/left-table.csv
-```
-
-##### VLOOKUP aka Join
-
-```shell
-gocsv join --left --columns LID,RID test-files/left-table.csv test-files/right-table.csv
-```
-
-##### Distinct Column Values
-
-```shell
-gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq | sort
-```
-
-##### Count of Distinct Column Values
-
-```shell
-gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq -c | sort -nr
-```
-
-##### Extract Rows Matching Regular Expression
-
-```shell
-gocsv filter --columns ABC --regex "-1$" test-files/left-table.csv
-```
-
-##### Sort by Multiple Columns
-
-```shell
-gocsv sort --columns LID,ABC --reverse test-files/left-table.csv
-```
-
-##### Combine Multiple CSVs
-
-```shell
-gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" test-files/stack-1.csv test-files/stack-2.csv test-files/stack-3.csv
-```
 
 TODO
 ----
