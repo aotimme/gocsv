@@ -176,7 +176,7 @@ cat test-files/left-table.csv \
 
 ## Installation
 
-See the [releases](https://github.com/DataFoxCo/gocsv/releases) page for pre-built binaries.
+For the latest pre-built binaries, see the [Latest Release](https://github.com/DataFoxCo/gocsv/releases/tag/latest) page.
 
 ### Apple OS X
 
