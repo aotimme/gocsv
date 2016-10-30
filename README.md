@@ -178,6 +178,48 @@ cat test-files/left-table.csv \
 
 See the [releases](https://github.com/DataFoxCo/gocsv/releases) page for pre-built binaries.
 
+### Apple OS X
+
+To install the pre-built binary for Apple OS X, download the `gocsv-darwin-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
+
+```shell
+cd ~/Downloads
+unzip gocsv-darwin-amd64.zip
+mv gocsv-darwin-amd64/gocsv /usr/local/bin
+rmdir gocsv-darwin-amd64
+```
+
+To verify that it has installed, open a _new_ Terminal windo and run
+
+```shell
+gocsv help
+```
+
+You should see the `gocsv` help message.
+
+### Linux
+
+Installing the pre-built binary for Linux is very similar to installing the binary for Apple OS X. First, download `gocsv-linux-amd64.zip`. Assuming this downloads to your `~/Downloads` directory, open a Terminal window and run the following commands:
+
+```shell
+cd ~/Downloads
+unzip gocsv-linux-amd64.zip
+mv gocsv-linux-amd64/gocsv /usr/local/bin
+rmdir gocsv-linux-amd64
+```
+
+To verify that it has installed, open a _new_ Terminal windo and run
+
+```shell
+gocsv help
+```
+
+You should see the `gocsv` help message.
+
+### Windows
+
+Download `gocsv-windows-amd64.zip`. Then good luck.
+
 TODO
 ----
 
