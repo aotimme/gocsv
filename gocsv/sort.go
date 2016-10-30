@@ -52,14 +52,14 @@ func RunSort(args []string) {
   }
   if columnsString == "" {
     fmt.Fprintln(os.Stderr, "Missing argument --columns")
-    return
+    os.Exit(2)
   }
   columns := GetArrayFromCsvString(columnsString)
 
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only filter one table")
-    return
+    os.Exit(2)
   }
   var inreader io.Reader
   if len(moreArgs) == 1 {

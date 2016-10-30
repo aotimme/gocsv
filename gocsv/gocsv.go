@@ -14,6 +14,10 @@ func usage() string {
     Clean a CSV of common formatting issues.
   - headers
     View the headers from a CSV.
+  - head
+    Extract the first N rows from a CSV.
+  - tail
+    Extract the last N rows from a CSV.
   - behead
     Remove the header from a CSV.
   - autoincrement
@@ -45,6 +49,10 @@ func main() {
     RunHeaders(args[2:])
   } else if subcommand == "clean" {
     RunClean(args[2:])
+  } else if subcommand == "head" {
+    RunHead(args[2:])
+  } else if subcommand == "tail" {
+    RunTail(args[2:])
   } else if subcommand == "behead" {
     RunBehead(args[2:])
   } else if subcommand == "autoinc" || subcommand == "autoincrement"{

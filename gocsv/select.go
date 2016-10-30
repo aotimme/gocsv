@@ -112,14 +112,14 @@ func RunSelect(args []string) {
   }
   if columnsString == "" {
     fmt.Fprintf(os.Stderr, "Missing required argument --columns")
-    return
+    os.Exit(2)
   }
   columns := GetArrayFromCsvString(columnsString)
   var inreader io.Reader
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only filter one table")
-    return
+    os.Exit(2)
   }
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])

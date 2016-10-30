@@ -217,7 +217,7 @@ func RunJoin(args []string) {
   }
   if numJoins > 1 {
     fmt.Fprintln(os.Stderr, "Must only specify zero or one of --left, --right, or --outer")
-    return
+    os.Exit(2)
   }
   c := csv.NewReader(strings.NewReader(columnsString))
   rows, err := c.ReadAll()
@@ -227,7 +227,7 @@ func RunJoin(args []string) {
   columns := rows[0]
   if len(columns) < 1 || len(columns) > 2 {
     fmt.Fprintln(os.Stderr, "Invalid argument for --columns")
-    return
+    os.Exit(2)
   }
   if len(columns) == 1 {
     columns = append(columns, columns[0])
@@ -235,10 +235,10 @@ func RunJoin(args []string) {
   moreArgs := fs.Args()
   if len(moreArgs) == 0 {
     fmt.Fprintln(os.Stderr, "Missing right table to join against")
-    return
+    os.Exit(2)
   } else if len(moreArgs) > 2 {
     fmt.Fprintln(os.Stderr, "Too many join tables")
-    return
+    os.Exit(2)
   }
   var leftReader, rightReader io.Reader
   if len(moreArgs) == 1 {

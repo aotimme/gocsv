@@ -82,7 +82,7 @@ func RunClean(args []string) {
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only clean one file")
-    return
+    os.Exit(2)
   }
   var inreader io.Reader
   if len(moreArgs) == 1 {

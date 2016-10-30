@@ -13,11 +13,13 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 
 ## Introduction
 
-The tool is built for pipelining, so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
+The tool is built for [pipelining](#pipelining), so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
 
 Subcommands:
 
 - [clean](#clean) - Clean a CSV of common formatting issues.
+- [head](#head) - Extract the first _N_ rows from a CSV.
+- [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
 - [behead](#behead) - Remove the header from a CSV.
 - [autoincrement](#autoincrement) (alias: `autoinc`)- Add a column of incrementing integers to a CSV.
@@ -43,6 +45,34 @@ gocsv clean [--no-trim] FILE
 Arguments:
 
 - `--no-trim` (optional) Do not remove trailing rows that are empty.
+
+### head
+
+Extract the first _N_ rows from a CSV.
+
+Usage:
+
+```shell
+gocsv head [-n N] FILE
+```
+
+Arguments:
+
+- `-n` (optional) The number of rows to extract. If `N` is an integer, it will extract the first _N_ rows. If `N` is prepended with `+`, it will extract all except the last _N_ rows.
+
+### tail
+
+Extract the last _N_ rows from a CSV.
+
+Usage:
+
+```shell
+gocsv tail [-n N] FILE
+```
+
+Arguments:
+
+- `-n` (optional) The number of rows to extract. If `N` is an integer, it will extract the last _N_ rows. If `N` is prepended with `+`, it will extract all except the first _N_ rows.
 
 ### headers
 
@@ -172,7 +202,7 @@ Note that by default it will perform an inner join. It will exit if you specify 
 
 ### Specifying Columns
 
-When specifying a column on the command line, you can specify either than name or the index of the column. The tool will _always_ try to interpret the column by index, and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the the _first_ column that matches.
+When specifying a column on the command line, you can specify either than name or the index of the column. The tool will always try to interpret the column by index, and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the the first column that matches.
 
 ## Pipelining
 

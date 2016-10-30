@@ -70,13 +70,13 @@ func RunFilter(args []string) {
   }
   if regex == "" || columnsString == "" {
     fmt.Fprintln(os.Stderr, "Missing required arguments --regex or --columns\n")
-    return
+    os.Exit(2)
   }
   columns := GetArrayFromCsvString(columnsString)
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only filter one table")
-    return
+    os.Exit(2)
   }
   var inreader io.Reader
   if len(moreArgs) == 1 {

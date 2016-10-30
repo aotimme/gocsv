@@ -36,7 +36,7 @@ func Behead(inreader io.Reader) {
 func RunBehead(args []string) {
   if len(args) > 1 {
     fmt.Fprintln(os.Stderr, "Can only behead one table")
-    return
+    os.Exit(2)
   }
   var inreader io.Reader
   if len(args) == 1 {

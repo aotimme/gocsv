@@ -26,7 +26,7 @@ func ShowHeaders(inreader io.Reader) {
 func RunHeaders(args []string) {
   if len(args) > 1 {
     fmt.Fprintln(os.Stderr, "Can only show headers for one table")
-    return
+    os.Exit(2)
   }
   var inreader io.Reader
   if len(args) == 1 {
