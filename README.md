@@ -96,9 +96,9 @@ gocsv behead FILE
 
 ### autoincrement
 
-Append (or prepend) a column of incrementing integers to each row. This can be helpful to be able to map back to the original row after a number of transformations.
+_Alias:_ `autoinc`
 
-Alias: `autoinc`
+Append (or prepend) a column of incrementing integers to each row. This can be helpful to be able to map back to the original row after a number of transformations.
 
 Usage:
 
@@ -243,7 +243,7 @@ mv gocsv-darwin-amd64/gocsv /usr/local/bin
 rmdir gocsv-darwin-amd64
 ```
 
-To verify that it has installed, open a _new_ Terminal windo and run
+To verify that it has installed, open a _new_ Terminal window and run
 
 ```shell
 gocsv help
@@ -262,7 +262,7 @@ mv gocsv-linux-amd64/gocsv /usr/local/bin
 rmdir gocsv-linux-amd64
 ```
 
-To verify that it has installed, open a _new_ Terminal windo and run
+To verify that it has installed, open a _new_ Terminal window and run
 
 ```shell
 gocsv help
