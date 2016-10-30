@@ -2,7 +2,7 @@
 
 Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive.
 
-The tool is built for pipelining, so every command (other than [headers](#headers)) accepts a CSV from standard input, and every command outputs to standard out.
+The tool is built for pipelining, so every command (other than [headers](#headers) and [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
 
 Subcommands:
 
@@ -128,7 +128,7 @@ When specifying a column on the command line, you can specify either than name o
 
 ## Pipelining
 
-Because all of the subcommands (other than [headers](#headers)) support receiving a CSV from standard input, you can easily pipeline:
+Because all of the subcommands (other than [headers](#headers) and [stack](#stack)) support receiving a CSV from standard input, you can easily pipeline:
 
 ```shell
 cat test-files/left-table.csv \
