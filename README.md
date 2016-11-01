@@ -10,7 +10,6 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 - [Pipelining](#pipelining)
 - [Examples](#examples)
 - [Installation](#installation)
-- [TODO](#todo)
 
 ## Introduction
 
@@ -26,6 +25,7 @@ Subcommands:
 - [behead](#behead) - Remove the header from a CSV.
 - [autoincrement](#autoincrement) (alias: `autoinc`)- Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
+- [split](#split) - Split a CSV into multiple files.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose columns match a regular expression.
 - [select](#select) - Extract specified columns.
@@ -143,6 +143,21 @@ Arguments:
 Note that `--groups` and `--filenames` are mutually exclusive.
 
 Also note that the `stack` subcommand does not support piping from standard input.
+
+### split
+
+Split a CSV into multiple files.
+
+Usage:
+
+```shell
+gocsv split --max-rows N [--filename-base FILENAME] FILE
+```
+
+Arguments:
+
+- `--max-rows` Maximum number of rows per final CSV.
+- `--filename-base` (optional) Prefix of the resulting files. The file outputs will be appended with `"-1.csv"`,`"-2.csv"`, etc. If not specified, the base filename will be the same as the base of the input filename, unless the input is specified by standard input. If so, then the base filename will be `out`.
 
 ### sort
 
@@ -339,12 +354,3 @@ You should see the `gocsv` help message.
 ### Windows
 
 Download `gocsv-windows-amd64.zip`. Then good luck.
-
-TODO
-----
-
-- Support `-` as a filename specifying `stdin` like csvkit does.
-- Support other delimiters (not just `,`) for both reading and writing.
-- Implement filtering by numeric types.
-- Add subcommand autocomplete (for `zshell` at least).
-

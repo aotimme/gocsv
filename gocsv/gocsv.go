@@ -26,6 +26,8 @@ func usage() string {
     Add a column of incrementing integers to a CSV.
   - stack
     Stack multiple CSVs into one CSV.
+  - split
+    Split a CSV into multiple files.
   - sort
     Sort a CSV based on one or more columns.
   - filter
@@ -63,6 +65,8 @@ func main() {
     RunAutoIncrement(args[2:])
   } else if subcommand == "stack" {
     RunStack(args[2:])
+  } else if subcommand == "split" {
+    RunSplit(args[2:])
   } else if subcommand == "filter" {
     RunFilter(args[2:])
   } else if subcommand == "select" {
