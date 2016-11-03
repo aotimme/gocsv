@@ -4,6 +4,7 @@ import (
   "encoding/csv"
   "flag"
   "fmt"
+  "io"
   "os"
   "strings"
 )
@@ -23,27 +24,37 @@ func concat(outrow, row1, row2 []string) {
 
 
 func InnerJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
-  leftCsv := NewInMemoryCsv(leftReader)
-  leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
+  leftHeader, err := leftReader.Read()
+  if err != nil {
+    panic(err)
+  }
+  leftColIndex := GetColumnIndexOrPanic(leftHeader, leftColname)
+  numLeftColumns := len(leftHeader)
+
   rightCsv := NewInMemoryCsv(rightReader)
   rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
-  rightCsv.Index(rightColIndex)
-
-
-  numLeftColumns := len(leftCsv.header)
   numRightColumns := len(rightCsv.header)
+  rightCsv.Index(rightColIndex)
 
   shellRow := make([]string, numLeftColumns + numRightColumns)
 
   writer := csv.NewWriter(os.Stdout)
 
   // Write header.
-  concat(shellRow, leftCsv.header, rightCsv.header)
+  concat(shellRow, leftHeader, rightCsv.header)
   writer.Write(shellRow)
   writer.Flush()
 
   // Write inner-joined rows.
-  for _, row := range leftCsv.rows {
+  for {
+    row, err := leftReader.Read()
+    if err != nil {
+      if err == io.EOF {
+        break
+      } else {
+        panic(err)
+      }
+    }
     rightRows := rightCsv.GetRowsMatchingIndexedColumn(row[leftColIndex])
     if len(rightRows) > 0 {
       for _, rightRow := range rightRows {
@@ -57,15 +68,17 @@ func InnerJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname st
 
 
 func LeftJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
-  leftCsv := NewInMemoryCsv(leftReader)
-  leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
+  leftHeader, err := leftReader.Read()
+  if err != nil {
+    panic(err)
+  }
+  leftColIndex := GetColumnIndexOrPanic(leftHeader, leftColname)
+  numLeftColumns := len(leftHeader)
 
   rightCsv := NewInMemoryCsv(rightReader)
   rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
-  rightCsv.Index(rightColIndex)
-
-  numLeftColumns := len(leftCsv.header)
   numRightColumns := len(rightCsv.header)
+  rightCsv.Index(rightColIndex)
 
   emptyRightRow := make([]string, numRightColumns)
   shellRow := make([]string, numLeftColumns + numRightColumns)
@@ -73,12 +86,20 @@ func LeftJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname str
   writer := csv.NewWriter(os.Stdout)
 
   // Write header.
-  concat(shellRow, leftCsv.header, rightCsv.header)
+  concat(shellRow, leftHeader, rightCsv.header)
   writer.Write(shellRow)
   writer.Flush()
 
-  // Write right-joined rows.
-  for _, row := range leftCsv.rows {
+  // Write left-joined rows.
+  for {
+    row, err := leftReader.Read()
+    if err != nil {
+      if err == io.EOF {
+        break
+      } else {
+        panic(err)
+      }
+    }
     rightRows := rightCsv.GetRowsMatchingIndexedColumn(row[leftColIndex])
     if len(rightRows) > 0 {
       for _, rightRow := range rightRows {
@@ -96,15 +117,17 @@ func LeftJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname str
 
 
 func RightJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
+  rightHeader, err := rightReader.Read()
+  if err != nil {
+    panic(err)
+  }
+  rightColIndex := GetColumnIndexOrPanic(rightHeader, rightColname)
+  numRightColumns := len(rightHeader)
+
   leftCsv := NewInMemoryCsv(leftReader)
   leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
   leftCsv.Index(leftColIndex)
-
-  rightCsv := NewInMemoryCsv(rightReader)
-  rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
-
   numLeftColumns := len(leftCsv.header)
-  numRightColumns := len(rightCsv.header)
 
   emptyLeftRow := make([]string, numLeftColumns)
   shellRow := make([]string, numLeftColumns + numRightColumns)
@@ -112,12 +135,20 @@ func RightJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname st
   writer := csv.NewWriter(os.Stdout)
 
   // Write header.
-  concat(shellRow, leftCsv.header, rightCsv.header)
+  concat(shellRow, leftCsv.header, rightHeader)
   writer.Write(shellRow)
   writer.Flush()
 
-  // Write left-joined rows.
-  for _, row := range rightCsv.rows {
+  // Write right-joined rows.
+  for {
+    row, err := rightReader.Read()
+    if err != nil {
+      if err == io.EOF {
+        break
+      } else {
+        panic(err)
+      }
+    }
     leftRows := leftCsv.GetRowsMatchingIndexedColumn(row[rightColIndex])
     if len(leftRows) > 0 {
       for _, leftRow := range leftRows {
@@ -138,20 +169,21 @@ func OuterJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname st
   // Basically do a left join and then append any rows from the right table
   // that weren't already included.
 
-  leftCsv := NewInMemoryCsv(leftReader)
-  leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
+  leftHeader, err := leftReader.Read()
+  if err != nil {
+    panic(err)
+  }
+  leftColIndex := GetColumnIndexOrPanic(leftHeader, leftColname)
+  numLeftColumns := len(leftHeader)
 
   rightCsv := NewInMemoryCsv(rightReader)
   rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
-  rightCsv.Index(rightColIndex)
-
-
-  numLeftColumns := len(leftCsv.header)
   numRightColumns := len(rightCsv.header)
+  rightCsv.Index(rightColIndex)
 
   emptyLeftRow := make([]string, numLeftColumns)
   emptyRightRow := make([]string, numRightColumns)
-  shellRow := make([]string, len(leftCsv.header) + len(rightCsv.header))
+  shellRow := make([]string, numLeftColumns + numRightColumns)
 
   // whether the row in the right column has been included already.
   rightIncludeStatus := make([]bool, len(rightCsv.rows))
@@ -159,12 +191,20 @@ func OuterJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname st
   writer := csv.NewWriter(os.Stdout)
 
   // Write header.
-  concat(shellRow, leftCsv.header, rightCsv.header)
+  concat(shellRow, leftHeader, rightCsv.header)
   writer.Write(shellRow)
   writer.Flush()
 
   // Write left-joined rows.
-  for _, row := range leftCsv.rows {
+  for {
+    row, err := leftReader.Read()
+    if err != nil {
+      if err == io.EOF {
+        break
+      } else {
+        panic(err)
+      }
+    }
     rightRowIndices := rightCsv.GetRowIndicesMatchingIndexedColumn(row[leftColIndex])
     if len(rightRowIndices) > 0 {
       for _, rightRowIndex := range rightRowIndices {
