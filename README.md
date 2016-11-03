@@ -13,7 +13,7 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 
 ## Introduction
 
-The tool is built for [pipelining](#pipelining), so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command outputs to standard out.
+The tool is built for [pipelining](#pipelining), so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command (other than [split](#split)) outputs to standard out.
 
 Subcommands:
 

@@ -4,7 +4,6 @@ import (
   "encoding/csv"
   "flag"
   "fmt"
-  "io"
   "os"
   "strings"
 )
@@ -23,7 +22,7 @@ func concat(outrow, row1, row2 []string) {
 }
 
 
-func InnerJoin(leftReader, rightReader io.Reader, leftColname, rightColname string) {
+func InnerJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
   leftCsv := NewInMemoryCsv(leftReader)
   leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
   rightCsv := NewInMemoryCsv(rightReader)
@@ -57,7 +56,7 @@ func InnerJoin(leftReader, rightReader io.Reader, leftColname, rightColname stri
 }
 
 
-func LeftJoin(leftReader, rightReader io.Reader, leftColname, rightColname string) {
+func LeftJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
   leftCsv := NewInMemoryCsv(leftReader)
   leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
 
@@ -96,7 +95,7 @@ func LeftJoin(leftReader, rightReader io.Reader, leftColname, rightColname strin
 }
 
 
-func RightJoin(leftReader, rightReader io.Reader, leftColname, rightColname string) {
+func RightJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
   leftCsv := NewInMemoryCsv(leftReader)
   leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
   leftCsv.Index(leftColIndex)
@@ -135,7 +134,7 @@ func RightJoin(leftReader, rightReader io.Reader, leftColname, rightColname stri
 }
 
 
-func OuterJoin(leftReader, rightReader io.Reader, leftColname, rightColname string) {
+func OuterJoin(leftReader, rightReader *csv.Reader, leftColname, rightColname string) {
   // Basically do a left join and then append any rows from the right table
   // that weren't already included.
 
@@ -240,28 +239,28 @@ func RunJoin(args []string) {
     fmt.Fprintln(os.Stderr, "Too many join tables")
     os.Exit(2)
   }
-  var leftReader, rightReader io.Reader
+  var leftReader, rightReader *csv.Reader
   if len(moreArgs) == 1 {
-    leftReader = os.Stdin
+    leftReader = csv.NewReader(os.Stdin)
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    rightReader = file
+    rightReader = csv.NewReader(file)
   } else {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    leftReader = file
+    leftReader = csv.NewReader(file)
     file, err = os.Open(moreArgs[1])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    rightReader = file
+    rightReader = csv.NewReader(file)
   }
   if left {
     LeftJoin(leftReader, rightReader, columns[0], columns[1])

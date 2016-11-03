@@ -4,12 +4,11 @@ import (
   "encoding/csv"
   "flag"
   "fmt"
-  "io"
   "os"
 )
 
 
-func SortCsv(inreader io.Reader, columns []string, reverse, noInference bool) {
+func SortCsv(inreader *csv.Reader, columns []string, reverse, noInference bool) {
   imc := NewInMemoryCsv(inreader)
   columnIndices := make([]int, len(columns))
   for i, column := range columns {
@@ -61,16 +60,16 @@ func RunSort(args []string) {
     fmt.Fprintln(os.Stderr, "Can only filter one table")
     os.Exit(2)
   }
-  var inreader io.Reader
+  var inreader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    inreader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    inreader = csv.NewReader(os.Stdin)
   }
 
   SortCsv(inreader, columns, reverse, noInference)
