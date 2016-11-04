@@ -2,6 +2,12 @@
 
 Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive. And written in Go.
 
+To install on Apple OS X, open a Terminal window and run
+
+```shell
+/bin/bash <(curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install-latest-darwin-amd64.sh)
+```
+
 ### Table of Contents
 
 - [Introduction](#introduction)
