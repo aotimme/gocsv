@@ -23,6 +23,7 @@ The tool is built for [pipelining](#pipelining), so every command (other than [s
 
 Subcommands:
 
+- [describe](#describe) - Get basic information about a CSV.
 - [clean](#clean) - Clean a CSV of common formatting issues.
 - [tsv](#tsv) - Transform a CSV into a TSV.
 - [head](#head) - Extract the first _N_ rows from a CSV.
@@ -39,6 +40,16 @@ Subcommands:
 
 
 ## Subcommands
+
+### describe
+
+Get basic information about a CSV. This will output the number of rows and columns in the CSV, the column headers in the CSV, and the inferred type of each column.
+
+Usage
+
+```shell
+gocsv describe FILE
+```
 
 ### clean
 
@@ -252,21 +263,22 @@ cat test-files/left-table.csv \
 
 ### Pipelining Support
 
-| Subcommand    |  Input   |  Output  |
-| ------------- | :------: | :------: |
-| clean         | &#x2714; | &#x2714; |
-| tsv           | &#x2714; | &#x2714; |
-| head          | &#x2714; | &#x2714; |
-| tail          | &#x2714; | &#x2714; |
-| header        | &#x2714; |   N/A    |
-| behead        | &#x2714; | &#x2714; |
-| autoincrement | &#x2714; | &#x2714; |
-| stack         |   Soon   | &#x2714; |
-| split         | &#x2714; |   N/A    |
-| sort          | &#x2714; | &#x2714; |
-| filter        | &#x2714; | &#x2714; |
-| select        | &#x2714; | &#x2714; |
-| join          | &#x2714; | &#x2714; |
+| Subcommand    |    Input    |  Output  |
+| ------------- | :---------: | :------: |
+| describe      |  &#x2714;   |   N/A    |
+| clean         |  &#x2714;   | &#x2714; |
+| tsv           |  &#x2714;   | &#x2714; |
+| head          |  &#x2714;   | &#x2714; |
+| tail          |  &#x2714;   | &#x2714; |
+| header        |  &#x2714;   |   N/A    |
+| behead        |  &#x2714;   | &#x2714; |
+| autoincrement |  &#x2714;   | &#x2714; |
+| stack         | Coming Soon | &#x2714; |
+| split         |  &#x2714;   |   N/A    |
+| sort          |  &#x2714;   | &#x2714; |
+| filter        |  &#x2714;   | &#x2714; |
+| select        |  &#x2714;   | &#x2714; |
+| join          |  &#x2714;   | &#x2714; |
 
 ## Examples
 

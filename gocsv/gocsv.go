@@ -10,6 +10,8 @@ import (
 func usage() string {
   return `Usage:
   Valid subcommands are:
+  - describe
+    Get basic information about a CSV.
   - clean
     Clean a CSV of common formatting issues.
   - tsv
@@ -49,7 +51,9 @@ func main() {
     return
   }
   subcommand := args[1]
-  if subcommand == "headers" {
+  if subcommand == "describe" {
+    RunDescribe(args[2:])
+  } else if subcommand == "headers" {
     RunHeaders(args[2:])
   } else if subcommand == "clean" {
     RunClean(args[2:])

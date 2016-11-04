@@ -41,6 +41,14 @@ func (imc *InMemoryCsv) Index(columnIndex int) {
   }
 }
 
+func (imc *InMemoryCsv) NumRows() int {
+  return len(imc.rows) - 1
+}
+
+func (imc *InMemoryCsv) NumColumns() int {
+  return len(imc.header)
+}
+
 
 func (imc *InMemoryCsv) GetRowIndicesMatchingIndexedColumn(value string) []int {
   indices, ok := imc.index[value]
@@ -61,7 +69,7 @@ func (imc *InMemoryCsv) GetRowsMatchingIndexedColumn(value string) [][]string {
 }
 
 func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
-  curType := FLOAT_TYPE
+  curType := INT_TYPE
   for _, row := range imc.rows {
     thisType := inferType(row[columnIndex])
     if thisType > curType {

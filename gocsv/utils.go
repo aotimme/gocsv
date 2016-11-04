@@ -49,20 +49,32 @@ func GetArrayFromCsvString(s string) []string {
 // NOTE: Order matters here. Ordered by strictness descending
 type ColumnType int
 const (
-  FLOAT_TYPE ColumnType = iota
-  INT_TYPE
+  INT_TYPE ColumnType = iota
+  FLOAT_TYPE
   STRING_TYPE
 )
 
-func inferType(elem string) ColumnType {
-  _, err := strconv.ParseFloat(elem, 64)
-  if err == nil {
-    return FLOAT_TYPE
+func ColumnTypeToString(columnType ColumnType) string {
+  if columnType == INT_TYPE {
+    return "int"
+  } else if columnType == FLOAT_TYPE {
+    return "float"
+  } else if columnType == STRING_TYPE {
+    return "string"
+  } else {
+    return ""
   }
-  err = nil
-  _, err = strconv.ParseInt(elem, 0, 0)
+}
+
+func inferType(elem string) ColumnType {
+  _, err := strconv.ParseInt(elem, 0, 0)
   if err == nil {
     return INT_TYPE
+  }
+  err = nil
+  _, err = strconv.ParseFloat(elem, 64)
+  if err == nil {
+    return FLOAT_TYPE
   }
   return STRING_TYPE
 }
