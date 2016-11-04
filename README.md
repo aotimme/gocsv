@@ -182,14 +182,17 @@ Filter a CSV by rows whose columns match a regular expression
 Usage:
 
 ```shell
-gocsv filter --columns COLUMNS --regex REGEX [--exclude] FILE
+gocsv filter [--columns COLUMNS] [--regex REGEX] [--gt N] [--gte N] [--lt N] [--lte N] [--exclude] FILE
 ```
 
 Arguments:
 
-- `--columns` A comma-separated list of the columns to filter against. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
-- `--regex` Regular expression to use to match against.
+- `--columns` (optional) A comma-separated list of the columns to filter against. If no columns are specified, then filter checks every column on a row. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
+- `--regex` (optional) Regular expression to use to match against.
+- `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against a number.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
+
+Note that one of `--regex`, `--gt` , `--gte`, `--lt`, or `--lte` must be specified.
 
 ### select
 
