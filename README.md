@@ -241,6 +241,24 @@ cat test-files/left-table.csv \
   | gocsv sort --columns LID,XYZ
 ```
 
+### Pipelining Support
+
+| Subcommand    |  Input   |  Output  |
+| ------------- | :------: | :------: |
+| clean         | &#x2714; | &#x2714; |
+| tsv           | &#x2714; | &#x2714; |
+| head          | &#x2714; | &#x2714; |
+| tail          | &#x2714; | &#x2714; |
+| header        | &#x2714; |   N/A    |
+| behead        | &#x2714; | &#x2714; |
+| autoincrement | &#x2714; | &#x2714; |
+| stack         |   Soon   | &#x2714; |
+| split         | &#x2714; |   N/A    |
+| sort          | &#x2714; | &#x2714; |
+| filter        | &#x2714; | &#x2714; |
+| select        | &#x2714; | &#x2714; |
+| join          | &#x2714; | &#x2714; |
+
 ## Examples
 
 ##### Copy Values

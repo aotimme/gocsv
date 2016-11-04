@@ -7,7 +7,6 @@
 - [ ] Support `-` as a filename specifying `stdin` like csvkit does.
 - [ ] Support other delimiters (not just `,`) for both reading and writing.
 - [ ] Implement filtering by numeric types (`--gt`, `--gte`, etc.).
-- [ ] Add table to README detailing pipelining support (Y/N stdin, Y/N stdout, notes).
 
 ## Maybe
 
