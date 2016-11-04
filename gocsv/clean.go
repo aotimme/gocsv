@@ -4,12 +4,10 @@ import (
   "encoding/csv"
   "flag"
   "fmt"
-  "io"
   "os"
 )
 
-func Clean(inreader io.Reader, noTrim bool) {
-  reader := csv.NewReader(inreader)
+func Clean(reader *csv.Reader, noTrim bool) {
   writer := csv.NewWriter(os.Stdout)
 
   // Disable errors when fields are varying length
@@ -84,16 +82,16 @@ func RunClean(args []string) {
     fmt.Fprintln(os.Stderr, "Can only clean one file")
     os.Exit(2)
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
-  Clean(inreader, noTrim)
+  Clean(reader, noTrim)
 }

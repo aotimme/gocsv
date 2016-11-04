@@ -9,12 +9,11 @@ import (
   "regexp"
 )
 
-func FilterRegex(inreader io.Reader, columns []string, expr string, exclude bool) {
+func FilterRegex(reader *csv.Reader, columns []string, expr string, exclude bool) {
   re, err := regexp.Compile(expr)
   if err != nil {
     panic(err)
   }
-  reader := csv.NewReader(inreader)
   writer := csv.NewWriter(os.Stdout)
 
   // Read header to get column index and write.
@@ -78,16 +77,16 @@ func RunFilter(args []string) {
     fmt.Fprintln(os.Stderr, "Can only filter one table")
     os.Exit(2)
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
-  FilterRegex(inreader, columns, regex, exclude)
+  FilterRegex(reader, columns, regex, exclude)
 }

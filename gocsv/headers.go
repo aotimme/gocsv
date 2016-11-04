@@ -3,13 +3,11 @@ package main
 import (
   "encoding/csv"
   "fmt"
-  "io"
   "os"
 )
 
 
-func ShowHeaders(inreader io.Reader) {
-  reader := csv.NewReader(inreader)
+func ShowHeaders(reader *csv.Reader) {
   for {
     header, err := reader.Read()
     if err != nil {
@@ -28,16 +26,16 @@ func RunHeaders(args []string) {
     fmt.Fprintln(os.Stderr, "Can only show headers for one table")
     os.Exit(2)
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(args) == 1 {
     file, err := os.Open(args[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
-  ShowHeaders(inreader)
+  ShowHeaders(reader)
 }

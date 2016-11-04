@@ -8,16 +8,12 @@ import (
   "os"
 )
 
-func StackFiles(inreaders []io.Reader, groupName string, groups []string)  {
+func StackFiles(readers []*csv.Reader, groupName string, groups []string)  {
   shouldAppendGroup := groupName != ""
   writer := csv.NewWriter(os.Stdout)
-  readers := make([]*csv.Reader, len(inreaders))
-  for i, inreader := range inreaders {
-    readers[i] = csv.NewReader(inreader)
-  }
 
   // Check that the headers match
-  headers := make([][]string, len(inreaders))
+  headers := make([][]string, len(readers))
   for i, reader := range readers {
     header, err := reader.Read()
     if err != nil {
@@ -108,14 +104,14 @@ func RunStack(args []string) {
     groupColumnName = ""
   }
 
-  inreaders := make([]io.Reader, len(filenames))
+  readers := make([]*csv.Reader, len(filenames))
   for i, filename := range filenames {
     file, err := os.Open(filename)
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreaders[i] = file
+    readers[i] = csv.NewReader(file)
   }
-  StackFiles(inreaders, groupColumnName, groups)
+  StackFiles(readers, groupColumnName, groups)
 }

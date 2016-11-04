@@ -9,8 +9,7 @@ import (
 )
 
 
-func ExcludeColumns(inreader io.Reader, columns []string) {
-  reader := csv.NewReader(inreader)
+func ExcludeColumns(reader *csv.Reader, columns []string) {
   writer := csv.NewWriter(os.Stdout)
 
   // Get the column indices to exclude.
@@ -62,8 +61,7 @@ func ExcludeColumns(inreader io.Reader, columns []string) {
 }
 
 
-func SelectColumns(inreader io.Reader, columns []string) {
-  reader := csv.NewReader(inreader)
+func SelectColumns(reader *csv.Reader, columns []string) {
   writer := csv.NewWriter(os.Stdout)
 
   outrow := make([]string, len(columns))
@@ -115,25 +113,25 @@ func RunSelect(args []string) {
     os.Exit(2)
   }
   columns := GetArrayFromCsvString(columnsString)
-  var inreader io.Reader
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
-    fmt.Fprintln(os.Stderr, "Can only filter one table")
+    fmt.Fprintln(os.Stderr, "Can only select one table")
     os.Exit(2)
   }
+  var reader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
   if exclude {
-    ExcludeColumns(inreader, columns)
+    ExcludeColumns(reader, columns)
   } else {
-    SelectColumns(inreader, columns)
+    SelectColumns(reader, columns)
   }
 }

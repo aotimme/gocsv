@@ -10,9 +10,7 @@ import (
   "strings"
 )
 
-func Split(inreader io.Reader, maxRows int, filenameBase string) {
-  reader := csv.NewReader(inreader)
-
+func Split(reader *csv.Reader, maxRows int, filenameBase string) {
   // Read and write header.
   header, err := reader.Read()
   if err != nil {
@@ -81,23 +79,23 @@ func RunSplit(args []string) {
     fmt.Fprintln(os.Stderr, "Can only split one file")
     return
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
     if filenameBase == "" {
       fileParts := strings.Split(moreArgs[0], ".")
       filenameBase = strings.Join(fileParts[:len(fileParts) - 1], ".")
     }
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
     if filenameBase == "" {
       filenameBase = "out"
     }
   }
-  Split(inreader, maxRows, filenameBase)
+  Split(reader, maxRows, filenameBase)
 }

@@ -9,8 +9,7 @@ import (
   "strconv"
 )
 
-func AutoIncrement(inreader io.Reader, name string, seed int, prepend bool) {
-  reader := csv.NewReader(inreader)
+func AutoIncrement(reader *csv.Reader, name string, seed int, prepend bool) {
   writer := csv.NewWriter(os.Stdout)
 
   // Read and write header.
@@ -77,16 +76,16 @@ func RunAutoIncrement(args []string) {
     fmt.Fprintln(os.Stderr, "Can only autoincrement one file")
     return
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
-  AutoIncrement(inreader, name, seed, prepend)
+  AutoIncrement(reader, name, seed, prepend)
 }

@@ -7,8 +7,7 @@ import (
   "os"
 )
 
-func Tsv(inreader io.Reader) {
-  reader := csv.NewReader(inreader)
+func Tsv(reader *csv.Reader) {
   writer := csv.NewWriter(os.Stdout)
   writer.Comma = '\t'
 
@@ -33,16 +32,16 @@ func RunTsv(args []string) {
     fmt.Fprintln(os.Stderr, "Can only convert one table to TSV")
     os.Exit(2)
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(args) == 1 {
     file, err := os.Open(args[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
-  Tsv(inreader)
+  Tsv(reader)
 }

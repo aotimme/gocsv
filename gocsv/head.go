@@ -12,8 +12,7 @@ import (
 )
 
 
-func HeadFromBottom(inreader io.Reader, numRows int) {
-  reader := csv.NewReader(inreader)
+func HeadFromBottom(reader *csv.Reader, numRows int) {
   writer := csv.NewWriter(os.Stdout)
 
   rows, err := reader.ReadAll()
@@ -37,8 +36,7 @@ func HeadFromBottom(inreader io.Reader, numRows int) {
 }
 
 
-func HeadFromTop(inreader io.Reader, numRows int) {
-  reader := csv.NewReader(inreader)
+func HeadFromTop(reader *csv.Reader, numRows int) {
   writer := csv.NewWriter(os.Stdout)
 
   // Read and write header.
@@ -90,16 +88,16 @@ func RunHead(args []string) {
     os.Exit(2)
     return
   }
-  var inreader io.Reader
+  var reader *csv.Reader
   if len(moreArgs) == 1 {
     file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
     defer file.Close()
-    inreader = file
+    reader = csv.NewReader(file)
   } else {
-    inreader = os.Stdin
+    reader = csv.NewReader(os.Stdin)
   }
   if strings.HasPrefix(numRowsStr, "+") {
     numRowsStr = strings.TrimPrefix(numRowsStr, "+")
@@ -107,12 +105,12 @@ func RunHead(args []string) {
     if err != nil {
       panic(err)
     }
-    HeadFromBottom(inreader, numRows)
+    HeadFromBottom(reader, numRows)
   } else {
     numRows, err := strconv.Atoi(numRowsStr)
     if err != nil {
       panic(err)
     }
-    HeadFromTop(inreader, numRows)
+    HeadFromTop(reader, numRows)
   }
 }
