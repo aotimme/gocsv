@@ -8,15 +8,12 @@ import (
 
 
 func ShowHeaders(reader *csv.Reader) {
-  for {
-    header, err := reader.Read()
-    if err != nil {
-      panic(err)
-    }
-    for i, name := range header {
-      fmt.Printf("%d: %s\n", i + 1, name)
-    }
-    break
+  header, err := reader.Read()
+  if err != nil {
+    panic(err)
+  }
+  for i, name := range header {
+    fmt.Printf("%d: %s\n", i + 1, name)
   }
 }
 

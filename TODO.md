@@ -7,6 +7,7 @@
 - [ ] Support `-` as a filename specifying `stdin` like csvkit does.
 - [ ] Support other delimiters (not just `,`) for both reading and writing.
 - [ ] Implement filtering by numeric types (`--gt`, `--gte`, etc.).
+- [ ] Replace `fmt.Fprintf` and `os.Exit(2)` with `log.Fatalf`.
 
 ## Maybe
 

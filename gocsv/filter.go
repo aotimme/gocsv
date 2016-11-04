@@ -9,11 +9,7 @@ import (
   "regexp"
 )
 
-func FilterRegex(reader *csv.Reader, columns []string, expr string, exclude bool) {
-  re, err := regexp.Compile(expr)
-  if err != nil {
-    panic(err)
-  }
+func FilterMatchFunc(reader *csv.Reader, columns []string, exclude bool, matchFunc func(string) bool ) {
   writer := csv.NewWriter(os.Stdout)
 
   // Read header to get column index and write.
@@ -42,7 +38,7 @@ func FilterRegex(reader *csv.Reader, columns []string, expr string, exclude bool
     }
     rowMatches := false
     for _, columnIndex := range columnIndices {
-      if re.MatchString(row[columnIndex]) {
+      if matchFunc(row[columnIndex]) {
         rowMatches = true
         break
       }
@@ -53,6 +49,17 @@ func FilterRegex(reader *csv.Reader, columns []string, expr string, exclude bool
       writer.Flush()
     }
   }
+}
+
+func FilterRegex(reader *csv.Reader, columns []string, expr string, exclude bool) {
+  re, err := regexp.Compile(expr)
+  if err != nil {
+    panic(err)
+  }
+  matchFunc := func(elem string) bool {
+    return re.MatchString(elem)
+  }
+  FilterMatchFunc(reader, columns, exclude, matchFunc)
 }
 
 
