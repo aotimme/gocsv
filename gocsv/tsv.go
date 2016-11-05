@@ -30,7 +30,7 @@ func Tsv(reader *csv.Reader) {
 func RunTsv(args []string) {
   if len(args) > 1 {
     fmt.Fprintln(os.Stderr, "Can only convert one table to TSV")
-    os.Exit(2)
+    os.Exit(1)
   }
   var reader *csv.Reader
   if len(args) == 1 {

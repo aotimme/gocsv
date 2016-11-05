@@ -135,14 +135,14 @@ func RunFilter(args []string) {
     }
   } else {
     fmt.Fprintln(os.Stderr, "Missing filter function")
-    os.Exit(2)
+    os.Exit(1)
   }
 
   // Get input CSV
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only filter one table")
-    os.Exit(2)
+    os.Exit(1)
   }
   var reader *csv.Reader
   if len(moreArgs) == 1 {

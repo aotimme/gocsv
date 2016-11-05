@@ -21,7 +21,7 @@ func ShowHeaders(reader *csv.Reader) {
 func RunHeaders(args []string) {
   if len(args) > 1 {
     fmt.Fprintln(os.Stderr, "Can only show headers for one table")
-    os.Exit(2)
+    os.Exit(1)
   }
   var reader *csv.Reader
   if len(args) == 1 {

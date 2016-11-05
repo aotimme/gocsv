@@ -47,7 +47,7 @@ func main() {
   if len(args) == 1 {
     fmt.Fprintln(os.Stderr, "Must provide a valid subcommand.")
     fmt.Fprintf(os.Stderr, "%s\n", usage())
-    os.Exit(2)
+    os.Exit(1)
     return
   }
   subcommand := args[1]
@@ -84,6 +84,6 @@ func main() {
   } else {
     fmt.Fprintf(os.Stderr, "Invalid subcommand \"%s\"\n", subcommand)
     fmt.Fprintf(os.Stderr, "%s\n", usage())
-    os.Exit(2)
+    os.Exit(1)
   }
 }

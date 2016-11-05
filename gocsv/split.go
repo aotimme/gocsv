@@ -72,7 +72,7 @@ func RunSplit(args []string) {
   }
   if maxRows < 1 {
     fmt.Fprintln(os.Stderr, "Invalid parameter for --max-rows")
-    os.Exit(2)
+    os.Exit(1)
   }
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {

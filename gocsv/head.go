@@ -79,13 +79,13 @@ func RunHead(args []string) {
   numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
   if !numRowsRegex.MatchString(numRowsStr) {
     fmt.Fprintln(os.Stderr, "Invalid argument to -n")
-    os.Exit(2)
+    os.Exit(1)
     return
   }
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only run head on one table")
-    os.Exit(2)
+    os.Exit(1)
     return
   }
   var reader *csv.Reader

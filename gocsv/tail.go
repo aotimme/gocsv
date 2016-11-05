@@ -79,12 +79,12 @@ func RunTail(args []string) {
   numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
   if !numRowsRegex.MatchString(numRowsStr) {
     fmt.Fprintln(os.Stderr, "Invalid argument to -n")
-    os.Exit(2)
+    os.Exit(1)
   }
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only run tail on one table")
-    os.Exit(2)
+    os.Exit(1)
   }
   var reader *csv.Reader
   if len(moreArgs) == 1 {

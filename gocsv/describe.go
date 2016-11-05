@@ -37,7 +37,7 @@ func RunDescribe(args []string) {
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only describe one CSV")
-    os.Exit(2)
+    os.Exit(1)
   }
   var reader *csv.Reader
   if len(moreArgs) == 1 {

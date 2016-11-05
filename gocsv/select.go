@@ -110,13 +110,13 @@ func RunSelect(args []string) {
   }
   if columnsString == "" {
     fmt.Fprintf(os.Stderr, "Missing required argument --columns")
-    os.Exit(2)
+    os.Exit(1)
   }
   columns := GetArrayFromCsvString(columnsString)
   moreArgs := fs.Args()
   if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only select one table")
-    os.Exit(2)
+    os.Exit(1)
   }
   var reader *csv.Reader
   if len(moreArgs) == 1 {
