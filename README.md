@@ -309,7 +309,7 @@ gocsv join --left --columns LID,RID test-files/left-table.csv test-files/right-t
 ##### Distinct Column Values
 
 ```shell
-gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq | sort
+gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uniq
 ```
 
 ##### Count of Distinct Column Values
