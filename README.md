@@ -29,6 +29,7 @@ Subcommands:
 - [head](#head) - Extract the first _N_ rows from a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
+- [rename](#rename) - Rename the headers of a CSV.
 - [behead](#behead) - Remove the header from a CSV.
 - [autoincrement](#autoincrement) (alias: `autoinc`)- Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
@@ -112,6 +113,21 @@ Usage:
 ```bash
 gocsv headers FILE
 ```
+
+### rename
+
+Rename the headers of a CSV.
+
+Usage:
+
+```shell
+gocsv rename --columns COLUMNS --names NAMES FILE
+```
+
+Arguments:
+
+- `--columns` A comma-separated list of the columns to rename. See [Specifying Columns](#specifying-columns) for more details.
+- `--names` A comma-separated list of names to change each column to. This must be the same length as and match the order of the `columns` argument.
 
 ### behead
 

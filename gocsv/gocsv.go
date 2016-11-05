@@ -18,6 +18,8 @@ func usage() string {
     Transform a CSV into a TSV.
   - headers
     View the headers from a CSV.
+  - rename
+    Rename the headers of a CSV.
   - head
     Extract the first N rows from a CSV.
   - tail
@@ -55,6 +57,8 @@ func main() {
     RunDescribe(args[2:])
   } else if subcommand == "headers" {
     RunHeaders(args[2:])
+  } else if subcommand == "rename" {
+    RunRename(args[2:])
   } else if subcommand == "clean" {
     RunClean(args[2:])
   } else if subcommand == "tsv" {
