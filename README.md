@@ -287,6 +287,7 @@ cat test-files/left-table.csv \
 | head          |  &#x2714;   | &#x2714; |
 | tail          |  &#x2714;   | &#x2714; |
 | header        |  &#x2714;   |   N/A    |
+| rename        |  &#x2714;   | &#x2714; |
 | behead        |  &#x2714;   | &#x2714; |
 | autoincrement |  &#x2714;   | &#x2714; |
 | stack         | Coming Soon | &#x2714; |
