@@ -31,13 +31,14 @@ Subcommands:
 - [headers](#headers) - View the headers from a CSV.
 - [rename](#rename) - Rename the headers of a CSV.
 - [behead](#behead) - Remove the header from a CSV.
-- [autoincrement](#autoincrement) (alias: `autoinc`)- Add a column of incrementing integers to a CSV.
+- [autoincrement](#autoincrement) (alias: `autoinc`) - Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [split](#split) - Split a CSV into multiple files.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose columns match a regular expression.
 - [select](#select) - Extract specified columns.
 - [sample](#sample) - Sample rows.
+- [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
 
 
@@ -242,6 +243,23 @@ Arguments:
 
 - `--columns` A comma-separated list (in order) of the columns to select. If you want to select a column multiple times, you can! See [Specifying Columns](#specifying-columns) for more details.
 - `--exclude` (optional) Exclude the specified columns (default is to include).
+
+### unique
+
+_Alias:_ `uniq`
+
+Extract unique rows based upon certain columns.
+
+Usage:
+
+```shell
+gocsv unique [--columns COLUMNS] [--sorted] FILE
+```
+
+Arguments
+
+- `--columns` (optional) A comma-separated list (in order) of the columns to use to define uniqueness. If no columns are specified, it will perform uniqueness across the entire row. See [Specifying Columns](#specifying-columns) for more details.
+- `--sorted` (optional) Specify whether the input is sorted. If the input is sorted, the unique subcommand will run more efficiently.
 
 ### sample
 

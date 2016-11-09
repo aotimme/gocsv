@@ -40,6 +40,8 @@ func usage() string {
     Extract specified columns.
   - sample
     Sample rows.
+  - unique
+    Extract unique rows based upon certain columns.
   - join
     Join two CSVs based on equality of elements in a column.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
@@ -85,6 +87,8 @@ func main() {
     RunSort(args[2:])
   } else if subcommand == "sample" {
     RunSample(args[2:])
+  } else if subcommand == "unique" || subcommand == "uniq" {
+    RunUnique(args[2:])
   } else if subcommand == "join" {
     RunJoin(args[2:])
   } else if subcommand == "help" {
