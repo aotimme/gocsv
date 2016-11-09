@@ -2,6 +2,8 @@ package main
 
 import (
   "encoding/csv"
+  "math/rand"
+  "time"
 )
 
 
@@ -119,4 +121,37 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
   }
 
   SortRowsBy(isLessFunc).Sort(imc.rows, reverse)
+}
+
+func (imc *InMemoryCsv) SampleRowIndicesWithReplacement(numRows, seed int) []int {
+  totalRows := imc.NumRows()
+  retval := make([]int, numRows)
+  for i := 0; i < numRows; i++ {
+    retval[i] = rand.Intn(totalRows)
+  }
+  return retval
+}
+
+func (imc *InMemoryCsv) SampleRowIndicesWithoutReplacement(numRows, seed int) []int {
+  totalRows := imc.NumRows()
+  permuted := rand.Perm(totalRows)
+  retval := make([]int, numRows)
+  for i := 0; i < numRows; i++ {
+    retval[i] = permuted[i]
+  }
+  return retval
+}
+
+func (imc *InMemoryCsv) SampleRowIndices(numRows int, replace bool, seed int) []int {
+  // NOTE: Updating global `rand` variable for the life of the proces...
+  if seed != 0 {
+    rand.Seed(int64(seed))
+  } else {
+    rand.Seed(time.Now().UTC().UnixNano())
+  }
+  if replace {
+    return imc.SampleRowIndicesWithReplacement(numRows, seed)
+  } else {
+    return imc.SampleRowIndicesWithoutReplacement(numRows, seed)
+  }
 }

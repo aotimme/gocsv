@@ -38,6 +38,8 @@ func usage() string {
     Extract rows whose column matches a regular expression.
   - select
     Extract specified columns.
+  - sample
+    Sample rows.
   - join
     Join two CSVs based on equality of elements in a column.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
@@ -81,6 +83,8 @@ func main() {
     RunSelect(args[2:])
   } else if subcommand == "sort" {
     RunSort(args[2:])
+  } else if subcommand == "sample" {
+    RunSample(args[2:])
   } else if subcommand == "join" {
     RunJoin(args[2:])
   } else if subcommand == "help" {

@@ -37,6 +37,7 @@ Subcommands:
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose columns match a regular expression.
 - [select](#select) - Extract specified columns.
+- [sample](#sample) - Sample rows.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
 
 
@@ -241,6 +242,22 @@ Arguments:
 
 - `--columns` A comma-separated list (in order) of the columns to select. If you want to select a column multiple times, you can! See [Specifying Columns](#specifying-columns) for more details.
 - `--exclude` (optional) Exclude the specified columns (default is to include).
+
+### sample
+
+Sample rows from a CSV
+
+Usage
+
+```shell
+gocsv sample -n NUM_ROWS [--replace] [--seed SEED] FILE
+```
+
+Arguments:
+
+- `-n` The number of rows to sample.
+- `--replace` (optional) Whether to sample with replacement. Defaults to `false`.
+- `--seed` (optional) Integer seed to use for generating pseudorandom numbers for sampling.
 
 ### join
 
