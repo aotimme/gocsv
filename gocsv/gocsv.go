@@ -12,6 +12,8 @@ func usage() string {
   Valid subcommands are:
   - describe
     Get basic information about a CSV.
+  - dimensions (alias: dims)
+    Get the dimensions of a CSV.
   - clean
     Clean a CSV of common formatting issues.
   - tsv
@@ -26,7 +28,7 @@ func usage() string {
     Extract the last N rows from a CSV.
   - behead
     Remove the header from a CSV.
-  - autoincrement
+  - autoincrement (alias: autoinc)
     Add a column of incrementing integers to a CSV.
   - stack
     Stack multiple CSVs into one CSV.
@@ -40,7 +42,7 @@ func usage() string {
     Extract specified columns.
   - sample
     Sample rows.
-  - unique
+  - unique (alias: uniq)
     Extract unique rows based upon certain columns.
   - join
     Join two CSVs based on equality of elements in a column.
@@ -59,6 +61,8 @@ func main() {
   subcommand := args[1]
   if subcommand == "describe" {
     RunDescribe(args[2:])
+  } else if subcommand == "dimensions" || subcommand == "dims" {
+    RunDimensions(args[2:])
   } else if subcommand == "headers" {
     RunHeaders(args[2:])
   } else if subcommand == "rename" {

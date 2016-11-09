@@ -24,6 +24,7 @@ The tool is built for [pipelining](#pipelining), so every command (other than [s
 Subcommands:
 
 - [describe](#describe) - Get basic information about a CSV.
+- [dimensions](#dimensions) (alias: `dims`) - Get the dimensions of a CSV.
 - [clean](#clean) - Clean a CSV of common formatting issues.
 - [tsv](#tsv) - Transform a CSV into a TSV.
 - [head](#head) - Extract the first _N_ rows from a CSV.
@@ -52,6 +53,18 @@ Usage
 
 ```shell
 gocsv describe FILE
+```
+
+### dimensions
+
+_Alias:_ `dims`
+
+Get the dimensions of a CSV.
+
+Usage
+
+```shell
+gocsv dimensions FILE
 ```
 
 ### clean
@@ -317,6 +330,7 @@ cat test-files/left-table.csv \
 | Subcommand    |    Input    |  Output  |
 | ------------- | :---------: | :------: |
 | describe      |  &#x2714;   |   N/A    |
+| dimensions    |  &#x2714;   |   N/A    |
 | clean         |  &#x2714;   | &#x2714; |
 | tsv           |  &#x2714;   | &#x2714; |
 | head          |  &#x2714;   | &#x2714; |
@@ -330,6 +344,8 @@ cat test-files/left-table.csv \
 | sort          |  &#x2714;   | &#x2714; |
 | filter        |  &#x2714;   | &#x2714; |
 | select        |  &#x2714;   | &#x2714; |
+| sample        |  &#x2714;   | &#x2714; |
+| unique        |  &#x2714;   | &#x2714; |
 | join          |  &#x2714;   | &#x2714; |
 
 ## Examples
