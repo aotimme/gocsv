@@ -141,7 +141,7 @@ gocsv rename --columns COLUMNS --names NAMES FILE
 
 Arguments:
 
-- `--columns` A comma-separated list of the columns to rename. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` (shorthand `-c`) A comma-separated list of the columns to rename. See [Specifying Columns](#specifying-columns) for more details.
 - `--names` A comma-separated list of names to change each column to. This must be the same length as and match the order of the `columns` argument.
 
 ### behead
@@ -219,7 +219,7 @@ gocsv sort --columns COLUMNS [--reverse] [--no-inference] FILE
 
 Arguments:
 
-- `--columns` A comma-separated list (in order) of the columns to sort against. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` (shorthand `-c`) A comma-separated list (in order) of the columns to sort against. See [Specifying Columns](#specifying-columns) for more details.
 - `--reverse` (optional) Reverse the order of sorting. By default the sort order is ascending.
 - `--no-inference` (optional) Skip type inference when sorting.
 
@@ -235,7 +235,7 @@ gocsv filter [--columns COLUMNS] [--regex REGEX] [--gt N] [--gte N] [--lt N] [--
 
 Arguments:
 
-- `--columns` (optional) A comma-separated list of the columns to filter against. If no columns are specified, then filter checks every column on a row. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` (optional, shorthand `-c`) A comma-separated list of the columns to filter against. If no columns are specified, then filter checks every column on a row. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
 - `--regex` (optional) Regular expression to use to match against.
 - `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against a number.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
@@ -254,7 +254,7 @@ gocsv select --columns COLUMNS [--exclude] FILE
 
 Arguments:
 
-- `--columns` A comma-separated list (in order) of the columns to select. If you want to select a column multiple times, you can! See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` (shorthand `-c`) A comma-separated list (in order) of the columns to select. If you want to select a column multiple times, you can! See [Specifying Columns](#specifying-columns) for more details.
 - `--exclude` (optional) Exclude the specified columns (default is to include).
 
 ### unique
@@ -271,7 +271,7 @@ gocsv unique [--columns COLUMNS] [--sorted] FILE
 
 Arguments
 
-- `--columns` (optional) A comma-separated list (in order) of the columns to use to define uniqueness. If no columns are specified, it will perform uniqueness across the entire row. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` (optional, shorthand `-c`) A comma-separated list (in order) of the columns to use to define uniqueness. If no columns are specified, it will perform uniqueness across the entire row. See [Specifying Columns](#specifying-columns) for more details.
 - `--sorted` (optional) Specify whether the input is sorted. If the input is sorted, the unique subcommand will run more efficiently.
 
 ### sample
@@ -302,7 +302,7 @@ gocsv join --columns COLUMNS [--left] [--right] [--outer] LEFT_FILE RIGHT_FILE
 
 Arguments:
 
-- `--columns` A comma-separated list (in order) of the columns to use for joining. You must specify either 1 or 2 columns. When 1 is specified, it will join the CSVs using that column in both the left and right CSV. When 2 are specified, it will join using the first column on the left CSV and the second column on the right CSV. See [Specifying Columns](#specifying-columns) for more details.
+- `--columns` (shorthand `-c`) A comma-separated list (in order) of the columns to use for joining. You must specify either 1 or 2 columns. When 1 is specified, it will join the CSVs using that column in both the left and right CSV. When 2 are specified, it will join using the first column on the left CSV and the second column on the right CSV. See [Specifying Columns](#specifying-columns) for more details.
 - `--left` (optional) Perform a left join.
 - `--right` (optional) Perform a right join.
 - `--outer` (optional) Perform an outer join.

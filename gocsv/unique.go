@@ -145,7 +145,8 @@ func RunUnique(args []string) {
   fs := flag.NewFlagSet("unique", flag.ExitOnError)
   var columnsString string
   var sorted bool
-  fs.StringVar(&columnsString, "columns", "", "Columns to define uniqueness")
+  fs.StringVar(&columnsString, "columns", "", "Columns to use for comparison")
+  fs.StringVar(&columnsString, "c", "", "Columns to use for comparison (shorthand)")
   fs.BoolVar(&sorted, "sorted", false, "Whether input CSV is already sorted")
   err := fs.Parse(args)
   if err != nil {

@@ -237,6 +237,7 @@ func RunJoin(args []string) {
   var columnsString string
   var left, right, outer bool
   fs.StringVar(&columnsString, "columns", "", "Columns to join on")
+  fs.StringVar(&columnsString, "c", "", "Columns to join on (shorthand)")
   fs.BoolVar(&left, "left", false, "Left join")
   fs.BoolVar(&right, "right", false, "Right join")
   fs.BoolVar(&outer, "outer", false, "Full outer join")

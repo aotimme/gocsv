@@ -103,6 +103,7 @@ func RunSelect(args []string) {
   var columnsString string
   var exclude bool
   fs.StringVar(&columnsString, "columns", "", "Columns to select")
+  fs.StringVar(&columnsString, "c", "", "Columns to select (shorthand)")
   fs.BoolVar(&exclude, "exclude", false, "Whether to exclude the specified columns")
   err := fs.Parse(args)
   if err != nil {

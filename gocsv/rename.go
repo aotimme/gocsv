@@ -46,7 +46,8 @@ func RenameColumns(reader *csv.Reader, columns, names []string) {
 func RunRename(args []string) {
   fs := flag.NewFlagSet("rename", flag.ExitOnError)
   var columnsString, namesString string
-  fs.StringVar(&columnsString, "columns", "", "Columns to select")
+  fs.StringVar(&columnsString, "columns", "", "Columns to rename")
+  fs.StringVar(&columnsString, "c", "", "Columns to rename (shorthand)")
   fs.StringVar(&namesString, "names", "", "New names for columns")
   err := fs.Parse(args)
   if err != nil {

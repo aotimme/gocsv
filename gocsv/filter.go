@@ -73,6 +73,7 @@ func RunFilter(args []string) {
   negativeInfinity := math.Inf(-1)
   fs.StringVar(&regex, "regex", "", "Regular expression for filtering")
   fs.StringVar(&columnsString, "columns", "", "Columns to filter against")
+  fs.StringVar(&columnsString, "c", "", "Columns to filter against (shorthand)")
   fs.BoolVar(&exclude, "exclude", false, "Exclude matching rows")
   fs.Float64Var(&gt, "gt", negativeInfinity, "Greater than")
   fs.Float64Var(&gte, "gte", negativeInfinity, "Greater than or equal to")
