@@ -152,10 +152,6 @@ func RunUnique(args []string) {
   if err != nil {
     panic(err)
   }
-  if columnsString == "" {
-    fmt.Fprintln(os.Stderr, "Missing argument --columns")
-    os.Exit(1)
-  }
   var columns []string
   if columnsString == "" {
     columns = make([]string, 0)
