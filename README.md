@@ -69,17 +69,22 @@ gocsv dimensions FILE
 
 ### clean
 
-Clean a CSV of common formatting issues. Currently this consists of making sure all rows are the same length (padding short rows and trimming long ones) and removing empty lines at the end.
+Clean a CSV of common formatting issues. Currently this consists of making sure all rows are the same length (padding short rows and trimming long ones) and removing empty rows at the end.
 
 Usage:
 
 ```shell
-gocsv clean [--no-trim] FILE
+gocsv clean [--verbose] [--no-trim] [--excel] [--numbers] FILE
 ```
 
 Arguments:
 
+- `--verbose` (optional) Print out to stderr when cleaning the CSV. 
 - `--no-trim` (optional) Do not remove trailing rows that are empty.
+- `--excel` (optional) Clean the CSV for issues that will cause problems with Excel. See [Excel specifications and limitations](https://support.office.com/en-us/article/Excel-specifications-and-limits-16c69c74-3d6a-4aaf-ba35-e6eb276e8eaa).
+  - Truncate any cells that exceed the maximum character limit of 32767.
+- `--numbers` (optional) Clean the CSV for issues that will cause problems with Numbers.
+  - Truncate the number of rows in the CSV at 65535, the maximum amount of rows that Numbers displays.
 
 ### tsv
 
