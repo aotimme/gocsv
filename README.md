@@ -19,7 +19,7 @@ To install on Apple OS X, open a Terminal window and run
 
 ## Introduction
 
-The tool is built for [pipelining](#pipelining), so every command (other than [stack](#stack)) accepts a CSV from standard input, and every command (other than [split](#split)) outputs to standard out.
+The tool is built for [pipelining](#pipelining), so most commands accept a CSV from standard output and output to standard output.
 
 Subcommands:
 
@@ -41,6 +41,7 @@ Subcommands:
 - [sample](#sample) - Sample rows.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
+- [xlsx](#xlsx) - Convert sheets of a XLSX file to CSVs.
 
 
 ## Subcommands
@@ -314,6 +315,20 @@ Arguments:
 
 Note that by default it will perform an inner join. It will exit if you specify multiple types of join.
 
+### xlsx
+
+Convert sheets of a XLSX file to CSVs.
+
+Usage:
+
+```shell
+gocsv xlsx [--dir] FILE
+```
+
+Arguments:
+
+- `--dir` (optional) Name of directory to output CSV conversions of sheets from `FILE`. If this is not specified, the command will output the CSV files to a directory with the same name as `FILE` (without the `.xlsx` extension).
+
 ## Specifying Columns
 
 When specifying a column on the command line, you can specify either the index or the name of the column. The tool will always try to interpret the column first by index and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the first column that is an exact case-sensitive match.
@@ -352,6 +367,7 @@ cat test-files/left-table.csv \
 | sample        |  &#x2714;   | &#x2714; |
 | unique        |  &#x2714;   | &#x2714; |
 | join          |  &#x2714;   | &#x2714; |
+| xlsx          |     N/A     |   N/A    |
 
 ## Examples
 

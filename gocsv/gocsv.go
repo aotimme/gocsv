@@ -46,6 +46,8 @@ func usage() string {
     Extract unique rows based upon certain columns.
   - join
     Join two CSVs based on equality of elements in a column.
+  - xlsx
+    Convert sheets of a XLSX file to CSVs.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
 }
 
