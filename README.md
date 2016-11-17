@@ -30,6 +30,7 @@ Subcommands:
 - [head](#head) - Extract the first _N_ rows from a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
+- [view](#view) - Display a CSV in a pretty tabular format.
 - [rename](#rename) - Rename the headers of a CSV.
 - [behead](#behead) - Remove header row(s) from a CSV.
 - [autoincrement](#autoincrement) (alias: `autoinc`) - Add a column of incrementing integers to a CSV.
@@ -134,6 +135,23 @@ Usage:
 ```bash
 gocsv headers FILE
 ```
+
+### view
+
+Display a CSV in a pretty tabular format.
+
+Usage:
+
+```shell
+gocsv view [-n N] [--max-width N] FILE
+```
+
+Arguments:
+
+- `-n` (optional) Display only the first _N_ rows of the CSV.
+- `--max-width` (optional, default 20) The maximum width of each cell for display. If a cell exceeds the maximum width, it will be truncated in the display.
+
+If the length of a cell exceeds `--max-width` it will be truncated with an ellipsis. If a cell contains a new-line character, only the first line will be displayed.
 
 ### rename
 
@@ -364,7 +382,8 @@ cat test-files/left-table.csv \
 | tsv           |  &#x2714;   | &#x2714; |
 | head          |  &#x2714;   | &#x2714; |
 | tail          |  &#x2714;   | &#x2714; |
-| header        |  &#x2714;   |   N/A    |
+| headers       |  &#x2714;   |   N/A    |
+| view          |  &#x2714;   |   N/A    |
 | rename        |  &#x2714;   | &#x2714; |
 | behead        |  &#x2714;   | &#x2714; |
 | autoincrement |  &#x2714;   | &#x2714; |

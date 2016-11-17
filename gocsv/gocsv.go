@@ -20,6 +20,8 @@ func usage() string {
     Transform a CSV into a TSV.
   - headers
     View the headers from a CSV.
+  - view
+    Display a CSV in a pretty tabular format.
   - rename
     Rename the headers of a CSV.
   - head
@@ -67,6 +69,8 @@ func main() {
     RunDimensions(args[2:])
   } else if subcommand == "headers" {
     RunHeaders(args[2:])
+  } else if subcommand == "view" {
+    RunView(args[2:])
   } else if subcommand == "rename" {
     RunRename(args[2:])
   } else if subcommand == "clean" {
