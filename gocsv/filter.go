@@ -67,14 +67,16 @@ func FilterMatchFunc(reader *csv.Reader, columns []string, exclude bool, matchFu
 func RunFilter(args []string) {
   fs := flag.NewFlagSet("filter", flag.ExitOnError)
   var regex, columnsString string
-  var exclude bool
+  var exclude, caseInsensitive bool
   var gt, gte, lt, lte float64
   positiveInfinity := math.Inf(1)
   negativeInfinity := math.Inf(-1)
-  fs.StringVar(&regex, "regex", "", "Regular expression for filtering")
   fs.StringVar(&columnsString, "columns", "", "Columns to filter against")
   fs.StringVar(&columnsString, "c", "", "Columns to filter against (shorthand)")
   fs.BoolVar(&exclude, "exclude", false, "Exclude matching rows")
+  fs.StringVar(&regex, "regex", "", "Regular expression for filtering")
+  fs.BoolVar(&caseInsensitive, "case-insensitive", false, "Make regular expression case insensitive")
+  fs.BoolVar(&caseInsensitive, "i", false, "Make regular expression case insensitive (shorthand)")
   fs.Float64Var(&gt, "gt", negativeInfinity, "Greater than")
   fs.Float64Var(&gte, "gte", negativeInfinity, "Greater than or equal to")
   fs.Float64Var(&lt, "lt", positiveInfinity, "Less than")
@@ -95,6 +97,9 @@ func RunFilter(args []string) {
   // Get match function
   var matchFunc func(string) bool
   if regex != "" {
+    if caseInsensitive {
+      regex = "(?i)" + regex
+    }
     re, err := regexp.Compile(regex)
     if err != nil {
       panic(err)
