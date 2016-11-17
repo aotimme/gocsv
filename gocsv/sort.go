@@ -43,6 +43,7 @@ func RunSort(args []string) {
   var columnsString string
   var reverse, noInference bool
   fs.StringVar(&columnsString, "columns", "", "Columns to sort on")
+  fs.StringVar(&columnsString, "c", "", "Columns to sort on (shorthand)")
   fs.BoolVar(&reverse, "reverse", false, "Sort in reverse")
   fs.BoolVar(&noInference, "no-inference", false, "Skip inference of input")
   err := fs.Parse(args)
