@@ -9,7 +9,7 @@ import (
   "github.com/tealeg/xlsx"
 )
 
-func ConvertXLSXSheet(dirname string, sheet *xlsx.Sheet) {
+func ConvertXLSXSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
   filename := fmt.Sprintf("%s/%s.csv", dirname, sheet.Name)
 
   file, err := os.Create(filename)
@@ -32,22 +32,63 @@ func ConvertXLSXSheet(dirname string, sheet *xlsx.Sheet) {
   }
 }
 
-func ConvertXLSX(filename, dirname string) {
+func ConvertXLSXFull(filename, dirname string) {
   xlsxFile, err := xlsx.OpenFile(filename)
   if err != nil {
     panic(err)
   }
   err = os.Mkdir(dirname, os.ModeDir | 0755)
   for _, sheet := range xlsxFile.Sheets {
-    ConvertXLSXSheet(dirname, sheet)
+    ConvertXLSXSheetToDirectory(dirname, sheet)
   }
 }
 
+func ConvertXLSXSheet(filename, sheetName string) {
+  xlsxFile, err := xlsx.OpenFile(filename)
+  if err != nil {
+    panic(err)
+  }
+
+  sheetNames := make([]string, len(xlsxFile.Sheets))
+  for i, sheet := range xlsxFile.Sheets {
+    sheetNames[i] = sheet.Name
+  }
+  sheetIndex := GetColumnIndexOrPanic(sheetNames, sheetName)
+
+  sheet := xlsxFile.Sheets[sheetIndex]
+  writer := csv.NewWriter(os.Stdout)
+  for _, row := range sheet.Rows {
+    csvRow := make([]string, 0)
+    for _, cell := range row.Cells {
+      cellValue, err := cell.FormattedValue()
+      if err != nil {
+        panic(err)
+      }
+      csvRow = append(csvRow, cellValue)
+    }
+    writer.Write(csvRow)
+    writer.Flush()
+  }
+}
+
+func ListXLXSSheets(filename string) {
+  xlsxFile, err := xlsx.OpenFile(filename)
+  if err != nil {
+    panic(err)
+  }
+
+  for i, sheet := range xlsxFile.Sheets {
+    fmt.Printf("%d: %s\n", i + 1, sheet.Name)
+  }
+}
 
 func RunXLSX(args []string) {
-  fs := flag.NewFlagSet("convert", flag.ExitOnError)
-  var dirname string
-  fs.StringVar(&dirname, "dir", "", "Name of folder sheets to")
+  fs := flag.NewFlagSet("xlsx", flag.ExitOnError)
+  var dirname, sheet string
+  var listSheets bool
+  fs.BoolVar(&listSheets, "list-sheets", false, "List sheets in file")
+  fs.StringVar(&dirname, "dirname", "", "Name of folder to output sheets to")
+  fs.StringVar(&sheet, "sheet", "", "Name of sheet to convert")
   err := fs.Parse(args)
   if err != nil {
     panic(err)
@@ -61,9 +102,17 @@ func RunXLSX(args []string) {
     os.Exit(1)
   }
   filename := moreArgs[0]
-  if dirname == "" {
-    fileParts := strings.Split(filename, ".")
-    dirname = strings.Join(fileParts[:len(fileParts) - 1], ".")
+  if listSheets {
+    ListXLXSSheets(filename)
+  } else {
+    if sheet == "" {
+      if dirname == "" {
+        fileParts := strings.Split(filename, ".")
+        dirname = strings.Join(fileParts[:len(fileParts) - 1], ".")
+      }
+      ConvertXLSXFull(filename, dirname)
+    } else {
+      ConvertXLSXSheet(filename, sheet)
+    }
   }
-  ConvertXLSX(filename, dirname)
 }

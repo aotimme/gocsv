@@ -41,7 +41,7 @@ Subcommands:
 - [sample](#sample) - Sample rows.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
-- [xlsx](#xlsx) - Convert sheets of a XLSX file to CSVs.
+- [xlsx](#xlsx) - Convert sheets of a XLSX file to CSV.
 
 
 ## Subcommands
@@ -243,6 +243,7 @@ Arguments:
 
 - `--columns` (optional, shorthand `-c`) A comma-separated list of the columns to filter against. If no columns are specified, then filter checks every column on a row. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
 - `--regex` (optional) Regular expression to use to match against.
+- `--case-insensitive` (optional, shorthand `-i`) When using the `--regex` flag, use this flag to specify a case insensitive match rather than the default case sensitive match.
 - `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against a number.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
 
@@ -317,17 +318,21 @@ Note that by default it will perform an inner join. It will exit if you specify 
 
 ### xlsx
 
-Convert sheets of a XLSX file to CSVs.
+Convert sheets of a XLSX file to CSV.
 
 Usage:
 
 ```shell
-gocsv xlsx [--dir] FILE
+gocsv xlsx [--list-sheets] [--dirname DIRNAME] [--sheet SHEET] FILE
 ```
 
 Arguments:
 
-- `--dir` (optional) Name of directory to output CSV conversions of sheets from `FILE`. If this is not specified, the command will output the CSV files to a directory with the same name as `FILE` (without the `.xlsx` extension).
+- `--list-sheets` (optional) List the sheets in the XLSX file.
+- `--sheet` (optional) Specify the sheet (by index or name) of the sheet to convert.
+- `--dirname` (optional) Name of directory to output CSV conversions of sheets from `FILE`. If this is not specified, the command will output the CSV files to a directory with the same name as `FILE` (without the `.xlsx` extension).
+
+By default the `xlsx` subcommand will convert all the sheets in `FILE` to CSVs to a directory with the same name as `FILE`.
 
 ## Specifying Columns
 

@@ -47,7 +47,7 @@ func usage() string {
   - join
     Join two CSVs based on equality of elements in a column.
   - xlsx
-    Convert sheets of a XLSX file to CSVs.
+    Convert sheets of a XLSX file to CSV.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
 }
 
