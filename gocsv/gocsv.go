@@ -27,7 +27,7 @@ func usage() string {
   - tail
     Extract the last N rows from a CSV.
   - behead
-    Remove the header from a CSV.
+    Remove header row(s) from a CSV.
   - autoincrement (alias: autoinc)
     Add a column of incrementing integers to a CSV.
   - stack

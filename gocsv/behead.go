@@ -2,18 +2,26 @@ package main
 
 import (
   "encoding/csv"
+  "flag"
   "fmt"
   "io"
   "os"
 )
 
-func Behead(reader *csv.Reader) {
+func Behead(reader *csv.Reader, numHeaders int) {
   writer := csv.NewWriter(os.Stdout)
 
-  // Get rid of the header.
-  _, err := reader.Read()
-  if err != nil {
-    panic(err)
+  // Get rid of the header rows.
+  for i := 0; i < numHeaders; i++ {
+    _, err := reader.Read()
+    if err != nil {
+      if err == io.EOF {
+        // If we remove _all_ the headers, then end early.
+        return
+      } else {
+        panic(err)
+      }
+    }
   }
 
   // Write rows.
@@ -33,13 +41,29 @@ func Behead(reader *csv.Reader) {
 
 
 func RunBehead(args []string) {
-  if len(args) > 1 {
+  fs := flag.NewFlagSet("behead", flag.ExitOnError)
+  var numHeaders int
+  fs.IntVar(&numHeaders, "n", 1, "Number of headers to remove")
+
+  err := fs.Parse(args)
+  if err != nil {
+    panic(err)
+  }
+
+  if numHeaders < 1 {
+    fmt.Fprintln(os.Stderr, "Invalid argument -n")
+    os.Exit(1)
+  }
+
+  // Get input CSV
+  moreArgs := fs.Args()
+  if len(moreArgs) > 1 {
     fmt.Fprintln(os.Stderr, "Can only behead one table")
     os.Exit(1)
   }
   var reader *csv.Reader
-  if len(args) == 1 {
-    file, err := os.Open(args[0])
+  if len(moreArgs) == 1 {
+    file, err := os.Open(moreArgs[0])
     if err != nil {
       panic(err)
     }
@@ -48,5 +72,5 @@ func RunBehead(args []string) {
   } else {
     reader = csv.NewReader(os.Stdin)
   }
-  Behead(reader)
+  Behead(reader, numHeaders)
 }

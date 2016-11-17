@@ -31,7 +31,7 @@ Subcommands:
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
 - [rename](#rename) - Rename the headers of a CSV.
-- [behead](#behead) - Remove the header from a CSV.
+- [behead](#behead) - Remove header row(s) from a CSV.
 - [autoincrement](#autoincrement) (alias: `autoinc`) - Add a column of incrementing integers to a CSV.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [split](#split) - Split a CSV into multiple files.
@@ -157,8 +157,12 @@ Remove the header from a CSV
 Usage:
 
 ```shell
-gocsv behead FILE
+gocsv behead [-n N] FILE
 ```
+
+Arguments:
+
+- `-n` (optional) Number of header rows to remove. Defaults to 1.
 
 ### autoincrement
 
