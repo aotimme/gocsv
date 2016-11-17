@@ -372,7 +372,9 @@ cat test-files/left-table.csv \
 | sample        |  &#x2714;   | &#x2714; |
 | unique        |  &#x2714;   | &#x2714; |
 | join          |  &#x2714;   | &#x2714; |
-| xlsx          |     N/A     |   N/A    |
+| xlsx          |     N/A     |    *     |
+
+\* `xlsx` sends output to standard out when using the `--sheet` flag.
 
 ## Examples
 
