@@ -95,6 +95,8 @@ func main() {
     RunUnique(args[2:])
   } else if subcommand == "join" {
     RunJoin(args[2:])
+  } else if subcommand == "xlsx" {
+    RunXLSX(args[2:])
   } else if subcommand == "help" {
     fmt.Fprintf(os.Stderr, "%s\n", usage())
   } else {
