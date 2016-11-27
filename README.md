@@ -295,13 +295,14 @@ Extract unique rows based upon certain columns.
 Usage:
 
 ```shell
-gocsv unique [--columns COLUMNS] [--sorted] FILE
+gocsv unique [--columns COLUMNS] [--sorted] [--count] FILE
 ```
 
 Arguments
 
 - `--columns` (optional, shorthand `-c`) A comma-separated list (in order) of the columns to use to define uniqueness. If no columns are specified, it will perform uniqueness across the entire row. See [Specifying Columns](#specifying-columns) for more details.
 - `--sorted` (optional) Specify whether the input is sorted. If the input is sorted, the unique subcommand will run more efficiently.
+- `--count` (optional) Append a column with the header "Count" to keep track of how many times that unique row occurred in the input.
 
 ### sample
 

@@ -8,5 +8,4 @@
 
 ## Maybe
 
-- [ ] Implement `view` subcommand with pretty printing.
 - [ ] Add subcommand autocomplete (for `zshell` at least).

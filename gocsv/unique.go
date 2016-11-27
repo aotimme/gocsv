@@ -6,6 +6,9 @@ import (
   "fmt"
   "io"
   "os"
+  "strconv"
+
+  "github.com/alphagov/router/trie"
 )
 
 
@@ -33,6 +36,64 @@ func rowMatchesOnIndices(rowA, rowB []string, columnIndices []int) bool {
   }
   return true
 }
+
+
+func UniqueifySortedWithCount(reader *csv.Reader, columns []string) {
+  header, err := reader.Read()
+  if err != nil {
+    panic(err)
+  }
+
+  shellRow := make([]string, len(header) + 1)
+
+  columnIndices := GetColumnIndicesOrAll(columns, header)
+
+  writer := csv.NewWriter(os.Stdout)
+
+  // Write header.
+  copy(shellRow, header)
+  shellRow[len(shellRow) - 1] = "Count"
+  writer.Write(shellRow)
+  writer.Flush()
+
+  // Read and write first row.
+  lastRow, err := reader.Read()
+  if err != nil {
+    if err == io.EOF {
+      return
+    } else {
+      panic(err)
+    }
+  }
+  numInRun := 1
+
+  // Write unique rows in order.
+  for {
+    row, err := reader.Read()
+    if err != nil {
+      if err == io.EOF {
+        break
+      } else {
+        panic(err)
+      }
+    }
+    if rowMatchesOnIndices(row, lastRow, columnIndices) {
+      numInRun++
+    } else {
+      copy(shellRow, lastRow)
+      shellRow[len(shellRow) - 1] = strconv.Itoa(numInRun)
+      writer.Write(shellRow)
+      writer.Flush()
+      lastRow = row
+      numInRun = 1
+    }
+  }
+  copy(shellRow, lastRow)
+  shellRow[len(shellRow) - 1] = strconv.Itoa(numInRun)
+  writer.Write(shellRow)
+  writer.Flush()
+}
+
 
 func UniqueifySorted(reader *csv.Reader, columns []string) {
   header, err := reader.Read()
@@ -78,33 +139,6 @@ func UniqueifySorted(reader *csv.Reader, columns []string) {
   }
 }
 
-func isInIndexMap(row []string, indices []int, indexMap map[string]interface{}) bool {
-  curMap := indexMap
-  for _, index := range indices {
-    cell := row[index]
-    curMapInterface, ok := curMap[cell]
-    if !ok {
-      return false
-    }
-    curMap = curMapInterface.(map[string]interface{})
-  }
-  return true
-}
-
-func addToIndexMap(row []string, indices []int, indexMap map[string]interface{}) {
-  prevMap := indexMap
-  for _, index := range indices {
-    cell := row[index]
-    curMapInterface, ok := prevMap[cell]
-    if ok {
-      prevMap = curMapInterface.(map[string]interface{})
-    } else {
-      curMap := make(map[string]interface{})
-      prevMap[cell] = curMap
-      prevMap = curMap
-    }
-  }
-}
 
 func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
   header, err := reader.Read()
@@ -120,7 +154,8 @@ func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
   writer.Write(header)
   writer.Flush()
 
-  seenRowsIndexed := make(map[string]interface{})
+  seenRowsTrie := trie.NewTrie()
+  lastRowArray := make([]string, len(columnIndices))
 
   // Write unique rows in order.
   for {
@@ -132,10 +167,61 @@ func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
         panic(err)
       }
     }
-
-    if !isInIndexMap(row, columnIndices, seenRowsIndexed) {
-      addToIndexMap(row, columnIndices, seenRowsIndexed)
+    for i, columnIndex := range columnIndices {
+      lastRowArray[i] = row[columnIndex]
+    }
+    _, ok := seenRowsTrie.Get(lastRowArray)
+    if !ok {
+      seenRowsTrie.Set(lastRowArray, true)
       writer.Write(row)
+      writer.Flush()
+    }
+  }
+}
+
+
+func UniqueifyUnsortedWithCount(reader *csv.Reader, columns []string) {
+  imc := NewInMemoryCsv(reader)
+
+  columnIndices := GetColumnIndicesOrAll(columns, imc.header)
+
+  rowIndexToCount := make(map[int]int)
+  seenRowsTrie := trie.NewTrie()
+
+  lastRowArray := make([]string, len(columnIndices))
+
+  for rowIndex, row := range imc.rows {
+    for i, columnIndex := range columnIndices {
+      lastRowArray[i] = row[columnIndex]
+    }
+    val, ok := seenRowsTrie.Get(lastRowArray)
+    if ok {
+      previousRowIndex := val.(int)
+      rowIndexToCount[previousRowIndex] = rowIndexToCount[previousRowIndex] + 1
+    } else {
+      previousRowIndex := rowIndex
+      seenRowsTrie.Set(lastRowArray, previousRowIndex)
+      rowIndexToCount[previousRowIndex] = 1
+    }
+  }
+
+  shellRow := make([]string, len(imc.header) + 1)
+  copy(shellRow, imc.header)
+  shellRow[len(shellRow) - 1] = "Count"
+
+  writer := csv.NewWriter(os.Stdout)
+
+  // Write header.
+  writer.Write(shellRow)
+  writer.Flush()
+
+  // Write unique rows with count.
+  for rowIndex, row := range imc.rows {
+    count, ok := rowIndexToCount[rowIndex]
+    if ok {
+      copy(shellRow, row)
+      shellRow[len(shellRow) - 1] = strconv.Itoa(count)
+      writer.Write(shellRow)
       writer.Flush()
     }
   }
@@ -144,10 +230,11 @@ func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
 func RunUnique(args []string) {
   fs := flag.NewFlagSet("unique", flag.ExitOnError)
   var columnsString string
-  var sorted bool
+  var sorted, count bool
   fs.StringVar(&columnsString, "columns", "", "Columns to use for comparison")
   fs.StringVar(&columnsString, "c", "", "Columns to use for comparison (shorthand)")
   fs.BoolVar(&sorted, "sorted", false, "Whether input CSV is already sorted")
+  fs.BoolVar(&count, "count", false, "Whether to append a Count column")
   err := fs.Parse(args)
   if err != nil {
     panic(err)
@@ -177,8 +264,16 @@ func RunUnique(args []string) {
   }
 
   if sorted {
-    UniqueifySorted(reader, columns)
+    if count {
+      UniqueifySortedWithCount(reader, columns)
+    } else {
+      UniqueifySorted(reader, columns)
+    }
   } else {
-    UniqueifyUnsorted(reader, columns)
+    if count {
+      UniqueifyUnsortedWithCount(reader, columns)
+    } else {
+      UniqueifyUnsorted(reader, columns)
+    }
   }
 }
