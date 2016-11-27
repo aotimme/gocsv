@@ -39,7 +39,7 @@ func usage() string {
   - sort
     Sort a CSV based on one or more columns.
   - filter
-    Extract rows whose column matches a regular expression.
+    Extract rows whose column match some criterion.
   - select
     Extract specified columns.
   - sample

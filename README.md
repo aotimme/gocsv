@@ -37,7 +37,7 @@ Subcommands:
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [split](#split) - Split a CSV into multiple files.
 - [sort](#sort) - Sort a CSV based on one or more columns.
-- [filter](#filter) - Extract rows whose columns match a regular expression.
+- [filter](#filter) - Extract rows whose column match some criterion.
 - [select](#select) - Extract specified columns.
 - [sample](#sample) - Sample rows.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
@@ -253,7 +253,7 @@ Arguments:
 
 ### filter
 
-Filter a CSV by rows whose columns match a regular expression
+Filter a CSV by rows whose columns match some criterion.
 
 Usage:
 
