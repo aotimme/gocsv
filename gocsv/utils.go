@@ -51,6 +51,7 @@ type ColumnType int
 const (
   INT_TYPE ColumnType = iota
   FLOAT_TYPE
+  BOOLEAN_TYPE
   STRING_TYPE
 )
 
@@ -59,6 +60,8 @@ func ColumnTypeToString(columnType ColumnType) string {
     return "int"
   } else if columnType == FLOAT_TYPE {
     return "float"
+  } else if columnType == BOOLEAN_TYPE {
+    return "boolean"
   } else if columnType == STRING_TYPE {
     return "string"
   } else {
@@ -75,6 +78,10 @@ func inferType(elem string) ColumnType {
   _, err = strconv.ParseFloat(elem, 64)
   if err == nil {
     return FLOAT_TYPE
+  }
+  strLower := strings.ToLower(strings.Trim(elem, " "))
+  if strLower == "t" || strLower == "true" || strLower == "f" || strLower == "false" {
+    return BOOLEAN_TYPE
   }
   return STRING_TYPE
 }
