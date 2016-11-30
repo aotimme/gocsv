@@ -44,7 +44,7 @@ func (imc *InMemoryCsv) Index(columnIndex int) {
 }
 
 func (imc *InMemoryCsv) NumRows() int {
-  return len(imc.rows) - 1
+  return len(imc.rows)
 }
 
 func (imc *InMemoryCsv) NumColumns() int {
