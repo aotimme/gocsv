@@ -27,6 +27,7 @@ Subcommands:
 - [dimensions](#dimensions) (alias: `dims`) - Get the dimensions of a CSV.
 - [clean](#clean) - Clean a CSV of common formatting issues.
 - [tsv](#tsv) - Transform a CSV into a TSV.
+- [delimiter](#delimiter) (alias: `delim`) - Change the delimiter being used for a CSV.
 - [head](#head) - Extract the first _N_ rows from a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
@@ -87,6 +88,23 @@ Arguments:
   - Truncate any cells that exceed the maximum character limit of 32767.
 - `--numbers` (optional) Clean the CSV for issues that will cause problems with Numbers.
   - Truncate the number of rows in the CSV at 65535, the maximum amount of rows that Numbers displays.
+
+### delimiter
+
+_Alias_: `delim`
+
+Change the delimiter being used for a CSV.
+
+Usage:
+
+```bash
+gocsv delim [--input INPUT_DELIMITER] [--output OUTPUT_DELIMITER] FILE
+```
+
+Arguments:
+
+- `--input` (shorthand `-i`, optional) The delimiter used in the input. Defaults to `,`.
+- `--output` (shorthand `-o`, optional) The delimiter used in the output. Defaults to `,`.
 
 ### tsv
 

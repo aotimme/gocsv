@@ -16,6 +16,8 @@ func usage() string {
     Get the dimensions of a CSV.
   - clean
     Clean a CSV of common formatting issues.
+  - delimiter (alias: delim)
+    Change the delimiter being used for a CSV.
   - tsv
     Transform a CSV into a TSV.
   - headers
@@ -77,6 +79,8 @@ func main() {
     RunClean(args[2:])
   } else if subcommand == "tsv" {
     RunTsv(args[2:])
+  } else if subcommand == "delim" || subcommand == "delimiter" {
+    RunDelimiter(args[2:])
   } else if subcommand == "head" {
     RunHead(args[2:])
   } else if subcommand == "tail" {
