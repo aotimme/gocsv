@@ -26,8 +26,8 @@ Subcommands:
 - [describe](#describe) - Get basic information about a CSV.
 - [dimensions](#dimensions) (alias: `dims`) - Get the dimensions of a CSV.
 - [clean](#clean) - Clean a CSV of common formatting issues.
-- [tsv](#tsv) - Transform a CSV into a TSV.
 - [delimiter](#delimiter) (alias: `delim`) - Change the delimiter being used for a CSV.
+- [tsv](#tsv) - Transform a CSV into a TSV.
 - [head](#head) - Extract the first _N_ rows from a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
@@ -82,7 +82,7 @@ gocsv clean [--verbose] [--no-trim] [--excel] [--numbers] FILE
 
 Arguments:
 
-- `--verbose` (optional) Print out to stderr when cleaning the CSV. 
+- `--verbose` (optional) Print out to stderr when cleaning the CSV.
 - `--no-trim` (optional) Do not remove trailing rows that are empty.
 - `--excel` (optional) Clean the CSV for issues that will cause problems with Excel. See [Excel specifications and limitations](https://support.office.com/en-us/article/Excel-specifications-and-limits-16c69c74-3d6a-4aaf-ba35-e6eb276e8eaa).
   - Truncate any cells that exceed the maximum character limit of 32767.
@@ -108,7 +108,7 @@ Arguments:
 
 ### tsv
 
-Transform a CSV into a TSV. This can very useful if you want to pipe the result to `pbcopy` (OS X) in order to paste it into a spreadsheet tool.
+Transform a CSV into a TSV. It is shortand for `gocsv delim -o "\t" FILE`. This can very useful if you want to pipe the result to `pbcopy` (OS X) in order to paste it into a spreadsheet tool.
 
 Usage:
 
@@ -399,6 +399,7 @@ cat test-files/left-table.csv \
 | dimensions    |  &#x2714;   |   N/A    |
 | clean         |  &#x2714;   | &#x2714; |
 | tsv           |  &#x2714;   | &#x2714; |
+| delimiter     |  &#x2714;   | &#x2714; |
 | head          |  &#x2714;   | &#x2714; |
 | tail          |  &#x2714;   | &#x2714; |
 | headers       |  &#x2714;   |   N/A    |
