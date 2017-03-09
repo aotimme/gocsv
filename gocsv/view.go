@@ -112,6 +112,7 @@ func RunView(args []string) {
 	fs := flag.NewFlagSet("view", flag.ExitOnError)
 	var maxWidth, maxRows int
 	fs.IntVar(&maxWidth, "max-width", 20, "Maximum width per column")
+	fs.IntVar(&maxWidth, "w", 20, "Maximum width per column (shorthand)")
 	fs.IntVar(&maxRows, "n", 0, "Number of rows to display")
 	err := fs.Parse(args)
 	if err != nil {

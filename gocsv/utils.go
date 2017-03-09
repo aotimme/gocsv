@@ -21,7 +21,7 @@ func GetIndexOfString(haystack []string, needle string) int {
 func GetColumnIndexOrPanic(headers []string, header string) int {
 	columnIndex := GetIndexOfStringOrIndexMinusOne(headers, header)
 	if columnIndex == -1 {
-		panic(errors.New(fmt.Sprintf("No column matching \"%s\"", columnIndex)))
+		panic(errors.New(fmt.Sprintf("No column matching \"%d\"", columnIndex)))
 	}
 	return columnIndex
 }

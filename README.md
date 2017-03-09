@@ -167,7 +167,7 @@ gocsv view [-n N] [--max-width N] FILE
 Arguments:
 
 - `-n` (optional) Display only the first _N_ rows of the CSV.
-- `--max-width` (optional, default 20) The maximum width of each cell for display. If a cell exceeds the maximum width, it will be truncated in the display.
+- `--max-width` (optional, default 20, shorthand `-w`) The maximum width of each cell for display. If a cell exceeds the maximum width, it will be truncated in the display.
 
 If the length of a cell exceeds `--max-width` it will be truncated with an ellipsis. If a cell contains a new-line character, only the first line will be displayed.
 
