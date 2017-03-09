@@ -4,16 +4,54 @@ BINARY_DIRNAME="gocsv-darwin-amd64"
 ZIP_FILENAME="${BINARY_DIRNAME}.zip"
 ZIP_URL="https://github.com/DataFoxCo/gocsv/releases/download/latest/${ZIP_FILENAME}"
 RAND=`date +%s | shasum | base64 | head -c 32; echo;`
-mkdir /tmp/${RAND}
-echo "Fetching binary..."
+TMP_DIR=/tmp/${RAND}
+INSTALL_DIR="/usr/local/bin"
+INSTALL_LOCATION="${INSTALL_DIR}/gocsv"
+
+COLOR_GRAY=$(tput setaf 7)
+COLOR_RED=$(tput setaf 1)
+COLOR_GREEN=$(tput setaf 2)
+TEXT_RESET=$(tput sgr0)
+
+mark_fail() {
+  echo -e "${COLOR_RED}\xE2\x9C\x98${TEXT_RESET}"
+}
+
+mark_pass() {
+  echo -e "${COLOR_GREEN}\xE2\x9C\x94${TEXT_RESET}"
+}
+
+echo -n "Checking permissions... "
+touch /usr/local/bin/gocsv
+if [ $? -eq 1 ]
+then
+  mark_fail
+  echo "Unable to install gocsv."
+  echo "You do not have permission to write to ${INSTALL_DIR}."
+  echo "Change write permissions on that directory and try again."
+  exit 1
+fi
+mark_pass
+
+echo -n "Fetching binary... "
+mkdir ${TMP_DIR}
 ZIP_ACTUAL_URL=`curl -s -I ${ZIP_URL} | grep "^Location: " | sed -n -e 's/^Location: //p' | tr -d '\r\n'`
-curl -s ${ZIP_ACTUAL_URL} > /tmp/${RAND}/${ZIP_FILENAME}
-echo "Extacting binary..."
-unzip -q -d /tmp/${RAND} /tmp/${RAND}/${ZIP_FILENAME}
-echo "Installing binary to /usr/local/bin/gocsv..."
-mv /tmp/${RAND}/${BINARY_DIRNAME}/gocsv /usr/local/bin
-echo "Cleaning up..."
-rm -r /tmp/${RAND}
+curl -s ${ZIP_ACTUAL_URL} > ${TMP_DIR}/${ZIP_FILENAME}
+mark_pass
+
+echo -n "Extacting binary... "
+unzip -q -d ${TMP_DIR} ${TMP_DIR}/${ZIP_FILENAME}
+mark_pass
+
+echo -n "Installing binary to /usr/local/bin/gocsv... "
+mv ${TMP_DIR}/${BINARY_DIRNAME}/gocsv ${INSTALL_LOCATION}
+mark_pass
+
+echo -n "Cleaning up... "
+rm -r ${TMP_DIR}
+mark_pass
+
+echo ""
 echo "GoCSV has been successfully installed!"
 echo "Open a new Terminal window and run:"
 echo "  gocsv help"
