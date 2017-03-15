@@ -23,6 +23,8 @@ func usage() string {
     View the headers from a CSV.
   - view
     Display a CSV in a pretty tabular format.
+  - stats
+  	Get some basic statistics on a CSV.
   - rename
     Rename the headers of a CSV.
   - head
@@ -71,6 +73,8 @@ func main() {
 		RunHeaders(args[2:])
 	} else if subcommand == "view" {
 		RunView(args[2:])
+	} else if subcommand == "stats" {
+		RunStats(args[2:])
 	} else if subcommand == "rename" {
 		RunRename(args[2:])
 	} else if subcommand == "clean" {

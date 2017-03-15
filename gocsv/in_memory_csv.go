@@ -2,7 +2,11 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
+	"math"
 	"math/rand"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -152,3 +156,397 @@ func (imc *InMemoryCsv) SampleRowIndices(numRows int, replace bool, seed int) []
 		return imc.SampleRowIndicesWithoutReplacement(numRows, seed)
 	}
 }
+
+func (imc *InMemoryCsv) PrintStats() {
+	for i := 0; i < imc.NumColumns(); i++ {
+		imc.PrintStatsForColumn(i)
+	}
+	fmt.Printf("Number of rows: %d\n", imc.NumRows())
+}
+
+func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
+	fmt.Printf("%d. %s\n", columnIndex+1, imc.header[columnIndex])
+	columnType := imc.InferType(columnIndex)
+	fmt.Printf("  %s\n", ColumnTypeToString(columnType))
+	imc.PrintColumnHasNulls(columnIndex)
+	if columnType == INT_TYPE {
+		imc.PrintStatsForColumnAsInt(columnIndex)
+	} else if columnType == FLOAT_TYPE {
+		imc.PrintStatsForColumnAsFloat(columnIndex)
+	} else if columnType == BOOLEAN_TYPE {
+		imc.PrintStatsForColumnAsBoolean(columnIndex)
+	} else {
+		imc.PrintStatsForColumnAsString(columnIndex)
+	}
+}
+
+func (imc *InMemoryCsv) PrintColumnHasNulls(columnIndex int) {
+	if imc.ColumnHasNulls(columnIndex) {
+		fmt.Println("  Nulls: true")
+	} else {
+		fmt.Println("  Nulls: false")
+	}
+}
+
+func (imc *InMemoryCsv) ColumnHasNulls(columnIndex int) bool {
+	for _, row := range imc.rows {
+		cell := row[columnIndex]
+		if cell == "" {
+			return true
+		}
+	}
+	return false
+}
+
+func (imc *InMemoryCsv) PrintStatsForColumnAsInt(columnIndex int) {
+	intArray := make([]int64, imc.NumRows())
+	for i, row := range imc.rows {
+		intArray[i] = parseInt64OrPanic(row[columnIndex])
+	}
+	ics := NewIntColumnsStats(intArray)
+	ics.CalculateAllStats()
+
+	fmt.Printf("  Min: %d\n", ics.min)
+	fmt.Printf("  Max: %d\n", ics.max)
+	fmt.Printf("  Sum: %d\n", ics.sum)
+	fmt.Printf("  Mean: %f\n", ics.mean)
+	fmt.Printf("  Median: %f\n", ics.median)
+	fmt.Printf("  Standard Deviation: %f\n", ics.stdev)
+	fmt.Printf("  Unique values: %d\n", len(ics.valueCounts))
+	numFrequent := 5
+	if numFrequent > len(ics.valueCounts) {
+		numFrequent = len(ics.valueCounts)
+	}
+	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	for i := 0; i < numFrequent; i++ {
+		fmt.Printf("      %d: %d\n", ics.valueCounts[i].value, ics.valueCounts[i].count)
+	}
+}
+
+type IntColumnStats struct {
+	array               []int64
+	min, max, sum       int64
+	mean, median, stdev float64
+	valueCounts         []IntValueCount
+}
+
+func NewIntColumnsStats(intArray []int64) *IntColumnStats {
+	ics := new(IntColumnStats)
+	ics.array = intArray
+	return ics
+}
+
+func (ics *IntColumnStats) CalculateAllStats() {
+	ics.CalculateMin()
+	ics.CalculateMax()
+	ics.CalculateSum()
+	ics.CalculateMean()
+	ics.CalculateMedian()
+	ics.CalculateStdDev()
+	ics.CalculateValueCounts()
+}
+
+func (ics *IntColumnStats) CalculateMin() {
+	ics.min = math.MaxInt64
+	for _, intVal := range ics.array {
+		if intVal < ics.min {
+			ics.min = intVal
+		}
+	}
+}
+
+func (ics *IntColumnStats) CalculateMax() {
+	ics.max = math.MinInt64
+	for _, intVal := range ics.array {
+		if intVal > ics.max {
+			ics.max = intVal
+		}
+	}
+}
+
+func (ics *IntColumnStats) CalculateSum() {
+	ics.sum = 0
+	for _, intVal := range ics.array {
+		ics.sum += intVal
+	}
+}
+
+func (ics *IntColumnStats) CalculateMean() {
+	ics.mean = float64(ics.sum) / float64(len(ics.array))
+}
+
+type Int64Array []int64
+
+func (a Int64Array) Len() int           { return len(a) }
+func (a Int64Array) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Int64Array) Less(i, j int) bool { return a[i] < a[j] }
+
+func (ics *IntColumnStats) CalculateMedian() {
+	arrayLen := len(ics.array)
+	sortedArray := make([]int64, arrayLen)
+	copy(sortedArray, ics.array)
+	sort.Sort(Int64Array(sortedArray))
+	if len(sortedArray)%2 == 0 {
+		ics.median = (float64(sortedArray[arrayLen/2-1]) + float64(sortedArray[arrayLen/2-1])) / 2.0
+	} else {
+		ics.median = float64(sortedArray[arrayLen/2])
+	}
+}
+
+func (ics *IntColumnStats) CalculateStdDev() {
+	sum := 0.0
+	for _, intVal := range ics.array {
+		elem := float64(intVal) - ics.mean
+		sum += elem * elem
+	}
+	ics.stdev = math.Sqrt(sum / float64(len(ics.array)-1))
+}
+
+func (ics *IntColumnStats) CalculateValueCounts() {
+	valueCountsMap := make(map[int64]int)
+	for _, intVal := range ics.array {
+		count, ok := valueCountsMap[intVal]
+		if ok {
+			valueCountsMap[intVal] = count + 1
+		} else {
+			valueCountsMap[intVal] = 1
+		}
+	}
+	ics.valueCounts = make([]IntValueCount, len(valueCountsMap))
+	i := 0
+	for value, count := range valueCountsMap {
+		ics.valueCounts[i] = IntValueCount{value, count}
+		i++
+	}
+	sort.Sort(sort.Reverse(IntValueCountByCount(ics.valueCounts)))
+}
+
+type IntValueCount struct {
+	value int64
+	count int
+}
+
+type IntValueCountByCount []IntValueCount
+
+func (a IntValueCountByCount) Len() int           { return len(a) }
+func (a IntValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a IntValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
+
+func (imc *InMemoryCsv) PrintStatsForColumnAsFloat(columnIndex int) {
+	floatArray := make([]float64, imc.NumRows())
+	for i, row := range imc.rows {
+		floatArray[i] = parseFloat64OrPanic(row[columnIndex])
+	}
+	fcs := NewFloatColumnsStats(floatArray)
+	fcs.CalculateAllStats()
+
+	fmt.Printf("  Min: %f\n", fcs.min)
+	fmt.Printf("  Max: %f\n", fcs.max)
+	fmt.Printf("  Sum: %f\n", fcs.sum)
+	fmt.Printf("  Mean: %f\n", fcs.mean)
+	fmt.Printf("  Median: %f\n", fcs.median)
+	fmt.Printf("  Standard Deviation: %f\n", fcs.stdev)
+	fmt.Printf("  Unique values: %d\n", len(fcs.valueCounts))
+	numFrequent := 5
+	if numFrequent > len(fcs.valueCounts) {
+		numFrequent = len(fcs.valueCounts)
+	}
+	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	for i := 0; i < numFrequent; i++ {
+		fmt.Printf("      %f: %d\n", fcs.valueCounts[i].value, fcs.valueCounts[i].count)
+	}
+}
+
+type FloatColumnStats struct {
+	array               []float64
+	min, max, sum       float64
+	mean, median, stdev float64
+	valueCounts         []FloatValueCount
+}
+
+func NewFloatColumnsStats(floatArray []float64) *FloatColumnStats {
+	fcs := new(FloatColumnStats)
+	fcs.array = floatArray
+	return fcs
+}
+
+func (fcs *FloatColumnStats) CalculateAllStats() {
+	fcs.CalculateMin()
+	fcs.CalculateMax()
+	fcs.CalculateSum()
+	fcs.CalculateMean()
+	fcs.CalculateMedian()
+	fcs.CalculateStdDev()
+	fcs.CalculateValueCounts()
+}
+
+func (fcs *FloatColumnStats) CalculateMin() {
+	fcs.min = math.Inf(1)
+	for _, floatVal := range fcs.array {
+		if floatVal < fcs.min {
+			fcs.min = floatVal
+		}
+	}
+}
+
+func (fcs *FloatColumnStats) CalculateMax() {
+	fcs.max = math.Inf(-1)
+	for _, floatVal := range fcs.array {
+		if floatVal > fcs.max {
+			fcs.max = floatVal
+		}
+	}
+}
+
+func (fcs *FloatColumnStats) CalculateSum() {
+	fcs.sum = 0.0
+	for _, floatVal := range fcs.array {
+		fcs.sum += floatVal
+	}
+}
+
+func (fcs *FloatColumnStats) CalculateMean() {
+	fcs.mean = fcs.sum / float64(len(fcs.array))
+}
+
+func (fcs *FloatColumnStats) CalculateMedian() {
+	arrayLen := len(fcs.array)
+	sortedArray := make([]float64, arrayLen)
+	copy(sortedArray, fcs.array)
+	sort.Float64s(sortedArray)
+	if len(sortedArray)%2 == 0 {
+		fcs.median = (float64(sortedArray[arrayLen/2-1]) + float64(sortedArray[arrayLen/2-1])) / 2.0
+	} else {
+		fcs.median = float64(sortedArray[arrayLen/2])
+	}
+}
+
+func (fcs *FloatColumnStats) CalculateStdDev() {
+	sum := 0.0
+	for _, floatVal := range fcs.array {
+		elem := float64(floatVal) - fcs.mean
+		sum += elem * elem
+	}
+	fcs.stdev = math.Sqrt(sum / float64(len(fcs.array)-1))
+}
+
+func (fcs *FloatColumnStats) CalculateValueCounts() {
+	valueCountsMap := make(map[float64]int)
+	for _, floatVal := range fcs.array {
+		count, ok := valueCountsMap[floatVal]
+		if ok {
+			valueCountsMap[floatVal] = count + 1
+		} else {
+			valueCountsMap[floatVal] = 1
+		}
+	}
+	fcs.valueCounts = make([]FloatValueCount, len(valueCountsMap))
+	i := 0
+	for value, count := range valueCountsMap {
+		fcs.valueCounts[i] = FloatValueCount{value, count}
+		i++
+	}
+	sort.Sort(sort.Reverse(FloatValueCountByCount(fcs.valueCounts)))
+}
+
+type FloatValueCount struct {
+	value float64
+	count int
+}
+
+type FloatValueCountByCount []FloatValueCount
+
+func (a FloatValueCountByCount) Len() int           { return len(a) }
+func (a FloatValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a FloatValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
+
+func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
+	numTrue := 0
+	numFalse := 0
+	for _, row := range imc.rows {
+		strLower := strings.ToLower(strings.Trim(row[columnIndex], " "))
+		if strLower == "t" || strLower == "true" {
+			numTrue++
+		} else if strLower == "f" || strLower == "false" {
+			numFalse++
+		}
+	}
+	fmt.Printf("  Number TRUE: %d\n", numTrue)
+	fmt.Printf("  Number FALSE: %d\n", numFalse)
+}
+
+func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {
+	stringArray := make([]string, imc.NumRows())
+	for i, row := range imc.rows {
+		stringArray[i] = row[columnIndex]
+	}
+	scs := NewStringColumnsStats(stringArray)
+	scs.CalculateAllStats()
+
+	fmt.Printf("  Unique values: %d\n", len(scs.valueCounts))
+	fmt.Printf("  Max length: %d\n", scs.maxLength)
+	numFrequent := 5
+	if numFrequent > len(scs.valueCounts) {
+		numFrequent = len(scs.valueCounts)
+	}
+	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	for i := 0; i < numFrequent; i++ {
+		fmt.Printf("      %s: %d\n", scs.valueCounts[i].value, scs.valueCounts[i].count)
+	}
+}
+
+type StringColumnStats struct {
+	array       []string
+	valueCounts []StringValueCount
+	maxLength   int
+}
+
+func NewStringColumnsStats(stringArray []string) *StringColumnStats {
+	scs := new(StringColumnStats)
+	scs.array = stringArray
+	return scs
+}
+
+func (scs *StringColumnStats) CalculateAllStats() {
+	scs.CalculateMaxLength()
+	scs.CalculateValueCounts()
+}
+
+func (scs *StringColumnStats) CalculateMaxLength() {
+	scs.maxLength = math.MinInt64
+	for _, elem := range scs.array {
+		if len(elem) > scs.maxLength {
+			scs.maxLength = len(elem)
+		}
+	}
+}
+
+func (scs *StringColumnStats) CalculateValueCounts() {
+	valueCountsMap := make(map[string]int)
+	for _, stringVal := range scs.array {
+		count, ok := valueCountsMap[stringVal]
+		if ok {
+			valueCountsMap[stringVal] = count + 1
+		} else {
+			valueCountsMap[stringVal] = 1
+		}
+	}
+	scs.valueCounts = make([]StringValueCount, len(valueCountsMap))
+	i := 0
+	for value, count := range valueCountsMap {
+		scs.valueCounts[i] = StringValueCount{value, count}
+		i++
+	}
+	sort.Sort(sort.Reverse(StringValueCountByCount(scs.valueCounts)))
+}
+
+type StringValueCount struct {
+	value string
+	count int
+}
+
+type StringValueCountByCount []StringValueCount
+
+func (a StringValueCountByCount) Len() int           { return len(a) }
+func (a StringValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a StringValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
