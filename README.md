@@ -40,7 +40,7 @@ Subcommands:
 - [split](#split) - Split a CSV into multiple files.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose column match some criterion.
-- [replace](#replace) - Replace values in cells by string or regular expression.
+- [replace](#replace) - Replace values in cells by regular expression.
 - [select](#select) - Extract specified columns.
 - [sample](#sample) - Sample rows.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
@@ -303,7 +303,7 @@ Note that one of `--regex`, `--gt` , `--gte`, `--lt`, or `--lte` must be specifi
 
 ### replace
 
-Replace values in cells by string or regular expression.
+Replace values in cells by regular expression.
 
 Usage:
 

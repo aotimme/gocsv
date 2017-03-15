@@ -44,7 +44,7 @@ func usage() string {
   - filter
     Extract rows whose column match some criterion.
   - replace
-  	Replace values in cells by string or regular expression.
+  	Replace values in cells by regular expression.
   - select
     Extract specified columns.
   - sample
