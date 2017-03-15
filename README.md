@@ -40,6 +40,7 @@ Subcommands:
 - [split](#split) - Split a CSV into multiple files.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [filter](#filter) - Extract rows whose column match some criterion.
+- [replace](#replace) - Replace values in cells by string or regular expression.
 - [select](#select) - Extract specified columns.
 - [sample](#sample) - Sample rows.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
@@ -300,6 +301,25 @@ Arguments:
 
 Note that one of `--regex`, `--gt` , `--gte`, `--lt`, or `--lte` must be specified.
 
+### replace
+
+Replace values in cells by string or regular expression.
+
+Usage:
+
+```shell
+gocsv replace [--columns COLUMNS] --regex REGEX --repl REPLACEMENT FILE
+```
+
+Arguments:
+
+- `--columns` (optional, shorthand `-c`) A comma-separated list of the columns to run replacements on. If no columns are specified, then replace runs the replacement operation on cells in every column. See [Specifying Columns](#specifying-columns) for more details.
+- `--regex` Regular expression to use to match against for replacement.
+- `--case-insensitive` (optional, shorthand `-i`) Use this flag to specify a case insensitive match for replacement rather than the default case sensitive match.
+- `--repl` String to use for replacement.
+
+Note that if you have a capture group in the `--regex` argument, you can use expand the replacement using, for example `"\$1"`.
+
 ### select
 
 Select (or exclude) columns from a CSV
@@ -423,6 +443,7 @@ cat test-files/left-table.csv \
 | split         |  &#x2714;   |   N/A    |
 | sort          |  &#x2714;   | &#x2714; |
 | filter        |  &#x2714;   | &#x2714; |
+| replace       |  &#x2714;   | &#x2714; |
 | select        |  &#x2714;   | &#x2714; |
 | sample        |  &#x2714;   | &#x2714; |
 | unique        |  &#x2714;   | &#x2714; |
@@ -473,6 +494,12 @@ gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uni
 
 ```shell
 gocsv filter --columns ABC --regex "-1$" test-files/left-table.csv
+```
+
+##### Replace Content in Cells By Regular Expression
+
+```shell
+gocsv replace --columns ABC --regex "^(.*)-(\d)$" -i --repl "\$2-\$1" test-files/left-table.csv
 ```
 
 ##### Sort by Multiple Columns

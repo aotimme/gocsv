@@ -43,6 +43,8 @@ func usage() string {
     Sort a CSV based on one or more columns.
   - filter
     Extract rows whose column match some criterion.
+  - replace
+  	Replace values in cells by string or regular expression.
   - select
     Extract specified columns.
   - sample
@@ -97,6 +99,8 @@ func main() {
 		RunSplit(args[2:])
 	} else if subcommand == "filter" {
 		RunFilter(args[2:])
+	} else if subcommand == "replace" {
+		RunReplace(args[2:])
 	} else if subcommand == "select" {
 		RunSelect(args[2:])
 	} else if subcommand == "sort" {
