@@ -9,6 +9,9 @@ EXECUTABLE=gocsv
 dist:
 	bash scripts/build-dist.sh
 
+tag:
+	bash scripts/update-latest-tag.sh
+
 bin:
 	rm -rf ${BIN_DIR}
 	mkdir -p ${BIN_DIR}

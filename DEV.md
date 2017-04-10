@@ -11,7 +11,7 @@ To release an update to `gocsv`, make sure you have committed and pushed the mos
 1. Tag the latest commit as "latest":
 
    ```shell
-   bash ./scripts/update-latest-tag.sh
+   make tag
    ```
 
 2. Create binaries for distribution:
