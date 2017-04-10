@@ -75,7 +75,7 @@ func (imc *InMemoryCsv) GetRowsMatchingIndexedColumn(value string) [][]string {
 func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
 	curType := INT_TYPE
 	for _, row := range imc.rows {
-		thisType := inferType(row[columnIndex])
+		thisType := InferType(row[columnIndex])
 		if thisType > curType {
 			curType = thisType
 		}
@@ -91,6 +91,17 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
 		row1 := *row1Ptr
 		row2 := *row2Ptr
 		for i, columnIndex := range columnIndices {
+			isElem1Null := IsNullType(row1[columnIndex])
+			isElem2Null := IsNullType(row2[columnIndex])
+			if isElem1Null && isElem2Null {
+				continue
+			}
+			if isElem1Null && !isElem2Null {
+				return true
+			}
+			if !isElem1Null && isElem2Null {
+				return false
+			}
 			columnType := columnTypes[i]
 			if columnType == FLOAT_TYPE {
 				row1Val := parseFloat64OrPanic(row1[columnIndex])
@@ -106,6 +117,14 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
 				if row1Val < row2Val {
 					return true
 				} else if row1Val > row2Val {
+					return false
+				}
+			} else if columnType == DATE_TYPE {
+				row1Val := ParseDateOrPanic(row1[columnIndex])
+				row2Val := ParseDateOrPanic(row2[columnIndex])
+				if row1Val.Before(row2Val) {
+					return true
+				} else if row1Val.After(row2Val) {
 					return false
 				}
 			} else {
@@ -175,6 +194,8 @@ func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
 		imc.PrintStatsForColumnAsFloat(columnIndex)
 	} else if columnType == BOOLEAN_TYPE {
 		imc.PrintStatsForColumnAsBoolean(columnIndex)
+	} else if columnType == DATE_TYPE {
+		imc.PrintStatsForColumnAsDate(columnIndex)
 	} else {
 		imc.PrintStatsForColumnAsString(columnIndex)
 	}
@@ -473,6 +494,84 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
 	}
 	fmt.Printf("  Number TRUE: %d\n", numTrue)
 	fmt.Printf("  Number FALSE: %d\n", numFalse)
+}
+
+func (imc *InMemoryCsv) PrintStatsForColumnAsDate(columnIndex int) {
+	dateArray := make([]time.Time, 0)
+	for _, row := range imc.rows {
+		t, err := ParseDate(row[columnIndex])
+		if err == nil {
+			dateArray = append(dateArray, t)
+		}
+	}
+	dcs := NewDateColumnsStats(dateArray)
+	dcs.CalculateAllStats()
+
+	fmt.Printf("  Min: %s\n", dcs.min.Format("2006-01-02"))
+	fmt.Printf("  Max: %s\n", dcs.max.Format("2006-01-02"))
+	fmt.Printf("  Unique values: %d\n", len(dcs.valueCounts))
+	numFrequent := 5
+	if numFrequent > len(dcs.valueCounts) {
+		numFrequent = len(dcs.valueCounts)
+	}
+	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	for i := 0; i < numFrequent; i++ {
+		fmt.Printf("      %s: %d\n", dcs.valueCounts[i].value, dcs.valueCounts[i].count)
+	}
+}
+
+type DateColumnStats struct {
+	array       []time.Time
+	min, max    time.Time
+	valueCounts []StringValueCount
+}
+
+func NewDateColumnsStats(dateArray []time.Time) *DateColumnStats {
+	dcs := new(DateColumnStats)
+	dcs.array = dateArray
+	return dcs
+}
+
+func (dcs *DateColumnStats) CalculateAllStats() {
+	dcs.CalculateMin()
+	dcs.CalculateMax()
+	dcs.CalculateValueCounts()
+}
+
+func (dcs *DateColumnStats) CalculateMin() {
+	for i, dateVal := range dcs.array {
+		if i == 0 || dateVal.Before(dcs.min) {
+			dcs.min = dateVal
+		}
+	}
+}
+
+func (dcs *DateColumnStats) CalculateMax() {
+	for i, dateVal := range dcs.array {
+		if i == 0 || dateVal.After(dcs.max) {
+			dcs.max = dateVal
+		}
+	}
+}
+
+func (dcs *DateColumnStats) CalculateValueCounts() {
+	valueCountsMap := make(map[string]int)
+	for _, dateVal := range dcs.array {
+		dateStr := dateVal.Format("2006-01-02")
+		count, ok := valueCountsMap[dateStr]
+		if ok {
+			valueCountsMap[dateStr] = count + 1
+		} else {
+			valueCountsMap[dateStr] = 1
+		}
+	}
+	dcs.valueCounts = make([]StringValueCount, len(valueCountsMap))
+	i := 0
+	for value, count := range valueCountsMap {
+		dcs.valueCounts[i] = StringValueCount{value, count}
+		i++
+	}
+	sort.Sort(sort.Reverse(StringValueCountByCount(dcs.valueCounts)))
 }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {

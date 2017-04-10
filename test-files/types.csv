@@ -1,0 +1,4 @@
+Float,Int,Boolean,Date,String
+151.2,51,true,2016-01-05,Hello world
+21.1,0,f,2017-12-25,Foo Bar
+-0.1,-5,T,9/1/1999,Baz

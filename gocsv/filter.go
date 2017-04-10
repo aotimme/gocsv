@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -68,19 +67,17 @@ func RunFilter(args []string) {
 	fs := flag.NewFlagSet("filter", flag.ExitOnError)
 	var regex, columnsString string
 	var exclude, caseInsensitive bool
-	var gt, gte, lt, lte float64
-	positiveInfinity := math.Inf(1)
-	negativeInfinity := math.Inf(-1)
+	var gtStr, gteStr, ltStr, lteStr string
 	fs.StringVar(&columnsString, "columns", "", "Columns to filter against")
 	fs.StringVar(&columnsString, "c", "", "Columns to filter against (shorthand)")
 	fs.BoolVar(&exclude, "exclude", false, "Exclude matching rows")
 	fs.StringVar(&regex, "regex", "", "Regular expression for filtering")
 	fs.BoolVar(&caseInsensitive, "case-insensitive", false, "Make regular expression case insensitive")
 	fs.BoolVar(&caseInsensitive, "i", false, "Make regular expression case insensitive (shorthand)")
-	fs.Float64Var(&gt, "gt", negativeInfinity, "Greater than")
-	fs.Float64Var(&gte, "gte", negativeInfinity, "Greater than or equal to")
-	fs.Float64Var(&lt, "lt", positiveInfinity, "Less than")
-	fs.Float64Var(&lte, "lte", positiveInfinity, "Less than or equal to")
+	fs.StringVar(&gtStr, "gt", "", "Greater than")
+	fs.StringVar(&gteStr, "gte", "", "Greater than or equal to")
+	fs.StringVar(&ltStr, "lt", "", "Less than")
+	fs.StringVar(&lteStr, "lte", "", "Less than or equal to")
 	err := fs.Parse(args)
 	if err != nil {
 		panic(err)
@@ -107,37 +104,121 @@ func RunFilter(args []string) {
 		matchFunc = func(elem string) bool {
 			return re.MatchString(elem)
 		}
-	} else if gt != negativeInfinity {
-		matchFunc = func(elem string) bool {
-			elem64, err := strconv.ParseFloat(elem, 64)
+	} else if gtStr != "" {
+		if IsFloatType(gtStr) {
+			gt, err := strconv.ParseFloat(gtStr, 64)
 			if err != nil {
-				return false
+				panic(err)
 			}
-			return elem64 > gt
+			matchFunc = func(elem string) bool {
+				elem64, err := strconv.ParseFloat(elem, 64)
+				if err != nil {
+					return false
+				}
+				return elem64 > gt
+			}
+		} else if IsDateType(gtStr) {
+			gt, err := ParseDate(gtStr)
+			if err != nil {
+				panic(err)
+			}
+			matchFunc = func(elem string) bool {
+				elemDate, err := ParseDate(elem)
+				if err != nil {
+					return false
+				}
+				return elemDate.After(gt)
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, "Invalid argument for -gt")
+			os.Exit(1)
 		}
-	} else if gte != negativeInfinity {
-		matchFunc = func(elem string) bool {
-			elem64, err := strconv.ParseFloat(elem, 64)
+	} else if gteStr != "" {
+		if IsFloatType(gteStr) {
+			gte, err := strconv.ParseFloat(gteStr, 64)
 			if err != nil {
-				return false
+				panic(err)
 			}
-			return elem64 >= gte
+			matchFunc = func(elem string) bool {
+				elem64, err := strconv.ParseFloat(elem, 64)
+				if err != nil {
+					return false
+				}
+				return elem64 >= gte
+			}
+		} else if IsDateType(gteStr) {
+			gte, err := ParseDate(gteStr)
+			if err != nil {
+				panic(err)
+			}
+			matchFunc = func(elem string) bool {
+				elemDate, err := ParseDate(elem)
+				if err != nil {
+					return false
+				}
+				return elemDate.Equal(gte) || elemDate.After(gte)
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, "Invalid argument for -gte")
+			os.Exit(1)
 		}
-	} else if lt != positiveInfinity {
-		matchFunc = func(elem string) bool {
-			elem64, err := strconv.ParseFloat(elem, 64)
+	} else if ltStr != "" {
+		if IsFloatType(ltStr) {
+			lt, err := strconv.ParseFloat(ltStr, 64)
 			if err != nil {
-				return false
+				panic(err)
 			}
-			return elem64 < lt
+			matchFunc = func(elem string) bool {
+				elem64, err := strconv.ParseFloat(elem, 64)
+				if err != nil {
+					return false
+				}
+				return elem64 < lt
+			}
+		} else if IsDateType(ltStr) {
+			lt, err := ParseDate(ltStr)
+			if err != nil {
+				panic(err)
+			}
+			matchFunc = func(elem string) bool {
+				elemDate, err := ParseDate(elem)
+				if err != nil {
+					return false
+				}
+				return elemDate.Before(lt)
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, "Invalid argument for -lt")
+			os.Exit(1)
 		}
-	} else if lte != positiveInfinity {
-		matchFunc = func(elem string) bool {
-			elem64, err := strconv.ParseFloat(elem, 64)
+	} else if lteStr != "" {
+		if IsFloatType(lteStr) {
+			lte, err := strconv.ParseFloat(lteStr, 64)
 			if err != nil {
-				return false
+				panic(err)
 			}
-			return elem64 <= lte
+			matchFunc = func(elem string) bool {
+				elem64, err := strconv.ParseFloat(elem, 64)
+				if err != nil {
+					return false
+				}
+				return elem64 <= lte
+			}
+		} else if IsDateType(lteStr) {
+			lte, err := ParseDate(lteStr)
+			if err != nil {
+				panic(err)
+			}
+			matchFunc = func(elem string) bool {
+				elemDate, err := ParseDate(elem)
+				if err != nil {
+					return false
+				}
+				return elemDate.Equal(lte) || elemDate.Before(lte)
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, "Invalid argument for -lte")
+			os.Exit(1)
 		}
 	} else {
 		fmt.Fprintln(os.Stderr, "Missing filter function")

@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetIndexOfString(haystack []string, needle string) int {
@@ -53,6 +54,7 @@ const (
 	INT_TYPE ColumnType = iota
 	FLOAT_TYPE
 	BOOLEAN_TYPE
+	DATE_TYPE
 	STRING_TYPE
 )
 
@@ -63,6 +65,8 @@ func ColumnTypeToString(columnType ColumnType) string {
 		return "float"
 	} else if columnType == BOOLEAN_TYPE {
 		return "boolean"
+	} else if columnType == DATE_TYPE {
+		return "date"
 	} else if columnType == STRING_TYPE {
 		return "string"
 	} else {
@@ -70,19 +74,66 @@ func ColumnTypeToString(columnType ColumnType) string {
 	}
 }
 
-func inferType(elem string) ColumnType {
+func IsNullType(elem string) bool {
+	return elem == ""
+}
+
+func IsIntType(elem string) bool {
 	_, err := strconv.ParseInt(elem, 0, 0)
-	if err == nil {
+	return err == nil
+}
+
+func IsFloatType(elem string) bool {
+	_, err := strconv.ParseFloat(elem, 64)
+	return err == nil
+}
+
+func IsBooleanType(elem string) bool {
+	strLower := strings.ToLower(elem)
+	return strLower == "t" || strLower == "true" || strLower == "f" || strLower == "false"
+}
+
+func IsDateType(elem string) bool {
+	_, err := ParseDate(elem)
+	return err == nil
+}
+
+func ParseDate(elem string) (time.Time, error) {
+	patterns := []string{
+		"2006-01-02",
+		"2006-1-2",
+		"1/2/2006",
+		"01/02/2006",
+	}
+	for _, pattern := range patterns {
+		t, err := time.Parse(pattern, elem)
+		if err == nil {
+			return t, nil
+		}
+	}
+	return time.Now(), errors.New("Invalid Date string")
+}
+
+func ParseDateOrPanic(elem string) time.Time {
+	t, err := ParseDate(elem)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+func InferType(elem string) ColumnType {
+	if IsIntType(elem) {
 		return INT_TYPE
 	}
-	err = nil
-	_, err = strconv.ParseFloat(elem, 64)
-	if err == nil {
+	if IsFloatType(elem) {
 		return FLOAT_TYPE
 	}
-	strLower := strings.ToLower(strings.Trim(elem, " "))
-	if strLower == "t" || strLower == "true" || strLower == "f" || strLower == "false" {
+	if IsBooleanType(elem) {
 		return BOOLEAN_TYPE
+	}
+	if IsDateType(elem) {
+		return DATE_TYPE
 	}
 	return STRING_TYPE
 }

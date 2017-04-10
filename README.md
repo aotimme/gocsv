@@ -267,7 +267,7 @@ Arguments:
 
 ### sort
 
-Sort a CSV by multiple columns, with or without type inference. The currently supported types are float, int, and string.
+Sort a CSV by multiple columns, with or without type inference. The currently supported types are float, int, date, and string.
 
 Usage:
 
