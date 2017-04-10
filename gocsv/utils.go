@@ -51,7 +51,8 @@ func GetArrayFromCsvString(s string) []string {
 type ColumnType int
 
 const (
-	INT_TYPE ColumnType = iota
+	NULL_TYPE ColumnType = iota
+	INT_TYPE
 	FLOAT_TYPE
 	BOOLEAN_TYPE
 	DATE_TYPE
@@ -59,7 +60,9 @@ const (
 )
 
 func ColumnTypeToString(columnType ColumnType) string {
-	if columnType == INT_TYPE {
+	if columnType == NULL_TYPE {
+		return "null"
+	} else if columnType == INT_TYPE {
 		return "int"
 	} else if columnType == FLOAT_TYPE {
 		return "float"
@@ -123,6 +126,9 @@ func ParseDateOrPanic(elem string) time.Time {
 }
 
 func InferType(elem string) ColumnType {
+	if IsNullType(elem) {
+		return NULL_TYPE
+	}
 	if IsIntType(elem) {
 		return INT_TYPE
 	}
@@ -163,16 +169,24 @@ func (rs *RowSorter) Less(i, j int) bool {
 	return rs.by(&rs.rows[i], &rs.rows[j])
 }
 
-func parseFloat64OrPanic(strVal string) float64 {
-	floatVal, err := strconv.ParseFloat(strVal, 64)
+func ParseFloat64(strVal string) (float64, error) {
+	return strconv.ParseFloat(strVal, 64)
+}
+
+func ParseFloat64OrPanic(strVal string) float64 {
+	floatVal, err := ParseFloat64(strVal)
 	if err != nil {
 		panic(err)
 	}
 	return floatVal
 }
 
-func parseInt64OrPanic(strVal string) int64 {
-	intVal, err := strconv.ParseInt(strVal, 0, 0)
+func ParseInt64(strVal string) (int64, error) {
+	return strconv.ParseInt(strVal, 0, 0)
+}
+
+func ParseInt64OrPanic(strVal string) int64 {
+	intVal, err := ParseInt64(strVal)
 	if err != nil {
 		panic(err)
 	}

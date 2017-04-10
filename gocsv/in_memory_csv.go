@@ -73,7 +73,7 @@ func (imc *InMemoryCsv) GetRowsMatchingIndexedColumn(value string) [][]string {
 }
 
 func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
-	curType := INT_TYPE
+	curType := NULL_TYPE
 	for _, row := range imc.rows {
 		thisType := InferType(row[columnIndex])
 		if thisType > curType {
@@ -104,16 +104,16 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
 			}
 			columnType := columnTypes[i]
 			if columnType == FLOAT_TYPE {
-				row1Val := parseFloat64OrPanic(row1[columnIndex])
-				row2Val := parseFloat64OrPanic(row2[columnIndex])
+				row1Val := ParseFloat64OrPanic(row1[columnIndex])
+				row2Val := ParseFloat64OrPanic(row2[columnIndex])
 				if row1Val < row2Val {
 					return true
 				} else if row1Val > row2Val {
 					return false
 				}
 			} else if columnType == INT_TYPE {
-				row1Val := parseInt64OrPanic(row1[columnIndex])
-				row2Val := parseInt64OrPanic(row2[columnIndex])
+				row1Val := ParseInt64OrPanic(row1[columnIndex])
+				row2Val := ParseInt64OrPanic(row2[columnIndex])
 				if row1Val < row2Val {
 					return true
 				} else if row1Val > row2Val {
@@ -186,9 +186,11 @@ func (imc *InMemoryCsv) PrintStats() {
 func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
 	fmt.Printf("%d. %s\n", columnIndex+1, imc.header[columnIndex])
 	columnType := imc.InferType(columnIndex)
-	fmt.Printf("  %s\n", ColumnTypeToString(columnType))
-	imc.PrintColumnHasNulls(columnIndex)
-	if columnType == INT_TYPE {
+	fmt.Printf("  Type: %s\n", ColumnTypeToString(columnType))
+	imc.PrintColumnNumberNulls(columnIndex)
+	if columnType == NULL_TYPE {
+		// continue
+	} else if columnType == INT_TYPE {
 		imc.PrintStatsForColumnAsInt(columnIndex)
 	} else if columnType == FLOAT_TYPE {
 		imc.PrintStatsForColumnAsFloat(columnIndex)
@@ -196,33 +198,36 @@ func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
 		imc.PrintStatsForColumnAsBoolean(columnIndex)
 	} else if columnType == DATE_TYPE {
 		imc.PrintStatsForColumnAsDate(columnIndex)
-	} else {
+	} else if columnType == STRING_TYPE {
 		imc.PrintStatsForColumnAsString(columnIndex)
 	}
 }
 
-func (imc *InMemoryCsv) PrintColumnHasNulls(columnIndex int) {
-	if imc.ColumnHasNulls(columnIndex) {
-		fmt.Println("  Nulls: true")
-	} else {
-		fmt.Println("  Nulls: false")
-	}
+func (imc *InMemoryCsv) PrintColumnNumberNulls(columnIndex int) {
+	numNulls := imc.CountNullsInColumn(columnIndex)
+	fmt.Printf("  Number NULL: %d\n", numNulls)
 }
 
-func (imc *InMemoryCsv) ColumnHasNulls(columnIndex int) bool {
+func (imc *InMemoryCsv) CountNullsInColumn(columnIndex int) int {
+	numNulls := 0
 	for _, row := range imc.rows {
 		cell := row[columnIndex]
-		if cell == "" {
-			return true
+		if IsNullType(cell) {
+			numNulls += 1
 		}
 	}
-	return false
+	return numNulls
 }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsInt(columnIndex int) {
-	intArray := make([]int64, imc.NumRows())
-	for i, row := range imc.rows {
-		intArray[i] = parseInt64OrPanic(row[columnIndex])
+	numNulls := imc.CountNullsInColumn(columnIndex)
+	intArray := make([]int64, imc.NumRows()-numNulls)
+	i := 0
+	for _, row := range imc.rows {
+		if !IsNullType(row[columnIndex]) {
+			intArray[i] = ParseInt64OrPanic(row[columnIndex])
+			i++
+		}
 	}
 	ics := NewIntColumnsStats(intArray)
 	ics.CalculateAllStats()
@@ -354,9 +359,14 @@ func (a IntValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a IntValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsFloat(columnIndex int) {
-	floatArray := make([]float64, imc.NumRows())
-	for i, row := range imc.rows {
-		floatArray[i] = parseFloat64OrPanic(row[columnIndex])
+	numNulls := imc.CountNullsInColumn(columnIndex)
+	floatArray := make([]float64, imc.NumRows()-numNulls)
+	i := 0
+	for _, row := range imc.rows {
+		if !IsNullType(row[columnIndex]) {
+			floatArray[i] = ParseFloat64OrPanic(row[columnIndex])
+			i++
+		}
 	}
 	fcs := NewFloatColumnsStats(floatArray)
 	fcs.CalculateAllStats()
@@ -497,11 +507,13 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
 }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsDate(columnIndex int) {
-	dateArray := make([]time.Time, 0)
+	numNulls := imc.CountNullsInColumn(columnIndex)
+	dateArray := make([]time.Time, imc.NumRows()-numNulls)
+	i := 0
 	for _, row := range imc.rows {
-		t, err := ParseDate(row[columnIndex])
-		if err == nil {
-			dateArray = append(dateArray, t)
+		if !IsNullType(row[columnIndex]) {
+			dateArray[i] = ParseDateOrPanic(row[columnIndex])
+			i++
 		}
 	}
 	dcs := NewDateColumnsStats(dateArray)
@@ -575,9 +587,14 @@ func (dcs *DateColumnStats) CalculateValueCounts() {
 }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {
-	stringArray := make([]string, imc.NumRows())
-	for i, row := range imc.rows {
-		stringArray[i] = row[columnIndex]
+	numNulls := imc.CountNullsInColumn(columnIndex)
+	stringArray := make([]string, imc.NumRows()-numNulls)
+	i := 0
+	for _, row := range imc.rows {
+		if !IsNullType(row[columnIndex]) {
+			stringArray[i] = row[columnIndex]
+			i++
+		}
 	}
 	scs := NewStringColumnsStats(stringArray)
 	scs.CalculateAllStats()
