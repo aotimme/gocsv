@@ -10,51 +10,51 @@ func usage() string {
 	return `Usage:
   Valid subcommands are:
   - describe
-    Get basic information about a CSV.
+      Get basic information about a CSV.
   - dimensions (alias: dims)
-    Get the dimensions of a CSV.
+      Get the dimensions of a CSV.
   - clean
-    Clean a CSV of common formatting issues.
+      Clean a CSV of common formatting issues.
   - delimiter (alias: delim)
-    Change the delimiter being used for a CSV.
+      Change the delimiter being used for a CSV.
   - tsv
-    Transform a CSV into a TSV.
+      Transform a CSV into a TSV.
   - headers
-    View the headers from a CSV.
+      View the headers from a CSV.
   - view
-    Display a CSV in a pretty tabular format.
+      Display a CSV in a pretty tabular format.
   - stats
-  	Get some basic statistics on a CSV.
+      Get some basic statistics on a CSV.
   - rename
-    Rename the headers of a CSV.
+      Rename the headers of a CSV.
   - head
-    Extract the first N rows from a CSV.
+      Extract the first N rows from a CSV.
   - tail
-    Extract the last N rows from a CSV.
+      Extract the last N rows from a CSV.
   - behead
-    Remove header row(s) from a CSV.
+      Remove header row(s) from a CSV.
   - autoincrement (alias: autoinc)
-    Add a column of incrementing integers to a CSV.
+      Add a column of incrementing integers to a CSV.
   - stack
-    Stack multiple CSVs into one CSV.
+      Stack multiple CSVs into one CSV.
   - split
-    Split a CSV into multiple files.
+      Split a CSV into multiple files.
   - sort
-    Sort a CSV based on one or more columns.
+      Sort a CSV based on one or more columns.
   - filter
-    Extract rows whose column match some criterion.
+      Extract rows whose column match some criterion.
   - replace
-  	Replace values in cells by regular expression.
+      Replace values in cells by regular expression.
   - select
-    Extract specified columns.
+      Extract specified columns.
   - sample
-    Sample rows.
+      Sample rows.
   - unique (alias: uniq)
-    Extract unique rows based upon certain columns.
+      Extract unique rows based upon certain columns.
   - join
-    Join two CSVs based on equality of elements in a column.
+      Join two CSVs based on equality of elements in a column.
   - xlsx
-    Convert sheets of a XLSX file to CSV.
+      Convert sheets of a XLSX file to CSV.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
 }
 
