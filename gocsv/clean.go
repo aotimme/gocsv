@@ -48,6 +48,7 @@ func Clean(reader *csv.Reader, noTrim, excel, numbers, verbose bool) {
 
 	// Disable errors when fields are varying length
 	reader.FieldsPerRecord = -1
+	reader.LazyQuotes = true
 
 	// Read in rows.
 	rows, err := reader.ReadAll()

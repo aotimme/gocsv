@@ -1,10 +1,11 @@
 Short,Headers
 Line,Too,Long
-Line,Even,Longer,
+"Quoted,Line",Long
+Line,"Even",Longer,
 Line,Short
 Shortest
 ,,,
-After,Empty,Row
+After,Empty",Row
 Row,"With
 New Line",
 ,,
