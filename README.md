@@ -19,7 +19,7 @@ To install on Apple OS X, open a Terminal window and run
 
 ## Introduction
 
-The tool is built for [pipelining](#pipelining), so most commands accept a CSV from standard output and output to standard output.
+The tool is built for [pipelining](#pipelining), so most commands accept a CSV from standard input and output to standard output.
 
 Subcommands:
 
@@ -75,6 +75,8 @@ gocsv dimensions FILE
 ### clean
 
 Clean a CSV of common formatting issues. Currently this consists of making sure all rows are the same length (padding short rows and trimming long ones) and removing empty rows at the end.
+
+Note that this subcommand, along with other subcommands, will include a newline at the end of the last line of the outputted CSV. This is because `gocsv` assumes that every row in a CSV (or other-delimited text file) will end in a new line.
 
 Usage:
 
