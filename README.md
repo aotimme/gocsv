@@ -470,6 +470,7 @@ cat test-files/left-table.csv \
 | sql           |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 
 &#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
+
 &#x2021; `xlsx` sends output to standard out when using the `--sheet` flag.
 
 ## Examples
