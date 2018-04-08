@@ -424,6 +424,8 @@ Arguments:
 
 When passing in files, you may read from standard input by specifying the filename `-`.
 
+Table names are derived from the CSV filenames by taking the base filename without the file extension. For example, `test-files/stats.csv` can be referenced as the table `stats`. The table from standard input `-` can be referenced as the table `'-'`.
+
 ## Specifying Columns
 
 When specifying a column on the command line, you can specify either the index or the name of the column. The tool will always try to interpret the column first by index and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the first column that is an exact case-sensitive match.
