@@ -424,7 +424,7 @@ Arguments:
 
 When passing in files, you may read from standard input by specifying the filename `-`.
 
-Table names are derived from the CSV filenames by taking the base filename without the file extension. For example, `test-files/stats.csv` can be referenced as the table `stats`. The table from standard input `-` can be referenced as the table `'-'`.
+Table names are derived from the CSV filenames by taking the base filename without the file extension. For example, `test-files/stats.csv` is referenced as a table with the name `stats`. The table from standard input `-` should be referenced as the table `'-'`.
 
 ## Specifying Columns
 
