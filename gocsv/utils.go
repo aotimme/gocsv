@@ -77,6 +77,24 @@ func ColumnTypeToString(columnType ColumnType) string {
 	}
 }
 
+func ColumnTypeToSqlType(columnType ColumnType) string {
+	if columnType == NULL_TYPE {
+		return "TEXT"
+	} else if columnType == INT_TYPE {
+		return "INTEGER"
+	} else if columnType == FLOAT_TYPE {
+		return "FLOAT"
+	} else if columnType == BOOLEAN_TYPE {
+		return "INTEGER"
+	} else if columnType == DATE_TYPE {
+		return "DATE"
+	} else if columnType == STRING_TYPE {
+		return "TEXT"
+	} else {
+		return "TEXT"
+	}
+}
+
 func IsNullType(elem string) bool {
 	return elem == ""
 }

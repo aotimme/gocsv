@@ -55,6 +55,8 @@ func usage() string {
       Join two CSVs based on equality of elements in a column.
   - xlsx
       Convert sheets of a XLSX file to CSV.
+  - sql
+      Run SQL queries on the input CSVs as tables.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
 }
 
@@ -113,6 +115,8 @@ func main() {
 		RunJoin(args[2:])
 	} else if subcommand == "xlsx" {
 		RunXLSX(args[2:])
+	} else if subcommand == "sql" {
+		RunSql(args[2:])
 	} else if subcommand == "help" {
 		fmt.Fprintf(os.Stderr, "%s\n", usage())
 	} else {
