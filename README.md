@@ -46,6 +46,7 @@ Subcommands:
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
 - [xlsx](#xlsx) - Convert sheets of a XLSX file to CSV.
+- [sql](#sql) - Run SQL queries on CSVs.
 
 
 ## Subcommands
@@ -408,6 +409,21 @@ Arguments:
 
 By default the `xlsx` subcommand will convert all the sheets in `FILE` to CSVs to a directory with the same name as `FILE`.
 
+### sql
+
+Run SQL queries on CSVs.
+
+Usage:
+```shell
+gocsv sql --query QUERY FILE [FILES]
+```
+
+Arguments:
+
+- `--query` (shorthand `-q`) The SQL query to run.
+
+When passing in files, you may read from standard input by specifying the filename `-`.
+
 ## Specifying Columns
 
 When specifying a column on the command line, you can specify either the index or the name of the column. The tool will always try to interpret the column first by index and then by name. The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand). When specifying the name, it will use the first column that is an exact case-sensitive match.
@@ -451,6 +467,7 @@ cat test-files/left-table.csv \
 | unique        |  &#x2714;   | &#x2714; |
 | join          |  &#x2714;   | &#x2714; |
 | xlsx          |     N/A     |    *     |
+| sql           |  &#x2714;   | &#x2714; |
 
 \* `xlsx` sends output to standard out when using the `--sheet` flag.
 

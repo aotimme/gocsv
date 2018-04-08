@@ -56,7 +56,7 @@ func usage() string {
   - xlsx
       Convert sheets of a XLSX file to CSV.
   - sql
-      Run SQL queries on the input CSVs as tables.
+      Run SQL queries on CSVs.
 See https://github.com/DataFoxCo/gocsv for more documentation.`
 }
 

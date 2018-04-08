@@ -124,26 +124,8 @@ func RunSql(args []string) {
 		panic(err)
 	}
 	filenames := fs.Args()
-	hasDash := false
-	for _, filename := range filenames {
-		if filename == "-" {
-			hasDash = true
-			break
-		}
-	}
-	var tableNames []string
-	var readers []*csv.Reader
-	startIndex := 0
-	if hasDash {
-		tableNames = make([]string, len(filenames))
-		readers = make([]*csv.Reader, len(filenames))
-	} else {
-		tableNames = make([]string, len(filenames)+1)
-		readers = make([]*csv.Reader, len(filenames)+1)
-		tableNames[0] = "-"
-		readers[0] = csv.NewReader(os.Stdin)
-		startIndex = 1
-	}
+	readers := make([]*csv.Reader, len(filenames))
+	tableNames := make([]string, len(filenames))
 	for i, filename := range filenames {
 		var reader *csv.Reader
 		var tableName string
@@ -161,8 +143,8 @@ func RunSql(args []string) {
 			reader = csv.NewReader(file)
 			defer file.Close()
 		}
-		tableNames[startIndex+i] = tableName
-		readers[startIndex+i] = reader
+		tableNames[i] = tableName
+		readers[i] = reader
 	}
 	DoSqlQuery(readers, tableNames, queryString)
 }
