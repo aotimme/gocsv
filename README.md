@@ -457,7 +457,7 @@ cat test-files/left-table.csv \
 | rename        |  &#x2714;           | &#x2714; |
 | behead        |  &#x2714;           | &#x2714; |
 | autoincrement |  &#x2714;           | &#x2714; |
-| stack         |  &#x2714;&#x2020;   | &#x2714; |
+| stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 | split         |  &#x2714;           |   N/A    |
 | sort          |  &#x2714;           | &#x2714; |
 | filter        |  &#x2714;           | &#x2714; |
@@ -467,7 +467,7 @@ cat test-files/left-table.csv \
 | unique        |  &#x2714;           | &#x2714; |
 | join          |  &#x2714;           | &#x2714; |
 | xlsx          |     N/A             | &#x2021; |
-| sql           |  &#x2714;&#x2020;   | &#x2714; |
+| sql           |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 
 &#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
 &#x2021; `xlsx` sends output to standard out when using the `--sheet` flag.
