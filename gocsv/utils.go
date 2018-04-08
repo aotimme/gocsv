@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -209,4 +210,10 @@ func ParseInt64OrPanic(strVal string) int64 {
 		panic(err)
 	}
 	return intVal
+}
+
+func GetBaseFilenameWithoutExtension(filename string) string {
+	baseFilename := path.Base(filename)
+	extension := path.Ext(baseFilename)
+	return strings.TrimSuffix(baseFilename, extension)
 }

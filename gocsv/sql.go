@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -134,8 +133,7 @@ func RunSql(args []string) {
 			reader = csv.NewReader(os.Stdin)
 		} else {
 			// leaves name unchanged if it does not end in ".csv"
-			_, baseFilename := path.Split(filename)
-			tableName = strings.TrimSuffix(baseFilename, ".csv")
+			tableName = GetBaseFilenameWithoutExtension(filename)
 			file, err := os.Open(filename)
 			if err != nil {
 				panic(err)

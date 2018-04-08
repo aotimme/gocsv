@@ -105,12 +105,18 @@ func RunStack(args []string) {
 
 	readers := make([]*csv.Reader, len(filenames))
 	for i, filename := range filenames {
-		file, err := os.Open(filename)
-		if err != nil {
-			panic(err)
+		var reader *csv.Reader
+		if filename == "-" {
+			reader = csv.NewReader(os.Stdin)
+		} else {
+			file, err := os.Open(filename)
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+			reader = csv.NewReader(file)
 		}
-		defer file.Close()
-		readers[i] = csv.NewReader(file)
+		readers[i] = reader
 	}
 	StackFiles(readers, groupColumnName, groups)
 }

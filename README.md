@@ -251,7 +251,7 @@ Arguments:
 
 Note that `--groups` and `--filenames` are mutually exclusive.
 
-Also note that the `stack` subcommand does not support piping from standard input.
+Specifying a file by name `-` will read a CSV from standard input.
 
 ### split
 
@@ -430,7 +430,7 @@ When specifying a column on the command line, you can specify either the index o
 
 ## Pipelining
 
-Because all of the subcommands (other than [stack](#stack)) support receiving a CSV from standard input, you can easily pipeline:
+Because all of the subcommands support receiving a CSV from standard input, you can easily pipeline:
 
 ```shell
 cat test-files/left-table.csv \
@@ -442,34 +442,35 @@ cat test-files/left-table.csv \
 
 ### Pipelining Support
 
-| Subcommand    |    Input    |  Output  |
-| ------------- | :---------: | :------: |
-| describe      |  &#x2714;   |   N/A    |
-| dimensions    |  &#x2714;   |   N/A    |
-| clean         |  &#x2714;   | &#x2714; |
-| tsv           |  &#x2714;   | &#x2714; |
-| delimiter     |  &#x2714;   | &#x2714; |
-| head          |  &#x2714;   | &#x2714; |
-| tail          |  &#x2714;   | &#x2714; |
-| headers       |  &#x2714;   |   N/A    |
-| view          |  &#x2714;   |   N/A    |
-| stats         |  &#x2714;   |   N/A    |
-| rename        |  &#x2714;   | &#x2714; |
-| behead        |  &#x2714;   | &#x2714; |
-| autoincrement |  &#x2714;   | &#x2714; |
-| stack         | Coming Soon | &#x2714; |
-| split         |  &#x2714;   |   N/A    |
-| sort          |  &#x2714;   | &#x2714; |
-| filter        |  &#x2714;   | &#x2714; |
-| replace       |  &#x2714;   | &#x2714; |
-| select        |  &#x2714;   | &#x2714; |
-| sample        |  &#x2714;   | &#x2714; |
-| unique        |  &#x2714;   | &#x2714; |
-| join          |  &#x2714;   | &#x2714; |
-| xlsx          |     N/A     |    *     |
-| sql           |  &#x2714;   | &#x2714; |
+| Subcommand    |    Input            |  Output  |
+| ------------- | :-----------------: | :------: |
+| describe      |  &#x2714;           |   N/A    |
+| dimensions    |  &#x2714;           |   N/A    |
+| clean         |  &#x2714;           | &#x2714; |
+| tsv           |  &#x2714;           | &#x2714; |
+| delimiter     |  &#x2714;           | &#x2714; |
+| head          |  &#x2714;           | &#x2714; |
+| tail          |  &#x2714;           | &#x2714; |
+| headers       |  &#x2714;           |   N/A    |
+| view          |  &#x2714;           |   N/A    |
+| stats         |  &#x2714;           |   N/A    |
+| rename        |  &#x2714;           | &#x2714; |
+| behead        |  &#x2714;           | &#x2714; |
+| autoincrement |  &#x2714;           | &#x2714; |
+| stack         |  &#x2714;&#x2020;   | &#x2714; |
+| split         |  &#x2714;           |   N/A    |
+| sort          |  &#x2714;           | &#x2714; |
+| filter        |  &#x2714;           | &#x2714; |
+| replace       |  &#x2714;           | &#x2714; |
+| select        |  &#x2714;           | &#x2714; |
+| sample        |  &#x2714;           | &#x2714; |
+| unique        |  &#x2714;           | &#x2714; |
+| join          |  &#x2714;           | &#x2714; |
+| xlsx          |     N/A             | &#x2021; |
+| sql           |  &#x2714;&#x2020;   | &#x2714; |
 
-\* `xlsx` sends output to standard out when using the `--sheet` flag.
+&#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
+&#x2021; `xlsx` sends output to standard out when using the `--sheet` flag.
 
 ## Examples
 
@@ -531,6 +532,12 @@ gocsv sort --columns LID,ABC --reverse test-files/left-table.csv
 
 ```shell
 gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" test-files/stack-1.csv test-files/stack-2.csv test-files/stack-3.csv
+```
+
+To do the same via pipelining through standard input,
+
+```shell
+cat test-files/stack-1.csv | ./bin/gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" - test-files/stack-2.csv test-files/stack-3.csv
 ```
 
 ## Installation
