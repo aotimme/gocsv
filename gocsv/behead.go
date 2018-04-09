@@ -8,6 +8,40 @@ import (
 	"os"
 )
 
+type BeheadSubcommand struct{}
+
+func (sub *BeheadSubcommand) Name() string {
+	return "behead"
+}
+func (sub *BeheadSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *BeheadSubcommand) Description() string {
+	return "Remove header row(s) from a CSV."
+}
+
+func (sub *BeheadSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet("behead", flag.ExitOnError)
+	var numHeaders int
+	fs.IntVar(&numHeaders, "n", 1, "Number of headers to remove")
+
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	if numHeaders < 1 {
+		fmt.Fprintln(os.Stderr, "Invalid argument -n")
+		os.Exit(1)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+	Behead(inputCsvs[0], numHeaders)
+}
+
 func Behead(inputCsv AbstractInputCsv, numHeaders int) {
 	writer := csv.NewWriter(os.Stdout)
 
@@ -37,26 +71,4 @@ func Behead(inputCsv AbstractInputCsv, numHeaders int) {
 		writer.Write(row)
 		writer.Flush()
 	}
-}
-
-func RunBehead(args []string) {
-	fs := flag.NewFlagSet("behead", flag.ExitOnError)
-	var numHeaders int
-	fs.IntVar(&numHeaders, "n", 1, "Number of headers to remove")
-
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	if numHeaders < 1 {
-		fmt.Fprintln(os.Stderr, "Invalid argument -n")
-		os.Exit(1)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-	Behead(inputCsvs[0], numHeaders)
 }

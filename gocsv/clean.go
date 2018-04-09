@@ -13,6 +13,37 @@ const (
 	NUMBERS_ROW_LIMIT     = 65535
 )
 
+type CleanSubcommand struct{}
+
+func (sub *CleanSubcommand) Name() string {
+	return "clean"
+}
+func (sub *CleanSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *CleanSubcommand) Description() string {
+	return "Clean a CSV of common formatting issues."
+}
+
+func (sub *CleanSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var noTrim, excel, numbers, verbose bool
+	fs.BoolVar(&noTrim, "no-trim", false, "Don't trim end of file of empty rows")
+	fs.BoolVar(&excel, "excel", false, "Clean for use in Excel")
+	fs.BoolVar(&numbers, "numbers", false, "Clean for use in Numbers")
+	fs.BoolVar(&verbose, "verbose", false, "Print messages when cleaning")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+	Clean(inputCsvs[0], noTrim, excel, numbers, verbose)
+}
+
 func GetStringForRowIndex(index int) string {
 	if index == 0 {
 		return "Header"
@@ -127,23 +158,4 @@ func Clean(inputCsv AbstractInputCsv, noTrim, excel, numbers, verbose bool) {
 		writer.Write(shellRow)
 		writer.Flush()
 	}
-}
-
-func RunClean(args []string) {
-	fs := flag.NewFlagSet("clean", flag.ExitOnError)
-	var noTrim, excel, numbers, verbose bool
-	fs.BoolVar(&noTrim, "no-trim", false, "Don't trim end of file of empty rows")
-	fs.BoolVar(&excel, "excel", false, "Clean for use in Excel")
-	fs.BoolVar(&numbers, "numbers", false, "Clean for use in Numbers")
-	fs.BoolVar(&verbose, "verbose", false, "Print messages when cleaning")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-	Clean(inputCsvs[0], noTrim, excel, numbers, verbose)
 }

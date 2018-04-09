@@ -11,6 +11,54 @@ import (
 	"strings"
 )
 
+type HeadSubcommand struct{}
+
+func (sub *HeadSubcommand) Name() string {
+	return "head"
+}
+func (sub *HeadSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *HeadSubcommand) Description() string {
+	return "Extract the first N rows from a CSV."
+}
+
+func (sub *HeadSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var numRowsStr string
+	fs.StringVar(&numRowsStr, "n", "10", "Number of rows to include")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
+	if !numRowsRegex.MatchString(numRowsStr) {
+		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
+		os.Exit(1)
+		return
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+
+	if strings.HasPrefix(numRowsStr, "+") {
+		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
+		numRows, err := strconv.Atoi(numRowsStr)
+		if err != nil {
+			panic(err)
+		}
+		HeadFromBottom(inputCsvs[0], numRows)
+	} else {
+		numRows, err := strconv.Atoi(numRowsStr)
+		if err != nil {
+			panic(err)
+		}
+		HeadFromTop(inputCsvs[0], numRows)
+	}
+}
+
 func HeadFromBottom(inputCsv AbstractInputCsv, numRows int) {
 	writer := csv.NewWriter(os.Stdout)
 
@@ -62,41 +110,5 @@ func HeadFromTop(inputCsv AbstractInputCsv, numRows int) {
 		curRow++
 		writer.Write(row)
 		writer.Flush()
-	}
-}
-
-func RunHead(args []string) {
-	fs := flag.NewFlagSet("filter", flag.ExitOnError)
-	var numRowsStr string
-	fs.StringVar(&numRowsStr, "n", "10", "Number of rows to include")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
-	if !numRowsRegex.MatchString(numRowsStr) {
-		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
-		os.Exit(1)
-		return
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-
-	if strings.HasPrefix(numRowsStr, "+") {
-		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
-		numRows, err := strconv.Atoi(numRowsStr)
-		if err != nil {
-			panic(err)
-		}
-		HeadFromBottom(inputCsvs[0], numRows)
-	} else {
-		numRows, err := strconv.Atoi(numRowsStr)
-		if err != nil {
-			panic(err)
-		}
-		HeadFromTop(inputCsvs[0], numRows)
 	}
 }

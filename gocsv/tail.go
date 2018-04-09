@@ -11,6 +11,53 @@ import (
 	"strings"
 )
 
+type TailSubcommand struct{}
+
+func (sub *TailSubcommand) Name() string {
+	return "tail"
+}
+func (sub *TailSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *TailSubcommand) Description() string {
+	return "Extract the last N rows from a CSV."
+}
+
+func (sub *TailSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var numRowsStr string
+	fs.StringVar(&numRowsStr, "n", "10", "Number of rows to include")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
+	if !numRowsRegex.MatchString(numRowsStr) {
+		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
+		os.Exit(1)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+
+	if strings.HasPrefix(numRowsStr, "+") {
+		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
+		numRows, err := strconv.Atoi(numRowsStr)
+		if err != nil {
+			panic(err)
+		}
+		TailFromTop(inputCsvs[0], numRows)
+	} else {
+		numRows, err := strconv.Atoi(numRowsStr)
+		if err != nil {
+			panic(err)
+		}
+		TailFromBottom(inputCsvs[0], numRows)
+	}
+}
+
 func TailFromBottom(inputCsv AbstractInputCsv, numRows int) {
 	writer := csv.NewWriter(os.Stdout)
 
@@ -62,40 +109,5 @@ func TailFromTop(inputCsv AbstractInputCsv, numRows int) {
 			writer.Write(row)
 			writer.Flush()
 		}
-	}
-}
-
-func RunTail(args []string) {
-	fs := flag.NewFlagSet("filter", flag.ExitOnError)
-	var numRowsStr string
-	fs.StringVar(&numRowsStr, "n", "10", "Number of rows to include")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
-	if !numRowsRegex.MatchString(numRowsStr) {
-		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
-		os.Exit(1)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-
-	if strings.HasPrefix(numRowsStr, "+") {
-		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
-		numRows, err := strconv.Atoi(numRowsStr)
-		if err != nil {
-			panic(err)
-		}
-		TailFromTop(inputCsvs[0], numRows)
-	} else {
-		numRows, err := strconv.Atoi(numRowsStr)
-		if err != nil {
-			panic(err)
-		}
-		TailFromBottom(inputCsvs[0], numRows)
 	}
 }

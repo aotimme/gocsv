@@ -10,6 +10,57 @@ import (
 	"github.com/alphagov/router/trie"
 )
 
+type UniqueSubcommand struct{}
+
+func (sub *UniqueSubcommand) Name() string {
+	return "unique"
+}
+func (sub *UniqueSubcommand) Aliases() []string {
+	return []string{"uniq"}
+}
+func (sub *UniqueSubcommand) Description() string {
+	return "Extract unique rows based upon certain columns."
+}
+
+func (sub *UniqueSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var columnsString string
+	var sorted, count bool
+	fs.StringVar(&columnsString, "columns", "", "Columns to use for comparison")
+	fs.StringVar(&columnsString, "c", "", "Columns to use for comparison (shorthand)")
+	fs.BoolVar(&sorted, "sorted", false, "Whether input CSV is already sorted")
+	fs.BoolVar(&count, "count", false, "Whether to append a Count column")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+	var columns []string
+	if columnsString == "" {
+		columns = make([]string, 0)
+	} else {
+		columns = GetArrayFromCsvString(columnsString)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+
+	if sorted {
+		if count {
+			UniqueifySortedWithCount(inputCsvs[0], columns)
+		} else {
+			UniqueifySorted(inputCsvs[0], columns)
+		}
+	} else {
+		if count {
+			UniqueifyUnsortedWithCount(inputCsvs[0], columns)
+		} else {
+			UniqueifyUnsorted(inputCsvs[0], columns)
+		}
+	}
+}
+
 func GetColumnIndicesOrAll(columns, header []string) []int {
 	var columnIndices []int
 	if len(columns) == 0 {
@@ -217,45 +268,6 @@ func UniqueifyUnsortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 			shellRow[len(shellRow)-1] = strconv.Itoa(count)
 			writer.Write(shellRow)
 			writer.Flush()
-		}
-	}
-}
-
-func RunUnique(args []string) {
-	fs := flag.NewFlagSet("unique", flag.ExitOnError)
-	var columnsString string
-	var sorted, count bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to use for comparison")
-	fs.StringVar(&columnsString, "c", "", "Columns to use for comparison (shorthand)")
-	fs.BoolVar(&sorted, "sorted", false, "Whether input CSV is already sorted")
-	fs.BoolVar(&count, "count", false, "Whether to append a Count column")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	var columns []string
-	if columnsString == "" {
-		columns = make([]string, 0)
-	} else {
-		columns = GetArrayFromCsvString(columnsString)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-
-	if sorted {
-		if count {
-			UniqueifySortedWithCount(inputCsvs[0], columns)
-		} else {
-			UniqueifySorted(inputCsvs[0], columns)
-		}
-	} else {
-		if count {
-			UniqueifyUnsortedWithCount(inputCsvs[0], columns)
-		} else {
-			UniqueifyUnsorted(inputCsvs[0], columns)
 		}
 	}
 }

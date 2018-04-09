@@ -4,13 +4,20 @@ import (
 	"flag"
 )
 
-func Stats(inputCsv AbstractInputCsv) {
-	imc := NewInMemoryCsvFromInputCsv(inputCsv)
-	imc.PrintStats()
+type StatsSubcommand struct{}
+
+func (sub *StatsSubcommand) Name() string {
+	return "stats"
+}
+func (sub *StatsSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *StatsSubcommand) Description() string {
+	return "Get some basic statistics on a CSV."
 }
 
-func RunStats(args []string) {
-	fs := flag.NewFlagSet("stats", flag.ExitOnError)
+func (sub *StatsSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
 	err := fs.Parse(args)
 	if err != nil {
 		panic(err)
@@ -22,4 +29,9 @@ func RunStats(args []string) {
 	}
 
 	Stats(inputCsvs[0])
+}
+
+func Stats(inputCsv AbstractInputCsv) {
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
+	imc.PrintStats()
 }

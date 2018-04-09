@@ -8,6 +8,42 @@ import (
 	"strconv"
 )
 
+type AutoincrementSubcommand struct{}
+
+func (sub *AutoincrementSubcommand) Name() string {
+	return "autoincrement"
+}
+func (sub *AutoincrementSubcommand) Aliases() []string {
+	return []string{"autoinc"}
+}
+func (sub *AutoincrementSubcommand) Description() string {
+	return "Add a column of incrementing integers to a CSV."
+}
+
+func (sub *AutoincrementSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var name string
+	var seed int
+	var prepend bool
+	fs.StringVar(&name, "name", "ID", "Name of autoincrementing column")
+	fs.IntVar(&seed, "seed", 1, "Initial value of autoincrementing column")
+	fs.BoolVar(&prepend, "prepend", false, "Prepend the autoincrementing column (defaults to append)")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+	AutoIncrement(inputCsvs[0], name, seed, prepend)
+	err = inputCsvs[0].Close()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend bool) {
 	writer := csv.NewWriter(os.Stdout)
 
@@ -54,29 +90,5 @@ func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend boo
 		inc++
 		writer.Write(shellRow)
 		writer.Flush()
-	}
-}
-
-func RunAutoIncrement(args []string) {
-	fs := flag.NewFlagSet("autoincrement", flag.ExitOnError)
-	var name string
-	var seed int
-	var prepend bool
-	fs.StringVar(&name, "name", "ID", "Name of autoincrementing column")
-	fs.IntVar(&seed, "seed", 1, "Initial value of autoincrementing column")
-	fs.BoolVar(&prepend, "prepend", false, "Prepend the autoincrementing column (defaults to append)")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-	AutoIncrement(inputCsvs[0], name, seed, prepend)
-	err = inputCsvs[0].Close()
-	if err != nil {
-		panic(err)
 	}
 }

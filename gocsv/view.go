@@ -7,6 +7,45 @@ import (
 	"strings"
 )
 
+type ViewSubcommand struct{}
+
+func (sub *ViewSubcommand) Name() string {
+	return "view"
+}
+func (sub *ViewSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *ViewSubcommand) Description() string {
+	return "Display a CSV in a pretty tabular format."
+}
+
+func (sub *ViewSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var maxWidth, maxRows int
+	fs.IntVar(&maxWidth, "max-width", 20, "Maximum width per column")
+	fs.IntVar(&maxWidth, "w", 20, "Maximum width per column (shorthand)")
+	fs.IntVar(&maxRows, "n", 0, "Number of rows to display")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	if maxWidth < 1 {
+		fmt.Fprintln(os.Stderr, "Invalid argument --max-width")
+		os.Exit(1)
+	}
+	if maxRows < 0 {
+		maxRows = 0
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+
+	View(inputCsvs[0], maxWidth, maxRows)
+}
+
 func getCellWidth(cell string) int {
 	indexOfNewline := strings.Index(cell, "\n")
 	if indexOfNewline > -1 {
@@ -105,31 +144,4 @@ func View(inputCsv AbstractInputCsv, maxWidth, maxRows int) {
 		fmt.Printf("| %s |\n", strings.Join(outrow, " | "))
 		fmt.Println(rowSeparator)
 	}
-}
-
-func RunView(args []string) {
-	fs := flag.NewFlagSet("view", flag.ExitOnError)
-	var maxWidth, maxRows int
-	fs.IntVar(&maxWidth, "max-width", 20, "Maximum width per column")
-	fs.IntVar(&maxWidth, "w", 20, "Maximum width per column (shorthand)")
-	fs.IntVar(&maxRows, "n", 0, "Number of rows to display")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	if maxWidth < 1 {
-		fmt.Fprintln(os.Stderr, "Invalid argument --max-width")
-		os.Exit(1)
-	}
-	if maxRows < 0 {
-		maxRows = 0
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-
-	View(inputCsvs[0], maxWidth, maxRows)
 }

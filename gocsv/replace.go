@@ -8,6 +8,62 @@ import (
 	"regexp"
 )
 
+type ReplaceSubcommand struct{}
+
+func (sub *ReplaceSubcommand) Name() string {
+	return "replace"
+}
+func (sub *ReplaceSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *ReplaceSubcommand) Description() string {
+	return "Replace values in cells by regular expression."
+}
+
+func (sub *ReplaceSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet("replace", flag.ExitOnError)
+	var regex, repl, columnsString string
+	var caseInsensitive bool
+	fs.StringVar(&columnsString, "columns", "", "Columns to replace cells")
+	fs.StringVar(&columnsString, "c", "", "Columns to replace cells (shorthand)")
+	fs.StringVar(&regex, "regex", "", "Regular expression to match for replacement")
+	fs.StringVar(&repl, "repl", "", "Replacement string")
+	fs.BoolVar(&caseInsensitive, "case-insensitive", false, "Make regex case insensitive")
+	fs.BoolVar(&caseInsensitive, "i", false, "Make regex case insensitive (shorthand)")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	// Get columns to compare against
+	var columns []string
+	if columnsString == "" {
+		columns = make([]string, 0)
+	} else {
+		columns = GetArrayFromCsvString(columnsString)
+	}
+
+	// Get replace function
+	var replaceFunc func(string) string
+	if caseInsensitive {
+		regex = "(?i)" + regex
+	}
+	re, err := regexp.Compile(regex)
+	if err != nil {
+		panic(err)
+	}
+	replaceFunc = func(elem string) string {
+		return re.ReplaceAllString(elem, repl)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+
+	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
+}
+
 // Get indices to compare against.
 // If no columns are specified, then check against all.
 func getColumnIndicesToCompareAgainst(header, columns []string) []int {
@@ -59,48 +115,4 @@ func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc fu
 		writer.Write(rowToWrite)
 		writer.Flush()
 	}
-}
-
-func RunReplace(args []string) {
-	fs := flag.NewFlagSet("replace", flag.ExitOnError)
-	var regex, repl, columnsString string
-	var caseInsensitive bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to replace cells")
-	fs.StringVar(&columnsString, "c", "", "Columns to replace cells (shorthand)")
-	fs.StringVar(&regex, "regex", "", "Regular expression to match for replacement")
-	fs.StringVar(&repl, "repl", "", "Replacement string")
-	fs.BoolVar(&caseInsensitive, "case-insensitive", false, "Make regex case insensitive")
-	fs.BoolVar(&caseInsensitive, "i", false, "Make regex case insensitive (shorthand)")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	// Get columns to compare against
-	var columns []string
-	if columnsString == "" {
-		columns = make([]string, 0)
-	} else {
-		columns = GetArrayFromCsvString(columnsString)
-	}
-
-	// Get replace function
-	var replaceFunc func(string) string
-	if caseInsensitive {
-		regex = "(?i)" + regex
-	}
-	re, err := regexp.Compile(regex)
-	if err != nil {
-		panic(err)
-	}
-	replaceFunc = func(elem string) string {
-		return re.ReplaceAllString(elem, repl)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-
-	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
 }

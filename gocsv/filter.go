@@ -10,61 +10,20 @@ import (
 	"strconv"
 )
 
-func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, matchFunc func(string) bool) {
-	writer := csv.NewWriter(os.Stdout)
+type FilterSubcommand struct{}
 
-	// Read header to get column index and write.
-	header, err := inputCsv.Read()
-	if err != nil {
-		panic(err)
-	}
-
-	// Get indices to compare against.
-	// If no columns are specified, then check against all.
-	var columnIndices []int
-	if len(columns) == 0 {
-		columnIndices = make([]int, len(header))
-		for i, _ := range header {
-			columnIndices[i] = i
-		}
-	} else {
-		columnIndices = make([]int, len(columns))
-		for i, column := range columns {
-			index := GetColumnIndexOrPanic(header, column)
-			columnIndices[i] = index
-		}
-	}
-
-	writer.Write(header)
-	writer.Flush()
-
-	// Write filtered rows.
-	for {
-		row, err := inputCsv.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			} else {
-				panic(err)
-			}
-		}
-		rowMatches := false
-		for _, columnIndex := range columnIndices {
-			if matchFunc(row[columnIndex]) {
-				rowMatches = true
-				break
-			}
-		}
-		shouldOutputRow := (!exclude && rowMatches) || (exclude && !rowMatches)
-		if shouldOutputRow {
-			writer.Write(row)
-			writer.Flush()
-		}
-	}
+func (sub *FilterSubcommand) Name() string {
+	return "filter"
+}
+func (sub *FilterSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *FilterSubcommand) Description() string {
+	return "Extract rows whose column match some criterion."
 }
 
-func RunFilter(args []string) {
-	fs := flag.NewFlagSet("filter", flag.ExitOnError)
+func (sub *FilterSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
 	var regex, columnsString string
 	var exclude, caseInsensitive bool
 	var gtStr, gteStr, ltStr, lteStr string
@@ -231,4 +190,57 @@ func RunFilter(args []string) {
 	}
 
 	FilterMatchFunc(inputCsvs[0], columns, exclude, matchFunc)
+}
+
+func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, matchFunc func(string) bool) {
+	writer := csv.NewWriter(os.Stdout)
+
+	// Read header to get column index and write.
+	header, err := inputCsv.Read()
+	if err != nil {
+		panic(err)
+	}
+
+	// Get indices to compare against.
+	// If no columns are specified, then check against all.
+	var columnIndices []int
+	if len(columns) == 0 {
+		columnIndices = make([]int, len(header))
+		for i, _ := range header {
+			columnIndices[i] = i
+		}
+	} else {
+		columnIndices = make([]int, len(columns))
+		for i, column := range columns {
+			index := GetColumnIndexOrPanic(header, column)
+			columnIndices[i] = index
+		}
+	}
+
+	writer.Write(header)
+	writer.Flush()
+
+	// Write filtered rows.
+	for {
+		row, err := inputCsv.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				panic(err)
+			}
+		}
+		rowMatches := false
+		for _, columnIndex := range columnIndices {
+			if matchFunc(row[columnIndex]) {
+				rowMatches = true
+				break
+			}
+		}
+		shouldOutputRow := (!exclude && rowMatches) || (exclude && !rowMatches)
+		if shouldOutputRow {
+			writer.Write(row)
+			writer.Flush()
+		}
+	}
 }

@@ -4,10 +4,58 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"github.com/tealeg/xlsx"
 	"os"
 	"strings"
+
+	"github.com/tealeg/xlsx"
 )
+
+type XlsxSubcommand struct{}
+
+func (sub *XlsxSubcommand) Name() string {
+	return "xlsx"
+}
+func (sub *XlsxSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *XlsxSubcommand) Description() string {
+	return "Convert sheets of a XLSX file to CSV."
+}
+
+func (sub *XlsxSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var dirname, sheet string
+	var listSheets bool
+	fs.BoolVar(&listSheets, "list-sheets", false, "List sheets in file")
+	fs.StringVar(&dirname, "dirname", "", "Name of folder to output sheets to")
+	fs.StringVar(&sheet, "sheet", "", "Name of sheet to convert")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+	moreArgs := fs.Args()
+	if len(moreArgs) > 1 {
+		fmt.Fprintln(os.Stderr, "Can only convert one file")
+		os.Exit(1)
+	} else if len(moreArgs) < 1 {
+		fmt.Fprintln(os.Stderr, "Cannot convert file from stdin")
+		os.Exit(1)
+	}
+	filename := moreArgs[0]
+	if listSheets {
+		ListXLXSSheets(filename)
+	} else {
+		if sheet == "" {
+			if dirname == "" {
+				fileParts := strings.Split(filename, ".")
+				dirname = strings.Join(fileParts[:len(fileParts)-1], ".")
+			}
+			ConvertXLSXFull(filename, dirname)
+		} else {
+			ConvertXLSXSheet(filename, sheet)
+		}
+	}
+}
 
 func ConvertXLSXSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 	filename := fmt.Sprintf("%s/%s.csv", dirname, sheet.Name)
@@ -79,40 +127,5 @@ func ListXLXSSheets(filename string) {
 
 	for i, sheet := range xlsxFile.Sheets {
 		fmt.Printf("%d: %s\n", i+1, sheet.Name)
-	}
-}
-
-func RunXLSX(args []string) {
-	fs := flag.NewFlagSet("xlsx", flag.ExitOnError)
-	var dirname, sheet string
-	var listSheets bool
-	fs.BoolVar(&listSheets, "list-sheets", false, "List sheets in file")
-	fs.StringVar(&dirname, "dirname", "", "Name of folder to output sheets to")
-	fs.StringVar(&sheet, "sheet", "", "Name of sheet to convert")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only convert one file")
-		os.Exit(1)
-	} else if len(moreArgs) < 1 {
-		fmt.Fprintln(os.Stderr, "Cannot convert file from stdin")
-		os.Exit(1)
-	}
-	filename := moreArgs[0]
-	if listSheets {
-		ListXLXSSheets(filename)
-	} else {
-		if sheet == "" {
-			if dirname == "" {
-				fileParts := strings.Split(filename, ".")
-				dirname = strings.Join(fileParts[:len(fileParts)-1], ".")
-			}
-			ConvertXLSXFull(filename, dirname)
-		} else {
-			ConvertXLSXSheet(filename, sheet)
-		}
 	}
 }

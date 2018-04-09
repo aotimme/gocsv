@@ -7,6 +7,43 @@ import (
 	"os"
 )
 
+type SampleSubcommand struct{}
+
+func (sub *SampleSubcommand) Name() string {
+	return "sample"
+}
+func (sub *SampleSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *SampleSubcommand) Description() string {
+	return "Sample rows."
+}
+
+func (sub *SampleSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var replace bool
+	var numRows, seed int
+	fs.BoolVar(&replace, "replace", false, "Sample with replacement")
+	fs.IntVar(&numRows, "n", 0, "Number of rows to sample")
+	fs.IntVar(&seed, "seed", 0, "Seed for random number generation")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	if numRows < 1 {
+		fmt.Fprintln(os.Stderr, "Invalid required argument -n")
+		os.Exit(1)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+
+	Sample(inputCsvs[0], numRows, replace, seed)
+}
+
 func Sample(inputCsv AbstractInputCsv, numRows int, replace bool, seed int) {
 
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
@@ -29,29 +66,4 @@ func Sample(inputCsv AbstractInputCsv, numRows int, replace bool, seed int) {
 		writer.Flush()
 	}
 
-}
-
-func RunSample(args []string) {
-	fs := flag.NewFlagSet("sample", flag.ExitOnError)
-	var replace bool
-	var numRows, seed int
-	fs.BoolVar(&replace, "replace", false, "Sample with replacement")
-	fs.IntVar(&numRows, "n", 0, "Number of rows to sample")
-	fs.IntVar(&seed, "seed", 0, "Seed for random number generation")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	if numRows < 1 {
-		fmt.Fprintln(os.Stderr, "Invalid required argument -n")
-		os.Exit(1)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-
-	Sample(inputCsvs[0], numRows, replace, seed)
 }

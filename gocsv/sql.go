@@ -11,6 +11,36 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+type SqlSubcommand struct{}
+
+func (sub *SqlSubcommand) Name() string {
+	return "sql"
+}
+func (sub *SqlSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *SqlSubcommand) Description() string {
+	return "Run SQL queries on CSVs."
+}
+
+func (sub *SqlSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var queryString string
+	fs.StringVar(&queryString, "query", "", "SQL query")
+	fs.StringVar(&queryString, "q", "", "SQL query (shorthand)")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), -1)
+	if err != nil {
+		panic(err)
+	}
+
+	DoSqlQuery(inputCsvs, queryString)
+}
+
 func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	// 1. Create the SQLite DB
 	db, err := sql.Open("sqlite3", ":memory:")
@@ -112,22 +142,4 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 			panic(err)
 		}
 	}
-}
-
-func RunSql(args []string) {
-	fs := flag.NewFlagSet("sql", flag.ExitOnError)
-	var queryString string
-	fs.StringVar(&queryString, "query", "", "SQL query")
-	fs.StringVar(&queryString, "q", "", "SQL query (shorthand)")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), -1)
-	if err != nil {
-		panic(err)
-	}
-
-	DoSqlQuery(inputCsvs, queryString)
 }

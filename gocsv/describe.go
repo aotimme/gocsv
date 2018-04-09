@@ -5,6 +5,32 @@ import (
 	"fmt"
 )
 
+type DescribeSubcommand struct{}
+
+func (sub *DescribeSubcommand) Name() string {
+	return "describe"
+}
+func (sub *DescribeSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *DescribeSubcommand) Description() string {
+	return "Get basic information about a CSV."
+}
+
+func (sub *DescribeSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
+	}
+	DescribeCsv(inputCsvs[0])
+}
+
 func DescribeCsv(inputCsv AbstractInputCsv) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
@@ -21,18 +47,4 @@ func DescribeCsv(inputCsv AbstractInputCsv) {
 		fmt.Printf("  %d: %s\n", i+1, imc.header[i])
 		fmt.Printf("    Type: %s\n", ColumnTypeToString(columnType))
 	}
-}
-
-func RunDescribe(args []string) {
-	fs := flag.NewFlagSet("describe", flag.ExitOnError)
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-	DescribeCsv(inputCsvs[0])
 }

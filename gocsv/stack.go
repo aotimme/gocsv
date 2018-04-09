@@ -8,6 +8,67 @@ import (
 	"os"
 )
 
+type StackSubcommand struct{}
+
+func (sub *StackSubcommand) Name() string {
+	return "stack"
+}
+func (sub *StackSubcommand) Aliases() []string {
+	return []string{}
+}
+func (sub *StackSubcommand) Description() string {
+	return "Stack multiple CSVs into one CSV."
+}
+
+func (sub *StackSubcommand) Run(args []string) {
+	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
+	var groupName, groupsString string
+	var useFilenames bool
+	fs.StringVar(&groupName, "group-name", "", "Name of the column for grouping")
+	fs.StringVar(&groupsString, "groups", "", "Group to display for each file")
+	fs.BoolVar(&useFilenames, "filenames", false, "Use the filename for groups")
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
+	}
+	filenames := fs.Args()
+
+	hasSpecifiedGroups := groupsString != ""
+	if hasSpecifiedGroups && useFilenames {
+		panic(errors.New("Cannot specify both --filename and --groups"))
+	}
+
+	shouldAppendGroup := hasSpecifiedGroups || useFilenames
+
+	var groups []string
+	if hasSpecifiedGroups {
+		groups = GetArrayFromCsvString(groupsString)
+	} else if useFilenames {
+		groups = filenames
+	}
+
+	if shouldAppendGroup && len(filenames) != len(groups) {
+		panic(errors.New("Number of files and groups are not equal"))
+	}
+
+	var groupColumnName string
+	if groupName != "" {
+		groupColumnName = groupName
+	} else if useFilenames {
+		groupColumnName = "File"
+	} else if shouldAppendGroup {
+		groupColumnName = "Group"
+	} else {
+		groupColumnName = ""
+	}
+
+	inputCsvs, err := GetInputCsvs(filenames, -1)
+	if err != nil {
+		panic(err)
+	}
+	StackFiles(inputCsvs, groupColumnName, groups)
+}
+
 func StackFiles(inputCsvs []AbstractInputCsv, groupName string, groups []string) {
 	shouldAppendGroup := groupName != ""
 	writer := csv.NewWriter(os.Stdout)
@@ -59,53 +120,4 @@ func StackFiles(inputCsvs []AbstractInputCsv, groupName string, groups []string)
 			writer.Flush()
 		}
 	}
-}
-
-func RunStack(args []string) {
-	fs := flag.NewFlagSet("stack", flag.ExitOnError)
-	var groupName, groupsString string
-	var useFilenames bool
-	fs.StringVar(&groupName, "group-name", "", "Name of the column for grouping")
-	fs.StringVar(&groupsString, "groups", "", "Group to display for each file")
-	fs.BoolVar(&useFilenames, "filenames", false, "Use the filename for groups")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	filenames := fs.Args()
-
-	hasSpecifiedGroups := groupsString != ""
-	if hasSpecifiedGroups && useFilenames {
-		panic(errors.New("Cannot specify both --filename and --groups"))
-	}
-
-	shouldAppendGroup := hasSpecifiedGroups || useFilenames
-
-	var groups []string
-	if hasSpecifiedGroups {
-		groups = GetArrayFromCsvString(groupsString)
-	} else if useFilenames {
-		groups = filenames
-	}
-
-	if shouldAppendGroup && len(filenames) != len(groups) {
-		panic(errors.New("Number of files and groups are not equal"))
-	}
-
-	var groupColumnName string
-	if groupName != "" {
-		groupColumnName = groupName
-	} else if useFilenames {
-		groupColumnName = "File"
-	} else if shouldAppendGroup {
-		groupColumnName = "Group"
-	} else {
-		groupColumnName = ""
-	}
-
-	inputCsvs, err := GetInputCsvs(filenames, -1)
-	if err != nil {
-		panic(err)
-	}
-	StackFiles(inputCsvs, groupColumnName, groups)
 }
