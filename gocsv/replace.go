@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/csv"
 	"flag"
-	"fmt"
 	"io"
 	"os"
 	"regexp"
@@ -28,11 +27,11 @@ func getColumnIndicesToCompareAgainst(header, columns []string) []int {
 	return columnIndices
 }
 
-func ReplaceWithFunc(reader *csv.Reader, columns []string, replaceFunc func(string) string) {
+func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc func(string) string) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Read header to get column index and write.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +44,7 @@ func ReplaceWithFunc(reader *csv.Reader, columns []string, replaceFunc func(stri
 	// Write replaced rows
 	rowToWrite := make([]string, len(header))
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -98,23 +97,10 @@ func RunReplace(args []string) {
 		return re.ReplaceAllString(elem, repl)
 	}
 
-	// Get input CSV
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only run replace on one table")
-		os.Exit(1)
-	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
 
-	ReplaceWithFunc(reader, columns, replaceFunc)
+	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
 }

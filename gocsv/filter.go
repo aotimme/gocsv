@@ -10,11 +10,11 @@ import (
 	"strconv"
 )
 
-func FilterMatchFunc(reader *csv.Reader, columns []string, exclude bool, matchFunc func(string) bool) {
+func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, matchFunc func(string) bool) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Read header to get column index and write.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +40,7 @@ func FilterMatchFunc(reader *csv.Reader, columns []string, exclude bool, matchFu
 
 	// Write filtered rows.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -225,23 +225,10 @@ func RunFilter(args []string) {
 		os.Exit(1)
 	}
 
-	// Get input CSV
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only filter one table")
-		os.Exit(1)
-	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
 
-	FilterMatchFunc(reader, columns, exclude, matchFunc)
+	FilterMatchFunc(inputCsvs[0], columns, exclude, matchFunc)
 }

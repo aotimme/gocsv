@@ -10,9 +10,19 @@ import (
 	"strings"
 )
 
-func Split(reader *csv.Reader, maxRows int, filenameBase string) {
+func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
+	if filenameBase == "" {
+		inputFilename := inputCsv.Filename()
+		if inputFilename == "-" {
+			filenameBase = "out"
+		} else {
+			fileParts := strings.Split(inputFilename, ".")
+			filenameBase = strings.Join(fileParts[:len(fileParts)-1], ".")
+		}
+	}
+
 	// Read and write header.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +40,7 @@ func Split(reader *csv.Reader, maxRows int, filenameBase string) {
 	writer.Flush()
 
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -73,28 +83,10 @@ func RunSplit(args []string) {
 		fmt.Fprintln(os.Stderr, "Invalid parameter for --max-rows")
 		os.Exit(1)
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only split one file")
-		return
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-		if filenameBase == "" {
-			fileParts := strings.Split(moreArgs[0], ".")
-			filenameBase = strings.Join(fileParts[:len(fileParts)-1], ".")
-		}
-	} else {
-		reader = csv.NewReader(os.Stdin)
-		if filenameBase == "" {
-			filenameBase = "out"
-		}
-	}
-	Split(reader, maxRows, filenameBase)
+	Split(inputCsvs[0], maxRows, filenameBase)
 }

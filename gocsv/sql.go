@@ -11,7 +11,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func DoSqlQuery(readers []*csv.Reader, tableNames []string, query string) {
+func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	// 1. Create the SQLite DB
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
@@ -20,8 +20,8 @@ func DoSqlQuery(readers []*csv.Reader, tableNames []string, query string) {
 	defer db.Close()
 
 	// 2. Create and populate the tables in the SQL DB
-	for i, reader := range readers {
-		PopulateSqlTable(db, tableNames[i], reader)
+	for _, inputCsv := range inputCsvs {
+		PopulateSqlTable(db, inputCsv)
 	}
 	// 3. Run the query
 	rows, err := db.Query(query)
@@ -64,8 +64,9 @@ func DoSqlQuery(readers []*csv.Reader, tableNames []string, query string) {
 	}
 }
 
-func PopulateSqlTable(db *sql.DB, tableName string, reader *csv.Reader) {
-	imc := NewInMemoryCsv(reader)
+func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
+	tableName := inputCsv.Name()
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	allVariables := make([]interface{}, 2*len(imc.header)+1)
 	allVariables[0] = tableName
 	createStatement := "CREATE TABLE \"%s\"("
@@ -122,27 +123,11 @@ func RunSql(args []string) {
 	if err != nil {
 		panic(err)
 	}
-	filenames := fs.Args()
-	readers := make([]*csv.Reader, len(filenames))
-	tableNames := make([]string, len(filenames))
-	for i, filename := range filenames {
-		var reader *csv.Reader
-		var tableName string
-		if filename == "-" {
-			tableName = "-"
-			reader = csv.NewReader(os.Stdin)
-		} else {
-			// leaves name unchanged if it does not end in ".csv"
-			tableName = GetBaseFilenameWithoutExtension(filename)
-			file, err := os.Open(filename)
-			if err != nil {
-				panic(err)
-			}
-			reader = csv.NewReader(file)
-			defer file.Close()
-		}
-		tableNames[i] = tableName
-		readers[i] = reader
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), -1)
+	if err != nil {
+		panic(err)
 	}
-	DoSqlQuery(readers, tableNames, queryString)
+
+	DoSqlQuery(inputCsvs, queryString)
 }

@@ -3,17 +3,16 @@ package main
 import (
 	"encoding/csv"
 	"flag"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
 )
 
-func AutoIncrement(reader *csv.Reader, name string, seed int, prepend bool) {
+func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend bool) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Read and write header.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +33,7 @@ func AutoIncrement(reader *csv.Reader, name string, seed int, prepend bool) {
 	// Write rows with autoincrement.
 	inc := seed
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -70,21 +69,14 @@ func RunAutoIncrement(args []string) {
 	if err != nil {
 		panic(err)
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only autoincrement one file")
-		return
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	AutoIncrement(inputCsvs[0], name, seed, prepend)
+	err = inputCsvs[0].Close()
+	if err != nil {
+		panic(err)
 	}
-	AutoIncrement(reader, name, seed, prepend)
 }

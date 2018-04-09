@@ -8,12 +8,12 @@ import (
 	"os"
 )
 
-func Behead(reader *csv.Reader, numHeaders int) {
+func Behead(inputCsv AbstractInputCsv, numHeaders int) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Get rid of the header rows.
 	for i := 0; i < numHeaders; i++ {
-		_, err := reader.Read()
+		_, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				// If we remove _all_ the headers, then end early.
@@ -26,7 +26,7 @@ func Behead(reader *csv.Reader, numHeaders int) {
 
 	// Write rows.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -54,22 +54,9 @@ func RunBehead(args []string) {
 		os.Exit(1)
 	}
 
-	// Get input CSV
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only behead one table")
-		os.Exit(1)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
-	Behead(reader, numHeaders)
+	Behead(inputCsvs[0], numHeaders)
 }

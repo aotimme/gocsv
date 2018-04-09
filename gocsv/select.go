@@ -8,11 +8,11 @@ import (
 	"os"
 )
 
-func ExcludeColumns(reader *csv.Reader, columns []string) {
+func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Get the column indices to exclude.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +38,7 @@ func ExcludeColumns(reader *csv.Reader, columns []string) {
 	writer.Flush()
 
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -59,13 +59,13 @@ func ExcludeColumns(reader *csv.Reader, columns []string) {
 	}
 }
 
-func SelectColumns(reader *csv.Reader, columns []string) {
+func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
 	writer := csv.NewWriter(os.Stdout)
 
 	outrow := make([]string, len(columns))
 
 	// Get the column indices to write.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +79,7 @@ func SelectColumns(reader *csv.Reader, columns []string) {
 	writer.Flush()
 
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -111,25 +111,15 @@ func RunSelect(args []string) {
 		os.Exit(1)
 	}
 	columns := GetArrayFromCsvString(columnsString)
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only select one table")
-		os.Exit(1)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
+
 	if exclude {
-		ExcludeColumns(reader, columns)
+		ExcludeColumns(inputCsvs[0], columns)
 	} else {
-		SelectColumns(reader, columns)
+		SelectColumns(inputCsvs[0], columns)
 	}
 }

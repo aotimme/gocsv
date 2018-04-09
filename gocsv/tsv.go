@@ -2,18 +2,18 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
+	"flag"
 	"io"
 	"os"
 )
 
-func Tsv(reader *csv.Reader) {
+func Tsv(inputCsv AbstractInputCsv) {
 	writer := csv.NewWriter(os.Stdout)
 	writer.Comma = '\t'
 
 	// Write all rows with tabs.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -27,20 +27,15 @@ func Tsv(reader *csv.Reader) {
 }
 
 func RunTsv(args []string) {
-	if len(args) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only convert one table to TSV")
-		os.Exit(1)
+	fs := flag.NewFlagSet("tsv", flag.ExitOnError)
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(args) == 1 {
-		file, err := os.Open(args[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	Tsv(reader)
+	Tsv(inputCsvs[0])
 }

@@ -1,14 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
-	"os"
 )
 
-func DescribeCsv(reader *csv.Reader) {
-	imc := NewInMemoryCsv(reader)
+func DescribeCsv(inputCsv AbstractInputCsv) {
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
 	numRows := imc.NumRows()
 	numColumns := imc.NumColumns()
@@ -32,22 +30,9 @@ func RunDescribe(args []string) {
 		panic(err)
 	}
 
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only describe one CSV")
-		os.Exit(1)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
-
-	DescribeCsv(reader)
+	DescribeCsv(inputCsvs[0])
 }

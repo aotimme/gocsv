@@ -540,7 +540,7 @@ gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-nam
 To do the same via pipelining through standard input,
 
 ```shell
-cat test-files/stack-1.csv | ./bin/gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" - test-files/stack-2.csv test-files/stack-3.csv
+cat test-files/stack-1.csv | gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" - test-files/stack-2.csv test-files/stack-3.csv
 ```
 
 ## Installation

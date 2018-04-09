@@ -11,10 +11,10 @@ import (
 	"strings"
 )
 
-func HeadFromBottom(reader *csv.Reader, numRows int) {
+func HeadFromBottom(inputCsv AbstractInputCsv, numRows int) {
 	writer := csv.NewWriter(os.Stdout)
 
-	rows, err := reader.ReadAll()
+	rows, err := inputCsv.ReadAll()
 	if err != nil {
 		panic(err)
 	}
@@ -34,11 +34,11 @@ func HeadFromBottom(reader *csv.Reader, numRows int) {
 	}
 }
 
-func HeadFromTop(reader *csv.Reader, numRows int) {
+func HeadFromTop(inputCsv AbstractInputCsv, numRows int) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Read and write header.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +51,7 @@ func HeadFromTop(reader *csv.Reader, numRows int) {
 		if curRow == numRows {
 			break
 		}
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -79,35 +79,24 @@ func RunHead(args []string) {
 		os.Exit(1)
 		return
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only run head on one table")
-		os.Exit(1)
-		return
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
+
 	if strings.HasPrefix(numRowsStr, "+") {
 		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
 		numRows, err := strconv.Atoi(numRowsStr)
 		if err != nil {
 			panic(err)
 		}
-		HeadFromBottom(reader, numRows)
+		HeadFromBottom(inputCsvs[0], numRows)
 	} else {
 		numRows, err := strconv.Atoi(numRowsStr)
 		if err != nil {
 			panic(err)
 		}
-		HeadFromTop(reader, numRows)
+		HeadFromTop(inputCsvs[0], numRows)
 	}
 }

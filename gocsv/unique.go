@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/csv"
 	"flag"
-	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -36,8 +35,8 @@ func rowMatchesOnIndices(rowA, rowB []string, columnIndices []int) bool {
 	return true
 }
 
-func UniqueifySortedWithCount(reader *csv.Reader, columns []string) {
-	header, err := reader.Read()
+func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +54,7 @@ func UniqueifySortedWithCount(reader *csv.Reader, columns []string) {
 	writer.Flush()
 
 	// Read and write first row.
-	lastRow, err := reader.Read()
+	lastRow, err := inputCsv.Read()
 	if err != nil {
 		if err == io.EOF {
 			return
@@ -67,7 +66,7 @@ func UniqueifySortedWithCount(reader *csv.Reader, columns []string) {
 
 	// Write unique rows in order.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -92,8 +91,8 @@ func UniqueifySortedWithCount(reader *csv.Reader, columns []string) {
 	writer.Flush()
 }
 
-func UniqueifySorted(reader *csv.Reader, columns []string) {
-	header, err := reader.Read()
+func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -107,7 +106,7 @@ func UniqueifySorted(reader *csv.Reader, columns []string) {
 	writer.Flush()
 
 	// Read and write first row.
-	lastRow, err := reader.Read()
+	lastRow, err := inputCsv.Read()
 	if err != nil {
 		if err == io.EOF {
 			return
@@ -120,7 +119,7 @@ func UniqueifySorted(reader *csv.Reader, columns []string) {
 
 	// Write unique rows in order.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -136,8 +135,8 @@ func UniqueifySorted(reader *csv.Reader, columns []string) {
 	}
 }
 
-func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
-	header, err := reader.Read()
+func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -155,7 +154,7 @@ func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
 
 	// Write unique rows in order.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -175,8 +174,8 @@ func UniqueifyUnsorted(reader *csv.Reader, columns []string) {
 	}
 }
 
-func UniqueifyUnsortedWithCount(reader *csv.Reader, columns []string) {
-	imc := NewInMemoryCsv(reader)
+func UniqueifyUnsortedWithCount(inputCsv AbstractInputCsv, columns []string) {
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
 	columnIndices := GetColumnIndicesOrAll(columns, imc.header)
 
@@ -241,34 +240,22 @@ func RunUnique(args []string) {
 		columns = GetArrayFromCsvString(columnsString)
 	}
 
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only unique one table")
-		os.Exit(1)
-	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
 
 	if sorted {
 		if count {
-			UniqueifySortedWithCount(reader, columns)
+			UniqueifySortedWithCount(inputCsvs[0], columns)
 		} else {
-			UniqueifySorted(reader, columns)
+			UniqueifySorted(inputCsvs[0], columns)
 		}
 	} else {
 		if count {
-			UniqueifyUnsortedWithCount(reader, columns)
+			UniqueifyUnsortedWithCount(inputCsvs[0], columns)
 		} else {
-			UniqueifyUnsorted(reader, columns)
+			UniqueifyUnsorted(inputCsvs[0], columns)
 		}
 	}
 }

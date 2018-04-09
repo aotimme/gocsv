@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"os"
@@ -48,9 +47,9 @@ func getRowSeparator(widths []int) string {
 	return fmt.Sprintf("+-%s-+", strings.Join(cells, "-+-"))
 }
 
-func View(reader *csv.Reader, maxWidth, maxRows int) {
+func View(inputCsv AbstractInputCsv, maxWidth, maxRows int) {
 
-	imc := NewInMemoryCsv(reader)
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
 	// Default to 0
 	columnWidths := make([]int, imc.NumColumns())
@@ -127,23 +126,10 @@ func RunView(args []string) {
 		maxRows = 0
 	}
 
-	// Get input CSV
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only view one table")
-		os.Exit(1)
-	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
 
-	View(reader, maxWidth, maxRows)
+	View(inputCsvs[0], maxWidth, maxRows)
 }

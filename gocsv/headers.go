@@ -1,13 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
+	"flag"
 	"fmt"
-	"os"
 )
 
-func ShowHeaders(reader *csv.Reader) {
-	header, err := reader.Read()
+func ShowHeaders(inputCsv AbstractInputCsv) {
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -17,20 +16,15 @@ func ShowHeaders(reader *csv.Reader) {
 }
 
 func RunHeaders(args []string) {
-	if len(args) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only show headers for one table")
-		os.Exit(1)
+	fs := flag.NewFlagSet("headers", flag.ExitOnError)
+	err := fs.Parse(args)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(args) == 1 {
-		file, err := os.Open(args[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	ShowHeaders(reader)
+	ShowHeaders(inputCsvs[0])
 }

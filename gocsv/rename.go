@@ -8,11 +8,11 @@ import (
 	"os"
 )
 
-func RenameColumns(reader *csv.Reader, columns, names []string) {
+func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Get the column indices to write.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func RenameColumns(reader *csv.Reader, columns, names []string) {
 	writer.Flush()
 
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -65,21 +65,11 @@ func RunRename(args []string) {
 		fmt.Fprintln(os.Stderr, "Length of --columns and --names argument must be the same")
 		os.Exit(1)
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only call rename on one table")
-		os.Exit(1)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
-	RenameColumns(reader, columns, names)
+
+	RenameColumns(inputCsvs[0], columns, names)
 }

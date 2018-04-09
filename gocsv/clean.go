@@ -43,8 +43,10 @@ func PrintCleanCheck(rowIndex, columnIndex int, message string) {
 	fmt.Fprintf(os.Stderr, fmt.Sprintf("%s%s\n", prelude, message))
 }
 
-func Clean(reader *csv.Reader, noTrim, excel, numbers, verbose bool) {
+func Clean(inputCsv AbstractInputCsv, noTrim, excel, numbers, verbose bool) {
 	writer := csv.NewWriter(os.Stdout)
+
+	reader := inputCsv.Reader()
 
 	// Disable errors when fields are varying length
 	reader.FieldsPerRecord = -1
@@ -138,21 +140,10 @@ func RunClean(args []string) {
 	if err != nil {
 		panic(err)
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only clean one file")
-		os.Exit(1)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
-	Clean(reader, noTrim, excel, numbers, verbose)
+	Clean(inputCsvs[0], noTrim, excel, numbers, verbose)
 }

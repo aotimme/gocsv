@@ -7,9 +7,9 @@ import (
 	"os"
 )
 
-func Sample(reader *csv.Reader, numRows int, replace bool, seed int) {
+func Sample(inputCsv AbstractInputCsv, numRows int, replace bool, seed int) {
 
-	imc := NewInMemoryCsv(reader)
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
 	if numRows > imc.NumRows() && !replace {
 		fmt.Fprintln(os.Stderr, "Cannot sample more rows than exist")
@@ -48,23 +48,10 @@ func RunSample(args []string) {
 		os.Exit(1)
 	}
 
-	// Get input CSV
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only sample one table")
-		os.Exit(1)
-	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
 
-	Sample(reader, numRows, replace, seed)
+	Sample(inputCsvs[0], numRows, replace, seed)
 }

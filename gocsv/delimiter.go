@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/csv"
 	"flag"
-	"fmt"
 	"io"
 	"os"
 	"unicode/utf8"
 )
 
-func ChangeDelimiter(reader *csv.Reader, inputDelimiter, outputDelimiter string) {
+func ChangeDelimiter(inputCsv AbstractInputCsv, inputDelimiter, outputDelimiter string) {
+	reader := inputCsv.Reader()
 	if inputDelimiter == "\\t" {
 		reader.Comma = '\t'
 	} else if len(inputDelimiter) > 0 {
@@ -51,21 +51,10 @@ func RunDelimiter(args []string) {
 	if err != nil {
 		panic(err)
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only change delimiters on one table")
-		os.Exit(1)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
-	ChangeDelimiter(reader, inputDelimiter, outputDelimiter)
+	ChangeDelimiter(inputCsvs[0], inputDelimiter, outputDelimiter)
 }

@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-func SortCsv(reader *csv.Reader, columns []string, reverse, noInference bool) {
-	imc := NewInMemoryCsv(reader)
+func SortCsv(inputCsv AbstractInputCsv, columns []string, reverse, noInference bool) {
+	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	columnIndices := make([]int, len(columns))
 	for i, column := range columns {
 		columnIndices[i] = GetColumnIndexOrPanic(imc.header, column)
@@ -54,22 +54,10 @@ func RunSort(args []string) {
 	}
 	columns := GetArrayFromCsvString(columnsString)
 
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only filter one table")
-		os.Exit(1)
-	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
 
-	SortCsv(reader, columns, reverse, noInference)
+	SortCsv(inputCsvs[0], columns, reverse, noInference)
 }

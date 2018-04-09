@@ -11,11 +11,11 @@ import (
 	"strings"
 )
 
-func TailFromBottom(reader *csv.Reader, numRows int) {
+func TailFromBottom(inputCsv AbstractInputCsv, numRows int) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Read all rows.
-	rows, err := reader.ReadAll()
+	rows, err := inputCsv.ReadAll()
 	if err != nil {
 		panic(err)
 	}
@@ -35,11 +35,11 @@ func TailFromBottom(reader *csv.Reader, numRows int) {
 	}
 }
 
-func TailFromTop(reader *csv.Reader, numRows int) {
+func TailFromTop(inputCsv AbstractInputCsv, numRows int) {
 	writer := csv.NewWriter(os.Stdout)
 
 	// Read and write header.
-	header, err := reader.Read()
+	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
@@ -49,7 +49,7 @@ func TailFromTop(reader *csv.Reader, numRows int) {
 	// Write rows after first `numRows` rows.
 	curRow := 0
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -78,34 +78,24 @@ func RunTail(args []string) {
 		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
 		os.Exit(1)
 	}
-	moreArgs := fs.Args()
-	if len(moreArgs) > 1 {
-		fmt.Fprintln(os.Stderr, "Can only run tail on one table")
-		os.Exit(1)
+
+	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	if err != nil {
+		panic(err)
 	}
-	var reader *csv.Reader
-	if len(moreArgs) == 1 {
-		file, err := os.Open(moreArgs[0])
-		if err != nil {
-			panic(err)
-		}
-		defer file.Close()
-		reader = csv.NewReader(file)
-	} else {
-		reader = csv.NewReader(os.Stdin)
-	}
+
 	if strings.HasPrefix(numRowsStr, "+") {
 		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
 		numRows, err := strconv.Atoi(numRowsStr)
 		if err != nil {
 			panic(err)
 		}
-		TailFromTop(reader, numRows)
+		TailFromTop(inputCsvs[0], numRows)
 	} else {
 		numRows, err := strconv.Atoi(numRowsStr)
 		if err != nil {
 			panic(err)
 		}
-		TailFromBottom(reader, numRows)
+		TailFromBottom(inputCsvs[0], numRows)
 	}
 }

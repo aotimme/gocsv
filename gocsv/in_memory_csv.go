@@ -31,6 +31,18 @@ func NewInMemoryCsv(reader *csv.Reader) *InMemoryCsv {
 	return imc
 }
 
+func NewInMemoryCsvFromInputCsv(inputCsv AbstractInputCsv) *InMemoryCsv {
+	imc := new(InMemoryCsv)
+	rows, err := inputCsv.ReadAll()
+	if err != nil {
+		panic(err)
+	}
+	imc.header = rows[0]
+	imc.rows = rows[1:]
+	imc.isIndexed = false
+	return imc
+}
+
 func (imc *InMemoryCsv) Index(columnIndex int) {
 	imc.index = make(map[string][]int)
 	for i, row := range imc.rows {
