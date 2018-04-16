@@ -203,19 +203,7 @@ func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, 
 
 	// Get indices to compare against.
 	// If no columns are specified, then check against all.
-	var columnIndices []int
-	if len(columns) == 0 {
-		columnIndices = make([]int, len(header))
-		for i, _ := range header {
-			columnIndices[i] = i
-		}
-	} else {
-		columnIndices = make([]int, len(columns))
-		for i, column := range columns {
-			index := GetColumnIndexOrPanic(header, column)
-			columnIndices[i] = index
-		}
-	}
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
 	writer.Write(header)
 	writer.Flush()

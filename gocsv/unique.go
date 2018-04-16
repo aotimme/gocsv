@@ -61,22 +61,6 @@ func (sub *UniqueSubcommand) Run(args []string) {
 	}
 }
 
-func GetColumnIndicesOrAll(columns, header []string) []int {
-	var columnIndices []int
-	if len(columns) == 0 {
-		columnIndices = make([]int, len(header))
-		for i := 0; i < len(header); i++ {
-			columnIndices[i] = i
-		}
-	} else {
-		columnIndices = make([]int, len(columns))
-		for i, column := range columns {
-			columnIndices[i] = GetColumnIndexOrPanic(header, column)
-		}
-	}
-	return columnIndices
-}
-
 func rowMatchesOnIndices(rowA, rowB []string, columnIndices []int) bool {
 	for _, columnIndex := range columnIndices {
 		if rowA[columnIndex] != rowB[columnIndex] {
@@ -94,7 +78,7 @@ func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 
 	shellRow := make([]string, len(header)+1)
 
-	columnIndices := GetColumnIndicesOrAll(columns, header)
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
 	writer := csv.NewWriter(os.Stdout)
 
@@ -148,7 +132,7 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 		panic(err)
 	}
 
-	columnIndices := GetColumnIndicesOrAll(columns, header)
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
 	writer := csv.NewWriter(os.Stdout)
 
@@ -192,7 +176,7 @@ func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
 		panic(err)
 	}
 
-	columnIndices := GetColumnIndicesOrAll(columns, header)
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
 	writer := csv.NewWriter(os.Stdout)
 
@@ -228,7 +212,7 @@ func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
 func UniqueifyUnsortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
-	columnIndices := GetColumnIndicesOrAll(columns, imc.header)
+	columnIndices := GetIndicesForColumnsOrPanic(imc.header, columns)
 
 	rowIndexToCount := make(map[int]int)
 	seenRowsTrie := trie.NewTrie()

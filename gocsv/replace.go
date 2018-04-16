@@ -64,25 +64,6 @@ func (sub *ReplaceSubcommand) Run(args []string) {
 	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
 }
 
-// Get indices to compare against.
-// If no columns are specified, then check against all.
-func getColumnIndicesToCompareAgainst(header, columns []string) []int {
-	var columnIndices []int
-	if len(columns) == 0 {
-		columnIndices = make([]int, len(header))
-		for i, _ := range header {
-			columnIndices[i] = i
-		}
-	} else {
-		columnIndices = make([]int, len(columns))
-		for i, column := range columns {
-			index := GetColumnIndexOrPanic(header, column)
-			columnIndices[i] = index
-		}
-	}
-	return columnIndices
-}
-
 func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc func(string) string) {
 	writer := csv.NewWriter(os.Stdout)
 
@@ -92,7 +73,7 @@ func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc fu
 		panic(err)
 	}
 
-	columnIndices := getColumnIndicesToCompareAgainst(header, columns)
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
 	writer.Write(header)
 	writer.Flush()

@@ -57,10 +57,10 @@ func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 	if err != nil {
 		panic(err)
 	}
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 	columnIndicesToExclude := make(map[int]bool)
-	for _, column := range columns {
-		index := GetColumnIndexOrPanic(header, column)
-		columnIndicesToExclude[index] = true
+	for _, columnIndex := range columnIndices {
+		columnIndicesToExclude[columnIndex] = true
 	}
 
 	outrow := make([]string, len(header)-len(columnIndicesToExclude))
@@ -103,18 +103,15 @@ func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
 	writer := csv.NewWriter(os.Stdout)
 
-	outrow := make([]string, len(columns))
-
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
 	if err != nil {
 		panic(err)
 	}
-	columnIndices := make([]int, len(columns))
-	for i, column := range columns {
-		index := GetColumnIndexOrPanic(header, column)
-		columnIndices[i] = index
-		outrow[i] = header[index]
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
+	outrow := make([]string, len(columnIndices))
+	for i, columnIndex := range columnIndices {
+		outrow[i] = header[columnIndex]
 	}
 	writer.Write(outrow)
 	writer.Flush()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -43,21 +44,21 @@ func (sub *XlsxSubcommand) Run(args []string) {
 	}
 	filename := moreArgs[0]
 	if listSheets {
-		ListXLXSSheets(filename)
+		ListXlxsSheets(filename)
 	} else {
 		if sheet == "" {
 			if dirname == "" {
 				fileParts := strings.Split(filename, ".")
 				dirname = strings.Join(fileParts[:len(fileParts)-1], ".")
 			}
-			ConvertXLSXFull(filename, dirname)
+			ConvertXlsxFull(filename, dirname)
 		} else {
-			ConvertXLSXSheet(filename, sheet)
+			ConvertXlsxSheet(filename, sheet)
 		}
 	}
 }
 
-func ConvertXLSXSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
+func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 	filename := fmt.Sprintf("%s/%s.csv", dirname, sheet.Name)
 
 	file, err := os.Create(filename)
@@ -80,18 +81,18 @@ func ConvertXLSXSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 	}
 }
 
-func ConvertXLSXFull(filename, dirname string) {
+func ConvertXlsxFull(filename, dirname string) {
 	xlsxFile, err := xlsx.OpenFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	err = os.Mkdir(dirname, os.ModeDir|0755)
 	for _, sheet := range xlsxFile.Sheets {
-		ConvertXLSXSheetToDirectory(dirname, sheet)
+		ConvertXlsxSheetToDirectory(dirname, sheet)
 	}
 }
 
-func ConvertXLSXSheet(filename, sheetName string) {
+func ConvertXlsxSheet(filename, sheetName string) {
 	xlsxFile, err := xlsx.OpenFile(filename)
 	if err != nil {
 		panic(err)
@@ -101,7 +102,10 @@ func ConvertXLSXSheet(filename, sheetName string) {
 	for i, sheet := range xlsxFile.Sheets {
 		sheetNames[i] = sheet.Name
 	}
-	sheetIndex := GetColumnIndexOrPanic(sheetNames, sheetName)
+	sheetIndex := GetIndexForColumn(sheetNames, sheetName)
+	if sheetIndex == -1 {
+		panic(errors.New("Could not find sheet from sheet name"))
+	}
 
 	sheet := xlsxFile.Sheets[sheetIndex]
 	writer := csv.NewWriter(os.Stdout)
@@ -119,7 +123,7 @@ func ConvertXLSXSheet(filename, sheetName string) {
 	}
 }
 
-func ListXLXSSheets(filename string) {
+func ListXlxsSheets(filename string) {
 	xlsxFile, err := xlsx.OpenFile(filename)
 	if err != nil {
 		panic(err)

@@ -47,10 +47,7 @@ func (sub *SortSubcommand) Run(args []string) {
 
 func SortCsv(inputCsv AbstractInputCsv, columns []string, reverse, noInference bool) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
-	columnIndices := make([]int, len(columns))
-	for i, column := range columns {
-		columnIndices[i] = GetColumnIndexOrPanic(imc.header, column)
-	}
+	columnIndices := GetIndicesForColumnsOrPanic(imc.header, columns)
 	columnTypes := make([]ColumnType, len(columnIndices))
 	for i, columnIndex := range columnIndices {
 		if noInference {

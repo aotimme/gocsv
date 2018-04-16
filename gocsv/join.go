@@ -95,11 +95,11 @@ func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 	if err != nil {
 		panic(err)
 	}
-	leftColIndex := GetColumnIndexOrPanic(leftHeader, leftColname)
+	leftColIndex := GetIndexForColumnOrPanic(leftHeader, leftColname)
 	numLeftColumns := len(leftHeader)
 
 	rightCsv := NewInMemoryCsvFromInputCsv(rightInputCsv)
-	rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
+	rightColIndex := GetIndexForColumnOrPanic(rightCsv.header, rightColname)
 	numRightColumns := len(rightCsv.header)
 	rightCsv.Index(rightColIndex)
 
@@ -138,11 +138,11 @@ func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightCo
 	if err != nil {
 		panic(err)
 	}
-	leftColIndex := GetColumnIndexOrPanic(leftHeader, leftColname)
+	leftColIndex := GetIndexForColumnOrPanic(leftHeader, leftColname)
 	numLeftColumns := len(leftHeader)
 
 	rightCsv := NewInMemoryCsvFromInputCsv(rightInputCsv)
-	rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
+	rightColIndex := GetIndexForColumnOrPanic(rightCsv.header, rightColname)
 	numRightColumns := len(rightCsv.header)
 	rightCsv.Index(rightColIndex)
 
@@ -186,11 +186,11 @@ func RightJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 	if err != nil {
 		panic(err)
 	}
-	rightColIndex := GetColumnIndexOrPanic(rightHeader, rightColname)
+	rightColIndex := GetIndexForColumnOrPanic(rightHeader, rightColname)
 	numRightColumns := len(rightHeader)
 
 	leftCsv := NewInMemoryCsvFromInputCsv(leftInputCsv)
-	leftColIndex := GetColumnIndexOrPanic(leftCsv.header, leftColname)
+	leftColIndex := GetIndexForColumnOrPanic(leftCsv.header, leftColname)
 	leftCsv.Index(leftColIndex)
 	numLeftColumns := len(leftCsv.header)
 
@@ -237,11 +237,11 @@ func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 	if err != nil {
 		panic(err)
 	}
-	leftColIndex := GetColumnIndexOrPanic(leftHeader, leftColname)
+	leftColIndex := GetIndexForColumnOrPanic(leftHeader, leftColname)
 	numLeftColumns := len(leftHeader)
 
 	rightCsv := NewInMemoryCsvFromInputCsv(rightInputCsv)
-	rightColIndex := GetColumnIndexOrPanic(rightCsv.header, rightColname)
+	rightColIndex := GetIndexForColumnOrPanic(rightCsv.header, rightColname)
 	numRightColumns := len(rightCsv.header)
 	rightCsv.Index(rightColIndex)
 

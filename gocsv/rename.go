@@ -40,10 +40,6 @@ func (sub *RenameSubcommand) Run(args []string) {
 	}
 	columns := GetArrayFromCsvString(columnsString)
 	names := GetArrayFromCsvString(namesString)
-	if len(columns) != len(names) {
-		fmt.Fprintln(os.Stderr, "Length of --columns and --names argument must be the same")
-		os.Exit(1)
-	}
 
 	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
 	if err != nil {
@@ -64,9 +60,14 @@ func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
 	renamedHeader := make([]string, len(header))
 	copy(renamedHeader, header)
 
-	for i, column := range columns {
-		index := GetColumnIndexOrPanic(header, column)
-		renamedHeader[index] = names[i]
+	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
+
+	if len(columnIndices) != len(names) {
+		fmt.Fprintln(os.Stderr, "Length of --columns and --names argument must be the same")
+		os.Exit(1)
+	}
+	for i, columnIndex := range columnIndices {
+		renamedHeader[columnIndex] = names[i]
 	}
 
 	writer.Write(renamedHeader)
