@@ -22,7 +22,7 @@ mark_pass() {
 }
 
 echo -n "Checking permissions... "
-touch /usr/local/bin/gocsv
+touch ${INSTALL_LOCATION}
 if [ $? -eq 1 ]
 then
   mark_fail
@@ -43,7 +43,7 @@ echo -n "Extacting binary... "
 unzip -q -d ${TMP_DIR} ${TMP_DIR}/${ZIP_FILENAME}
 mark_pass
 
-echo -n "Installing binary to /usr/local/bin/gocsv... "
+echo -n "Installing binary to ${INSTALL_LOCATION}... "
 mv ${TMP_DIR}/${BINARY_DIRNAME}/gocsv ${INSTALL_LOCATION}
 mark_pass
 
