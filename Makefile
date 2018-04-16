@@ -1,6 +1,6 @@
 BIN_DIR=bin
 DIST_DIR=dist
-SRC_DIR=gocsv
+SRC_DIR=src
 EXECUTABLE=gocsv
 
 .DEFAULT_GOAL := bin
@@ -12,7 +12,7 @@ dist:
 tag:
 	bash scripts/update-latest-tag.sh
 
-unit-test:
+test:
 	cd $(SRC_DIR) && go test -cover
 
 bin:
