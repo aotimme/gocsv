@@ -128,11 +128,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 	valuesRow := make([]interface{}, len(imc.header))
 	for _, row := range imc.rows {
 		for i, elem := range row {
-			if elem == "" {
-				valuesRow[i] = nil
-			} else {
-				valuesRow[i] = elem
-			}
+			valuesRow[i] = elem
 		}
 		_, err = preparedInsert.Exec(valuesRow...)
 		if err != nil {
