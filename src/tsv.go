@@ -18,15 +18,11 @@ func (sub *TsvSubcommand) Aliases() []string {
 func (sub *TsvSubcommand) Description() string {
 	return "Transform a CSV into a TSV."
 }
+func (sub *TsvSubcommand) SetFlags(fs *flag.FlagSet) {
+}
 
 func (sub *TsvSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

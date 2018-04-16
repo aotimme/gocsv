@@ -8,7 +8,11 @@ import (
 	"strconv"
 )
 
-type AutoincrementSubcommand struct{}
+type AutoincrementSubcommand struct {
+	name    string
+	seed    int
+	prepend bool
+}
 
 func (sub *AutoincrementSubcommand) Name() string {
 	return "autoincrement"
@@ -19,25 +23,18 @@ func (sub *AutoincrementSubcommand) Aliases() []string {
 func (sub *AutoincrementSubcommand) Description() string {
 	return "Add a column of incrementing integers to a CSV."
 }
+func (sub *AutoincrementSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.name, "name", "ID", "Name of autoincrementing column")
+	fs.IntVar(&sub.seed, "seed", 1, "Initial value of autoincrementing column")
+	fs.BoolVar(&sub.prepend, "prepend", false, "Prepend the autoincrementing column (defaults to append)")
+}
 
 func (sub *AutoincrementSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var name string
-	var seed int
-	var prepend bool
-	fs.StringVar(&name, "name", "ID", "Name of autoincrementing column")
-	fs.IntVar(&seed, "seed", 1, "Initial value of autoincrementing column")
-	fs.BoolVar(&prepend, "prepend", false, "Prepend the autoincrementing column (defaults to append)")
-	err := fs.Parse(args)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-	AutoIncrement(inputCsvs[0], name, seed, prepend)
+	AutoIncrement(inputCsvs[0], sub.name, sub.seed, sub.prepend)
 	err = inputCsvs[0].Close()
 	if err != nil {
 		panic(err)

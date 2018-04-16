@@ -16,15 +16,11 @@ func (sub *DescribeSubcommand) Aliases() []string {
 func (sub *DescribeSubcommand) Description() string {
 	return "Get basic information about a CSV."
 }
+func (sub *DescribeSubcommand) SetFlags(fs *flag.FlagSet) {
+}
 
 func (sub *DescribeSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

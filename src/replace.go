@@ -8,7 +8,12 @@ import (
 	"regexp"
 )
 
-type ReplaceSubcommand struct{}
+type ReplaceSubcommand struct {
+	columnsString   string
+	regex           string
+	repl            string
+	caseInsensitive bool
+}
 
 func (sub *ReplaceSubcommand) Name() string {
 	return "replace"
@@ -19,44 +24,38 @@ func (sub *ReplaceSubcommand) Aliases() []string {
 func (sub *ReplaceSubcommand) Description() string {
 	return "Replace values in cells by regular expression."
 }
+func (sub *ReplaceSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to replace cells")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to replace cells (shorthand)")
+	fs.StringVar(&sub.regex, "regex", "", "Regular expression to match for replacement")
+	fs.StringVar(&sub.repl, "repl", "", "Replacement string")
+	fs.BoolVar(&sub.caseInsensitive, "case-insensitive", false, "Make regex case insensitive")
+	fs.BoolVar(&sub.caseInsensitive, "i", false, "Make regex case insensitive (shorthand)")
+}
 
 func (sub *ReplaceSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet("replace", flag.ExitOnError)
-	var regex, repl, columnsString string
-	var caseInsensitive bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to replace cells")
-	fs.StringVar(&columnsString, "c", "", "Columns to replace cells (shorthand)")
-	fs.StringVar(&regex, "regex", "", "Regular expression to match for replacement")
-	fs.StringVar(&repl, "repl", "", "Replacement string")
-	fs.BoolVar(&caseInsensitive, "case-insensitive", false, "Make regex case insensitive")
-	fs.BoolVar(&caseInsensitive, "i", false, "Make regex case insensitive (shorthand)")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
 	// Get columns to compare against
 	var columns []string
-	if columnsString == "" {
+	if sub.columnsString == "" {
 		columns = make([]string, 0)
 	} else {
-		columns = GetArrayFromCsvString(columnsString)
+		columns = GetArrayFromCsvString(sub.columnsString)
 	}
 
 	// Get replace function
 	var replaceFunc func(string) string
-	if caseInsensitive {
-		regex = "(?i)" + regex
+	if sub.caseInsensitive {
+		sub.regex = "(?i)" + sub.regex
 	}
-	re, err := regexp.Compile(regex)
+	re, err := regexp.Compile(sub.regex)
 	if err != nil {
 		panic(err)
 	}
 	replaceFunc = func(elem string) string {
-		return re.ReplaceAllString(elem, repl)
+		return re.ReplaceAllString(elem, sub.repl)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

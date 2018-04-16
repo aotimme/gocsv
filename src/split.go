@@ -10,7 +10,10 @@ import (
 	"strings"
 )
 
-type SplitSubcommand struct{}
+type SplitSubcommand struct {
+	maxRows      int
+	filenameBase string
+}
 
 func (sub *SplitSubcommand) Name() string {
 	return "split"
@@ -21,27 +24,22 @@ func (sub *SplitSubcommand) Aliases() []string {
 func (sub *SplitSubcommand) Description() string {
 	return "Split a CSV into multiple files."
 }
+func (sub *SplitSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.IntVar(&sub.maxRows, "max-rows", 0, "Maximum number of rows per CSV.")
+	fs.StringVar(&sub.filenameBase, "filename-base", "", "Base of filenames for output.")
+}
 
 func (sub *SplitSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var maxRows int
-	var filenameBase string
-	fs.IntVar(&maxRows, "max-rows", 0, "Maximum number of rows per CSV.")
-	fs.StringVar(&filenameBase, "filename-base", "", "Base of filenames for output.")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	if maxRows < 1 {
+	if sub.maxRows < 1 {
 		fmt.Fprintln(os.Stderr, "Invalid parameter for --max-rows")
 		os.Exit(1)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
-	Split(inputCsvs[0], maxRows, filenameBase)
+	Split(inputCsvs[0], sub.maxRows, sub.filenameBase)
 }
 
 func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {

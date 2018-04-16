@@ -8,7 +8,9 @@ import (
 	"os"
 )
 
-type BeheadSubcommand struct{}
+type BeheadSubcommand struct {
+	numHeaders int
+}
 
 func (sub *BeheadSubcommand) Name() string {
 	return "behead"
@@ -19,27 +21,21 @@ func (sub *BeheadSubcommand) Aliases() []string {
 func (sub *BeheadSubcommand) Description() string {
 	return "Remove header row(s) from a CSV."
 }
+func (sub *BeheadSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.IntVar(&sub.numHeaders, "n", 1, "Number of headers to remove")
+}
 
 func (sub *BeheadSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet("behead", flag.ExitOnError)
-	var numHeaders int
-	fs.IntVar(&numHeaders, "n", 1, "Number of headers to remove")
-
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	if numHeaders < 1 {
+	if sub.numHeaders < 1 {
 		fmt.Fprintln(os.Stderr, "Invalid argument -n")
 		os.Exit(1)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
-	Behead(inputCsvs[0], numHeaders)
+	Behead(inputCsvs[0], sub.numHeaders)
 }
 
 func Behead(inputCsv AbstractInputCsv, numHeaders int) {

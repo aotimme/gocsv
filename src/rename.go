@@ -8,7 +8,10 @@ import (
 	"os"
 )
 
-type RenameSubcommand struct{}
+type RenameSubcommand struct {
+	columnsString string
+	namesString   string
+}
 
 func (sub *RenameSubcommand) Name() string {
 	return "rename"
@@ -19,29 +22,25 @@ func (sub *RenameSubcommand) Aliases() []string {
 func (sub *RenameSubcommand) Description() string {
 	return "Rename the headers of a CSV."
 }
+func (sub *RenameSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to rename")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to rename (shorthand)")
+	fs.StringVar(&sub.namesString, "names", "", "New names for columns")
+}
 
 func (sub *RenameSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var columnsString, namesString string
-	fs.StringVar(&columnsString, "columns", "", "Columns to rename")
-	fs.StringVar(&columnsString, "c", "", "Columns to rename (shorthand)")
-	fs.StringVar(&namesString, "names", "", "New names for columns")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	if columnsString == "" {
+	if sub.columnsString == "" {
 		fmt.Fprintf(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
-	if namesString == "" {
+	if sub.namesString == "" {
 		fmt.Fprintf(os.Stderr, "Missing required argument --names")
 		os.Exit(1)
 	}
-	columns := GetArrayFromCsvString(columnsString)
-	names := GetArrayFromCsvString(namesString)
+	columns := GetArrayFromCsvString(sub.columnsString)
+	names := GetArrayFromCsvString(sub.namesString)
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

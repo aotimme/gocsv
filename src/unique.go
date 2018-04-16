@@ -10,7 +10,11 @@ import (
 	"github.com/alphagov/router/trie"
 )
 
-type UniqueSubcommand struct{}
+type UniqueSubcommand struct {
+	columnsString string
+	sorted        bool
+	count         bool
+}
 
 func (sub *UniqueSubcommand) Name() string {
 	return "unique"
@@ -21,39 +25,34 @@ func (sub *UniqueSubcommand) Aliases() []string {
 func (sub *UniqueSubcommand) Description() string {
 	return "Extract unique rows based upon certain columns."
 }
+func (sub *UniqueSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to use for comparison")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to use for comparison (shorthand)")
+	fs.BoolVar(&sub.sorted, "sorted", false, "Whether input CSV is already sorted")
+	fs.BoolVar(&sub.count, "count", false, "Whether to append a Count column")
+}
 
 func (sub *UniqueSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var columnsString string
-	var sorted, count bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to use for comparison")
-	fs.StringVar(&columnsString, "c", "", "Columns to use for comparison (shorthand)")
-	fs.BoolVar(&sorted, "sorted", false, "Whether input CSV is already sorted")
-	fs.BoolVar(&count, "count", false, "Whether to append a Count column")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
 	var columns []string
-	if columnsString == "" {
+	if sub.columnsString == "" {
 		columns = make([]string, 0)
 	} else {
-		columns = GetArrayFromCsvString(columnsString)
+		columns = GetArrayFromCsvString(sub.columnsString)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	if sorted {
-		if count {
+	if sub.sorted {
+		if sub.count {
 			UniqueifySortedWithCount(inputCsvs[0], columns)
 		} else {
 			UniqueifySorted(inputCsvs[0], columns)
 		}
 	} else {
-		if count {
+		if sub.count {
 			UniqueifyUnsortedWithCount(inputCsvs[0], columns)
 		} else {
 			UniqueifyUnsorted(inputCsvs[0], columns)

@@ -10,7 +10,16 @@ import (
 	"strconv"
 )
 
-type FilterSubcommand struct{}
+type FilterSubcommand struct {
+	columnsString   string
+	exclude         bool
+	regex           string
+	caseInsensitive bool
+	gtStr           string
+	gteStr          string
+	ltStr           string
+	lteStr          string
+}
 
 func (sub *FilterSubcommand) Name() string {
 	return "filter"
@@ -21,51 +30,44 @@ func (sub *FilterSubcommand) Aliases() []string {
 func (sub *FilterSubcommand) Description() string {
 	return "Extract rows whose column match some criterion."
 }
+func (sub *FilterSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to filter against")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to filter against (shorthand)")
+	fs.BoolVar(&sub.exclude, "exclude", false, "Exclude matching rows")
+	fs.StringVar(&sub.regex, "regex", "", "Regular expression for filtering")
+	fs.BoolVar(&sub.caseInsensitive, "case-insensitive", false, "Make regular expression case insensitive")
+	fs.BoolVar(&sub.caseInsensitive, "i", false, "Make regular expression case insensitive (shorthand)")
+	fs.StringVar(&sub.gtStr, "gt", "", "Greater than")
+	fs.StringVar(&sub.gteStr, "gte", "", "Greater than or equal to")
+	fs.StringVar(&sub.ltStr, "lt", "", "Less than")
+	fs.StringVar(&sub.lteStr, "lte", "", "Less than or equal to")
+}
 
 func (sub *FilterSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var regex, columnsString string
-	var exclude, caseInsensitive bool
-	var gtStr, gteStr, ltStr, lteStr string
-	fs.StringVar(&columnsString, "columns", "", "Columns to filter against")
-	fs.StringVar(&columnsString, "c", "", "Columns to filter against (shorthand)")
-	fs.BoolVar(&exclude, "exclude", false, "Exclude matching rows")
-	fs.StringVar(&regex, "regex", "", "Regular expression for filtering")
-	fs.BoolVar(&caseInsensitive, "case-insensitive", false, "Make regular expression case insensitive")
-	fs.BoolVar(&caseInsensitive, "i", false, "Make regular expression case insensitive (shorthand)")
-	fs.StringVar(&gtStr, "gt", "", "Greater than")
-	fs.StringVar(&gteStr, "gte", "", "Greater than or equal to")
-	fs.StringVar(&ltStr, "lt", "", "Less than")
-	fs.StringVar(&lteStr, "lte", "", "Less than or equal to")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
 	// Get columns to compare against
 	var columns []string
-	if columnsString == "" {
+	if sub.columnsString == "" {
 		columns = make([]string, 0)
 	} else {
-		columns = GetArrayFromCsvString(columnsString)
+		columns = GetArrayFromCsvString(sub.columnsString)
 	}
 
 	// Get match function
 	var matchFunc func(string) bool
-	if regex != "" {
-		if caseInsensitive {
-			regex = "(?i)" + regex
+	if sub.regex != "" {
+		if sub.caseInsensitive {
+			sub.regex = "(?i)" + sub.regex
 		}
-		re, err := regexp.Compile(regex)
+		re, err := regexp.Compile(sub.regex)
 		if err != nil {
 			panic(err)
 		}
 		matchFunc = func(elem string) bool {
 			return re.MatchString(elem)
 		}
-	} else if gtStr != "" {
-		if IsFloatType(gtStr) {
-			gt, err := strconv.ParseFloat(gtStr, 64)
+	} else if sub.gtStr != "" {
+		if IsFloatType(sub.gtStr) {
+			gt, err := strconv.ParseFloat(sub.gtStr, 64)
 			if err != nil {
 				panic(err)
 			}
@@ -76,8 +78,8 @@ func (sub *FilterSubcommand) Run(args []string) {
 				}
 				return elem64 > gt
 			}
-		} else if IsDateType(gtStr) {
-			gt, err := ParseDate(gtStr)
+		} else if IsDateType(sub.gtStr) {
+			gt, err := ParseDate(sub.gtStr)
 			if err != nil {
 				panic(err)
 			}
@@ -92,9 +94,9 @@ func (sub *FilterSubcommand) Run(args []string) {
 			fmt.Fprintln(os.Stderr, "Invalid argument for -gt")
 			os.Exit(1)
 		}
-	} else if gteStr != "" {
-		if IsFloatType(gteStr) {
-			gte, err := strconv.ParseFloat(gteStr, 64)
+	} else if sub.gteStr != "" {
+		if IsFloatType(sub.gteStr) {
+			gte, err := strconv.ParseFloat(sub.gteStr, 64)
 			if err != nil {
 				panic(err)
 			}
@@ -105,8 +107,8 @@ func (sub *FilterSubcommand) Run(args []string) {
 				}
 				return elem64 >= gte
 			}
-		} else if IsDateType(gteStr) {
-			gte, err := ParseDate(gteStr)
+		} else if IsDateType(sub.gteStr) {
+			gte, err := ParseDate(sub.gteStr)
 			if err != nil {
 				panic(err)
 			}
@@ -121,9 +123,9 @@ func (sub *FilterSubcommand) Run(args []string) {
 			fmt.Fprintln(os.Stderr, "Invalid argument for -gte")
 			os.Exit(1)
 		}
-	} else if ltStr != "" {
-		if IsFloatType(ltStr) {
-			lt, err := strconv.ParseFloat(ltStr, 64)
+	} else if sub.ltStr != "" {
+		if IsFloatType(sub.ltStr) {
+			lt, err := strconv.ParseFloat(sub.ltStr, 64)
 			if err != nil {
 				panic(err)
 			}
@@ -134,8 +136,8 @@ func (sub *FilterSubcommand) Run(args []string) {
 				}
 				return elem64 < lt
 			}
-		} else if IsDateType(ltStr) {
-			lt, err := ParseDate(ltStr)
+		} else if IsDateType(sub.ltStr) {
+			lt, err := ParseDate(sub.ltStr)
 			if err != nil {
 				panic(err)
 			}
@@ -150,9 +152,9 @@ func (sub *FilterSubcommand) Run(args []string) {
 			fmt.Fprintln(os.Stderr, "Invalid argument for -lt")
 			os.Exit(1)
 		}
-	} else if lteStr != "" {
-		if IsFloatType(lteStr) {
-			lte, err := strconv.ParseFloat(lteStr, 64)
+	} else if sub.lteStr != "" {
+		if IsFloatType(sub.lteStr) {
+			lte, err := strconv.ParseFloat(sub.lteStr, 64)
 			if err != nil {
 				panic(err)
 			}
@@ -163,8 +165,8 @@ func (sub *FilterSubcommand) Run(args []string) {
 				}
 				return elem64 <= lte
 			}
-		} else if IsDateType(lteStr) {
-			lte, err := ParseDate(lteStr)
+		} else if IsDateType(sub.lteStr) {
+			lte, err := ParseDate(sub.lteStr)
 			if err != nil {
 				panic(err)
 			}
@@ -184,12 +186,12 @@ func (sub *FilterSubcommand) Run(args []string) {
 		os.Exit(1)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	FilterMatchFunc(inputCsvs[0], columns, exclude, matchFunc)
+	FilterMatchFunc(inputCsvs[0], columns, sub.exclude, matchFunc)
 }
 
 func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, matchFunc func(string) bool) {

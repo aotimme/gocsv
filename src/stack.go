@@ -8,7 +8,11 @@ import (
 	"os"
 )
 
-type StackSubcommand struct{}
+type StackSubcommand struct {
+	groupName    string
+	groupsString string
+	useFilenames bool
+}
 
 func (sub *StackSubcommand) Name() string {
 	return "stack"
@@ -19,31 +23,26 @@ func (sub *StackSubcommand) Aliases() []string {
 func (sub *StackSubcommand) Description() string {
 	return "Stack multiple CSVs into one CSV."
 }
+func (sub *StackSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.groupName, "group-name", "", "Name of the column for grouping")
+	fs.StringVar(&sub.groupsString, "groups", "", "Group to display for each file")
+	fs.BoolVar(&sub.useFilenames, "filenames", false, "Use the filename for groups")
+}
 
 func (sub *StackSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var groupName, groupsString string
-	var useFilenames bool
-	fs.StringVar(&groupName, "group-name", "", "Name of the column for grouping")
-	fs.StringVar(&groupsString, "groups", "", "Group to display for each file")
-	fs.BoolVar(&useFilenames, "filenames", false, "Use the filename for groups")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	filenames := fs.Args()
+	filenames := args
 
-	hasSpecifiedGroups := groupsString != ""
-	if hasSpecifiedGroups && useFilenames {
+	hasSpecifiedGroups := sub.groupsString != ""
+	if hasSpecifiedGroups && sub.useFilenames {
 		panic(errors.New("Cannot specify both --filename and --groups"))
 	}
 
-	shouldAppendGroup := hasSpecifiedGroups || useFilenames
+	shouldAppendGroup := hasSpecifiedGroups || sub.useFilenames
 
 	var groups []string
 	if hasSpecifiedGroups {
-		groups = GetArrayFromCsvString(groupsString)
-	} else if useFilenames {
+		groups = GetArrayFromCsvString(sub.groupsString)
+	} else if sub.useFilenames {
 		groups = filenames
 	}
 
@@ -52,9 +51,9 @@ func (sub *StackSubcommand) Run(args []string) {
 	}
 
 	var groupColumnName string
-	if groupName != "" {
-		groupColumnName = groupName
-	} else if useFilenames {
+	if sub.groupName != "" {
+		groupColumnName = sub.groupName
+	} else if sub.useFilenames {
 		groupColumnName = "File"
 	} else if shouldAppendGroup {
 		groupColumnName = "Group"

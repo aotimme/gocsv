@@ -7,7 +7,11 @@ import (
 	"os"
 )
 
-type SortSubcommand struct{}
+type SortSubcommand struct {
+	columnsString string
+	reverse       bool
+	noInference   bool
+}
 
 func (sub *SortSubcommand) Name() string {
 	return "sort"
@@ -18,31 +22,26 @@ func (sub *SortSubcommand) Aliases() []string {
 func (sub *SortSubcommand) Description() string {
 	return "Sort a CSV based on one or more columns."
 }
+func (sub *SortSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to select")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to select (shorthand)")
+	fs.BoolVar(&sub.reverse, "reverse", false, "Sort in reverse")
+	fs.BoolVar(&sub.noInference, "no-inference", false, "Skip inference of input")
+}
 
 func (sub *SortSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var columnsString string
-	var reverse, noInference bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to sort on")
-	fs.StringVar(&columnsString, "c", "", "Columns to sort on (shorthand)")
-	fs.BoolVar(&reverse, "reverse", false, "Sort in reverse")
-	fs.BoolVar(&noInference, "no-inference", false, "Skip inference of input")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	if columnsString == "" {
+	if sub.columnsString == "" {
 		fmt.Fprintln(os.Stderr, "Missing argument --columns")
 		os.Exit(1)
 	}
-	columns := GetArrayFromCsvString(columnsString)
+	columns := GetArrayFromCsvString(sub.columnsString)
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	SortCsv(inputCsvs[0], columns, reverse, noInference)
+	SortCsv(inputCsvs[0], columns, sub.reverse, sub.noInference)
 }
 
 func SortCsv(inputCsv AbstractInputCsv, columns []string, reverse, noInference bool) {

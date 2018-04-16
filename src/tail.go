@@ -11,7 +11,9 @@ import (
 	"strings"
 )
 
-type TailSubcommand struct{}
+type TailSubcommand struct {
+	numRowsStr string
+}
 
 func (sub *TailSubcommand) Name() string {
 	return "tail"
@@ -22,35 +24,31 @@ func (sub *TailSubcommand) Aliases() []string {
 func (sub *TailSubcommand) Description() string {
 	return "Extract the last N rows from a CSV."
 }
+func (sub *TailSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.numRowsStr, "n", "10", "Number of rows to include")
+}
 
 func (sub *TailSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var numRowsStr string
-	fs.StringVar(&numRowsStr, "n", "10", "Number of rows to include")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
 	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
-	if !numRowsRegex.MatchString(numRowsStr) {
+	if !numRowsRegex.MatchString(sub.numRowsStr) {
 		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
 		os.Exit(1)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	if strings.HasPrefix(numRowsStr, "+") {
-		numRowsStr = strings.TrimPrefix(numRowsStr, "+")
+	if strings.HasPrefix(sub.numRowsStr, "+") {
+		numRowsStr := strings.TrimPrefix(sub.numRowsStr, "+")
 		numRows, err := strconv.Atoi(numRowsStr)
 		if err != nil {
 			panic(err)
 		}
 		TailFromTop(inputCsvs[0], numRows)
 	} else {
-		numRows, err := strconv.Atoi(numRowsStr)
+		numRows, err := strconv.Atoi(sub.numRowsStr)
 		if err != nil {
 			panic(err)
 		}

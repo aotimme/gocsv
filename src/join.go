@@ -6,10 +6,14 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 )
 
-type JoinSubcommand struct{}
+type JoinSubcommand struct {
+	columnsString string
+	left          bool
+	right         bool
+	outer         bool
+}
 
 func (sub *JoinSubcommand) Name() string {
 	return "join"
@@ -20,40 +24,30 @@ func (sub *JoinSubcommand) Aliases() []string {
 func (sub *JoinSubcommand) Description() string {
 	return "Join two CSVs based on equality of elements in a column."
 }
+func (sub *JoinSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to join on")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to join on (shorthand)")
+	fs.BoolVar(&sub.left, "left", false, "Left join")
+	fs.BoolVar(&sub.right, "right", false, "Right join")
+	fs.BoolVar(&sub.outer, "outer", false, "Full outer join")
+}
 
 func (sub *JoinSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var columnsString string
-	var left, right, outer bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to join on")
-	fs.StringVar(&columnsString, "c", "", "Columns to join on (shorthand)")
-	fs.BoolVar(&left, "left", false, "Left join")
-	fs.BoolVar(&right, "right", false, "Right join")
-	fs.BoolVar(&outer, "outer", false, "Full outer join")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
 	numJoins := 0
-	if left {
+	if sub.left {
 		numJoins++
 	}
-	if right {
+	if sub.right {
 		numJoins++
 	}
-	if outer {
+	if sub.outer {
 		numJoins++
 	}
 	if numJoins > 1 {
 		fmt.Fprintln(os.Stderr, "Must only specify zero or one of --left, --right, or --outer")
 		os.Exit(1)
 	}
-	c := csv.NewReader(strings.NewReader(columnsString))
-	rows, err := c.ReadAll()
-	if err != nil {
-		panic(err)
-	}
-	columns := rows[0]
+	columns := GetArrayFromCsvString(sub.columnsString)
 	if len(columns) < 1 || len(columns) > 2 {
 		fmt.Fprintln(os.Stderr, "Invalid argument for --columns")
 		os.Exit(1)
@@ -62,31 +56,19 @@ func (sub *JoinSubcommand) Run(args []string) {
 		columns = append(columns, columns[0])
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 2)
+	inputCsvs, err := GetInputCsvs(args, 2)
 	if err != nil {
 		panic(err)
 	}
 
-	if left {
+	if sub.left {
 		LeftJoin(inputCsvs[0], inputCsvs[1], columns[0], columns[1])
-	} else if right {
+	} else if sub.right {
 		RightJoin(inputCsvs[0], inputCsvs[1], columns[0], columns[1])
-	} else if outer {
+	} else if sub.outer {
 		OuterJoin(inputCsvs[0], inputCsvs[1], columns[0], columns[1])
 	} else {
 		InnerJoin(inputCsvs[0], inputCsvs[1], columns[0], columns[1])
-	}
-}
-
-func concat(outrow, row1, row2 []string) {
-	i := 0
-	for _, elem := range row1 {
-		outrow[i] = elem
-		i++
-	}
-	for _, elem := range row2 {
-		outrow[i] = elem
-		i++
 	}
 }
 

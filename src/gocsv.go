@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -10,6 +11,7 @@ type Subcommand interface {
 	Name() string
 	Aliases() []string
 	Description() string
+	SetFlags(*flag.FlagSet)
 	Run([]string)
 }
 
@@ -84,7 +86,13 @@ func main() {
 	}
 	for _, subcommand := range subcommands {
 		if MatchesSubcommand(subcommand, subcommandName) {
-			subcommand.Run(args[2:])
+			fs := flag.NewFlagSet(subcommand.Name(), flag.ExitOnError)
+			subcommand.SetFlags(fs)
+			err := fs.Parse(args[2:])
+			if err != nil {
+				panic(err)
+			}
+			subcommand.Run(fs.Args())
 			return
 		}
 	}

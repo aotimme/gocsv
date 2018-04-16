@@ -17,15 +17,11 @@ func (sub *DimensionsSubcommand) Aliases() []string {
 func (sub *DimensionsSubcommand) Description() string {
 	return "Get the dimensions of a CSV."
 }
+func (sub *DimensionsSubcommand) SetFlags(fs *flag.FlagSet) {
+}
 
 func (sub *DimensionsSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

@@ -317,3 +317,15 @@ func GetBaseFilenameWithoutExtension(filename string) string {
 	extension := path.Ext(baseFilename)
 	return strings.TrimSuffix(baseFilename, extension)
 }
+
+func concat(outrow, row1, row2 []string) {
+	i := 0
+	for _, elem := range row1 {
+		outrow[i] = elem
+		i++
+	}
+	for _, elem := range row2 {
+		outrow[i] = elem
+		i++
+	}
+}

@@ -8,7 +8,10 @@ import (
 	"unicode/utf8"
 )
 
-type DelimiterSubcommand struct{}
+type DelimiterSubcommand struct {
+	inputDelimiter  string
+	outputDelimiter string
+}
 
 func (sub *DelimiterSubcommand) Name() string {
 	return "delimiter"
@@ -19,24 +22,19 @@ func (sub *DelimiterSubcommand) Aliases() []string {
 func (sub *DelimiterSubcommand) Description() string {
 	return "Change the delimiter being used for a CSV."
 }
+func (sub *DelimiterSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.inputDelimiter, "input", "", "Input delimiter")
+	fs.StringVar(&sub.inputDelimiter, "i", "", "Input delimiter (shorthand)")
+	fs.StringVar(&sub.outputDelimiter, "output", "", "Output delimiter")
+	fs.StringVar(&sub.outputDelimiter, "o", "", "Output delimiter (shorthand)")
+}
 
 func (sub *DelimiterSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var inputDelimiter, outputDelimiter string
-	fs.StringVar(&inputDelimiter, "input", "", "Input delimiter")
-	fs.StringVar(&inputDelimiter, "i", "", "Input delimiter (shorthand)")
-	fs.StringVar(&outputDelimiter, "output", "", "Output delimiter")
-	fs.StringVar(&outputDelimiter, "o", "", "Output delimiter (shorthand)")
-	err := fs.Parse(args)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
-	if err != nil {
-		panic(err)
-	}
-	ChangeDelimiter(inputCsvs[0], inputDelimiter, outputDelimiter)
+	ChangeDelimiter(inputCsvs[0], sub.inputDelimiter, sub.outputDelimiter)
 }
 
 func ChangeDelimiter(inputCsv AbstractInputCsv, inputDelimiter, outputDelimiter string) {

@@ -11,7 +11,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type SqlSubcommand struct{}
+type SqlSubcommand struct {
+	queryString string
+}
 
 func (sub *SqlSubcommand) Name() string {
 	return "sql"
@@ -22,23 +24,18 @@ func (sub *SqlSubcommand) Aliases() []string {
 func (sub *SqlSubcommand) Description() string {
 	return "Run SQL queries on CSVs."
 }
+func (sub *SqlSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.queryString, "query", "", "SQL query")
+	fs.StringVar(&sub.queryString, "q", "", "SQL query (shorthand)")
+}
 
 func (sub *SqlSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var queryString string
-	fs.StringVar(&queryString, "query", "", "SQL query")
-	fs.StringVar(&queryString, "q", "", "SQL query (shorthand)")
-	err := fs.Parse(args)
+	inputCsvs, err := GetInputCsvs(args, -1)
 	if err != nil {
 		panic(err)
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), -1)
-	if err != nil {
-		panic(err)
-	}
-
-	DoSqlQuery(inputCsvs, queryString)
+	DoSqlQuery(inputCsvs, sub.queryString)
 }
 
 func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {

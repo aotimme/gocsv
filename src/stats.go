@@ -15,15 +15,11 @@ func (sub *StatsSubcommand) Aliases() []string {
 func (sub *StatsSubcommand) Description() string {
 	return "Get some basic statistics on a CSV."
 }
+func (sub *StatsSubcommand) SetFlags(fs *flag.FlagSet) {
+}
 
 func (sub *StatsSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

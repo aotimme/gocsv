@@ -7,7 +7,10 @@ import (
 	"strings"
 )
 
-type ViewSubcommand struct{}
+type ViewSubcommand struct {
+	maxWidth int
+	maxRows  int
+}
 
 func (sub *ViewSubcommand) Name() string {
 	return "view"
@@ -18,32 +21,27 @@ func (sub *ViewSubcommand) Aliases() []string {
 func (sub *ViewSubcommand) Description() string {
 	return "Display a CSV in a pretty tabular format."
 }
+func (sub *ViewSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.IntVar(&sub.maxWidth, "max-width", 20, "Maximum width per column")
+	fs.IntVar(&sub.maxWidth, "w", 20, "Maximum width per column (shorthand)")
+	fs.IntVar(&sub.maxRows, "n", 0, "Number of rows to display")
+}
 
 func (sub *ViewSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var maxWidth, maxRows int
-	fs.IntVar(&maxWidth, "max-width", 20, "Maximum width per column")
-	fs.IntVar(&maxWidth, "w", 20, "Maximum width per column (shorthand)")
-	fs.IntVar(&maxRows, "n", 0, "Number of rows to display")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	if maxWidth < 1 {
+	if sub.maxWidth < 1 {
 		fmt.Fprintln(os.Stderr, "Invalid argument --max-width")
 		os.Exit(1)
 	}
-	if maxRows < 0 {
-		maxRows = 0
+	if sub.maxRows < 0 {
+		sub.maxRows = 0
 	}
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	View(inputCsvs[0], maxWidth, maxRows)
+	View(inputCsvs[0], sub.maxWidth, sub.maxRows)
 }
 
 func getCellWidth(cell string) int {

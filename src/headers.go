@@ -16,15 +16,11 @@ func (sub *HeadersSubcommand) Aliases() []string {
 func (sub *HeadersSubcommand) Description() string {
 	return "View the headers from a CSV."
 }
+func (sub *HeadersSubcommand) SetFlags(fs *flag.FlagSet) {
+}
 
 func (sub *HeadersSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}

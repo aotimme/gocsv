@@ -8,7 +8,10 @@ import (
 	"os"
 )
 
-type SelectSubcommand struct{}
+type SelectSubcommand struct {
+	columnsString string
+	exclude       bool
+}
 
 func (sub *SelectSubcommand) Name() string {
 	return "select"
@@ -19,30 +22,25 @@ func (sub *SelectSubcommand) Aliases() []string {
 func (sub *SelectSubcommand) Description() string {
 	return "Extract specified columns."
 }
+func (sub *SelectSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.columnsString, "columns", "", "Columns to select")
+	fs.StringVar(&sub.columnsString, "c", "", "Columns to select (shorthand)")
+	fs.BoolVar(&sub.exclude, "exclude", false, "Whether to exclude the specified columns")
+}
 
 func (sub *SelectSubcommand) Run(args []string) {
-	fs := flag.NewFlagSet(sub.Name(), flag.ExitOnError)
-	var columnsString string
-	var exclude bool
-	fs.StringVar(&columnsString, "columns", "", "Columns to select")
-	fs.StringVar(&columnsString, "c", "", "Columns to select (shorthand)")
-	fs.BoolVar(&exclude, "exclude", false, "Whether to exclude the specified columns")
-	err := fs.Parse(args)
-	if err != nil {
-		panic(err)
-	}
-	if columnsString == "" {
+	if sub.columnsString == "" {
 		fmt.Fprintf(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
-	columns := GetArrayFromCsvString(columnsString)
+	columns := GetArrayFromCsvString(sub.columnsString)
 
-	inputCsvs, err := GetInputCsvs(fs.Args(), 1)
+	inputCsvs, err := GetInputCsvs(args, 1)
 	if err != nil {
 		panic(err)
 	}
 
-	if exclude {
+	if sub.exclude {
 		ExcludeColumns(inputCsvs[0], columns)
 	} else {
 		SelectColumns(inputCsvs[0], columns)
