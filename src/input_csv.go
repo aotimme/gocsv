@@ -40,7 +40,7 @@ func (sic *StandardInputCsv) Close() error {
 }
 
 func (sic *StandardInputCsv) Name() string {
-	return "-"
+	return "stdin"
 }
 
 func (sic *StandardInputCsv) Filename() string {

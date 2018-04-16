@@ -319,7 +319,13 @@ Arguments:
 
 When passing in files, you may read from standard input by specifying the filename `-`.
 
-Table names are derived from the CSV filenames by taking the base filename without the file extension. For example, `test-files/stats.csv` is referenced as a table with the name `stats`. The table from standard input `-` should be referenced as the table `'-'`.
+Table names are derived from the CSV filenames by taking the base filename without the file extension. For example, `test-files/stats.csv` is referenced as a table with the name `stats`. The table from standard input `-` should be referenced as the table `stdin`.
+
+This subcommand uses SQLite3 under the hood. It attempts to infer column types for defining the SQL tables, but all the rules of dynamic typing and type affinity in SQLite3 still pertain.
+
+See [Datatypes In SQLite Version 3](https://www.sqlite.org/datatype3.html) for more information.
+
+Also note that this subcommand makes no attempts to prevent SQL injection (either via the input CSVs or via the query).
 
 ### stack
 

@@ -100,7 +100,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 	for i, headerName := range imc.header {
 		allVariables[2*i+1] = headerName
 		columnType := imc.InferType(i)
-		allVariables[2*i+2] = ColumnTypeToSqlType(columnType)
+		allVariables[2*i+2] = ColumnTypeToSqliteType(columnType)
 		if i > 0 {
 			createStatement += ", "
 		}

@@ -7,14 +7,15 @@ import (
 	"time"
 )
 
-// NOTE: Order matters here. Ordered by strictness descending
 type ColumnType int
 
+// NOTE: Order matters here. Ordered by strictness descending
 const (
 	NULL_TYPE ColumnType = iota
 	INT_TYPE
 	FLOAT_TYPE
 	BOOLEAN_TYPE
+	DATETIME_TYPE
 	DATE_TYPE
 	STRING_TYPE
 )
@@ -28,6 +29,8 @@ func ColumnTypeToString(columnType ColumnType) string {
 		return "float"
 	} else if columnType == BOOLEAN_TYPE {
 		return "boolean"
+	} else if columnType == DATETIME_TYPE {
+		return "datetime"
 	} else if columnType == DATE_TYPE {
 		return "date"
 	} else if columnType == STRING_TYPE {
@@ -37,22 +40,46 @@ func ColumnTypeToString(columnType ColumnType) string {
 	}
 }
 
-func ColumnTypeToSqlType(columnType ColumnType) string {
+func ColumnTypeToSqliteType(columnType ColumnType) string {
 	if columnType == NULL_TYPE {
 		return "TEXT"
 	} else if columnType == INT_TYPE {
 		return "INTEGER"
 	} else if columnType == FLOAT_TYPE {
-		return "FLOAT"
+		return "REAL"
 	} else if columnType == BOOLEAN_TYPE {
-		return "INTEGER"
+		return "TEXT"
+	} else if columnType == DATETIME_TYPE {
+		return "TEXT"
 	} else if columnType == DATE_TYPE {
-		return "DATE"
+		return "TEXT"
 	} else if columnType == STRING_TYPE {
 		return "TEXT"
 	} else {
 		return "TEXT"
 	}
+}
+
+func InferTypeWithHint(elem string, hint ColumnType) ColumnType {
+	if IsNullType(elem) {
+		return NULL_TYPE
+	}
+	if INT_TYPE >= hint && IsIntType(elem) {
+		return INT_TYPE
+	}
+	if FLOAT_TYPE >= hint && IsFloatType(elem) {
+		return FLOAT_TYPE
+	}
+	if BOOLEAN_TYPE >= hint && IsBooleanType(elem) {
+		return BOOLEAN_TYPE
+	}
+	if DATETIME_TYPE >= hint && IsDatetimeType(elem) {
+		return DATETIME_TYPE
+	}
+	if DATE_TYPE >= hint && IsDateType(elem) {
+		return DATE_TYPE
+	}
+	return STRING_TYPE
 }
 
 func IsNullType(elem string) bool {
@@ -74,28 +101,43 @@ func IsBooleanType(elem string) bool {
 	return strLower == "t" || strLower == "true" || strLower == "f" || strLower == "false"
 }
 
+func IsDatetimeType(elem string) bool {
+	_, err := ParseDatetime(elem)
+	return err == nil
+}
+
 func IsDateType(elem string) bool {
 	_, err := ParseDate(elem)
 	return err == nil
 }
 
-func InferType(elem string) ColumnType {
-	if IsNullType(elem) {
-		return NULL_TYPE
+func ParseDatetimeOrPanic(elem string) time.Time {
+	t, err := ParseDatetime(elem)
+	if err != nil {
+		panic(err)
 	}
-	if IsIntType(elem) {
-		return INT_TYPE
+	return t
+}
+
+func ParseDatetime(elem string) (time.Time, error) {
+	patterns := []string{
+		time.ANSIC,
+		time.UnixDate,
+		time.RubyDate,
+		time.RFC822,
+		time.RFC822Z,
+		time.RFC850,
+		time.RFC1123,
+		time.RFC1123Z,
+		time.RFC3339,
 	}
-	if IsFloatType(elem) {
-		return FLOAT_TYPE
+	for _, pattern := range patterns {
+		t, err := time.Parse(pattern, elem)
+		if err == nil {
+			return t, nil
+		}
 	}
-	if IsBooleanType(elem) {
-		return BOOLEAN_TYPE
-	}
-	if IsDateType(elem) {
-		return DATE_TYPE
-	}
-	return STRING_TYPE
+	return time.Time{}, errors.New("Invalid Date string")
 }
 
 func ParseDateOrPanic(elem string) time.Time {

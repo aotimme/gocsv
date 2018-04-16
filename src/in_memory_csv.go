@@ -74,7 +74,7 @@ func (imc *InMemoryCsv) GetRowsMatchingIndexedColumn(value string) [][]string {
 func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
 	curType := NULL_TYPE
 	for _, row := range imc.rows {
-		thisType := InferType(row[columnIndex])
+		thisType := InferTypeWithHint(row[columnIndex], curType)
 		if thisType > curType {
 			curType = thisType
 		}
@@ -116,6 +116,14 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
 				if row1Val < row2Val {
 					return true
 				} else if row1Val > row2Val {
+					return false
+				}
+			} else if columnType == DATETIME_TYPE {
+				row1Val := ParseDatetimeOrPanic(row1[columnIndex])
+				row2Val := ParseDatetimeOrPanic(row2[columnIndex])
+				if row1Val.Before(row2Val) {
+					return true
+				} else if row1Val.After(row2Val) {
 					return false
 				}
 			} else if columnType == DATE_TYPE {
