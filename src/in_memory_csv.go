@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"math"
 	"math/rand"
@@ -17,18 +16,6 @@ type InMemoryCsv struct {
 	// index of column
 	isIndexed bool
 	index     map[string][]int
-}
-
-func NewInMemoryCsv(reader *csv.Reader) *InMemoryCsv {
-	imc := new(InMemoryCsv)
-	rows, err := reader.ReadAll()
-	if err != nil {
-		panic(err)
-	}
-	imc.header = rows[0]
-	imc.rows = rows[1:]
-	imc.isIndexed = false
-	return imc
 }
 
 func NewInMemoryCsvFromInputCsv(inputCsv AbstractInputCsv) *InMemoryCsv {
