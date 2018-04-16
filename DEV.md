@@ -2,6 +2,11 @@
 
 ## Development
 
+After cloning this repository, set up the pre-commit hook to ensure proper formatting of the Go code:
+```shell
+ln -s ../../git-hooks/pre-commit .git/hooks/pre-commit
+```
+
 When developing, you can build a local version of the `gocsv` binary via running `make`. This will create a newly compiled `gocsv` binary in `bin/`.
 
 ## Releasing
