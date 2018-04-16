@@ -56,10 +56,7 @@ func (sub *JoinSubcommand) Run(args []string) {
 		columns = append(columns, columns[0])
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 2)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 2)
 
 	if sub.left {
 		LeftJoin(inputCsvs[0], inputCsvs[1], columns[0], columns[1])

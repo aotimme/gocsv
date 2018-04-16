@@ -61,10 +61,7 @@ func (sub *StackSubcommand) Run(args []string) {
 		groupColumnName = ""
 	}
 
-	inputCsvs, err := GetInputCsvs(filenames, -1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(filenames, -1)
 	StackFiles(inputCsvs, groupColumnName, groups)
 }
 

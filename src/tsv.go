@@ -22,10 +22,7 @@ func (sub *TsvSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *TsvSubcommand) Run(args []string) {
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	Tsv(inputCsvs[0])
 }
 

@@ -82,6 +82,14 @@ func (fic *FileInputCsv) Filename() string {
 	return fic.filename
 }
 
+func GetInputCsvsOrPanic(filenames []string, numInputCsvs int) (csvs []AbstractInputCsv) {
+	csvs, err := GetInputCsvs(filenames, numInputCsvs)
+	if err != nil {
+		panic(err)
+	}
+	return
+}
+
 func GetInputCsvs(filenames []string, numInputCsvs int) (csvs []AbstractInputCsv, err error) {
 	hasDash := false
 	for _, filename := range filenames {

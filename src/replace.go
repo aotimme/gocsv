@@ -55,10 +55,7 @@ func (sub *ReplaceSubcommand) Run(args []string) {
 		return re.ReplaceAllString(elem, sub.repl)
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 
 	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
 }

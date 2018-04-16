@@ -30,11 +30,7 @@ func (sub *SqlSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *SqlSubcommand) Run(args []string) {
-	inputCsvs, err := GetInputCsvs(args, -1)
-	if err != nil {
-		panic(err)
-	}
-
+	inputCsvs := GetInputCsvsOrPanic(args, -1)
 	DoSqlQuery(inputCsvs, sub.queryString)
 }
 

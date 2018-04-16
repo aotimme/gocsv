@@ -36,11 +36,7 @@ func (sub *ViewSubcommand) Run(args []string) {
 		sub.maxRows = 0
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
-
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	View(inputCsvs[0], sub.maxWidth, sub.maxRows)
 }
 

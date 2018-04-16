@@ -35,11 +35,7 @@ func (sub *SelectSubcommand) Run(args []string) {
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
-
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	if sub.exclude {
 		ExcludeColumns(inputCsvs[0], columns)
 	} else {

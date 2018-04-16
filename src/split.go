@@ -35,10 +35,7 @@ func (sub *SplitSubcommand) Run(args []string) {
 		os.Exit(1)
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	Split(inputCsvs[0], sub.maxRows, sub.filenameBase)
 }
 

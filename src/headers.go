@@ -20,10 +20,7 @@ func (sub *HeadersSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *HeadersSubcommand) Run(args []string) {
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	ShowHeaders(inputCsvs[0])
 }
 

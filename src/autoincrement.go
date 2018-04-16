@@ -30,12 +30,9 @@ func (sub *AutoincrementSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *AutoincrementSubcommand) Run(args []string) {
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	AutoIncrement(inputCsvs[0], sub.name, sub.seed, sub.prepend)
-	err = inputCsvs[0].Close()
+	err := inputCsvs[0].Close()
 	if err != nil {
 		panic(err)
 	}

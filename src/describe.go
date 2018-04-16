@@ -20,10 +20,7 @@ func (sub *DescribeSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *DescribeSubcommand) Run(args []string) {
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	DescribeCsv(inputCsvs[0])
 }
 

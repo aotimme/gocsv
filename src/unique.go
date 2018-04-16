@@ -40,11 +40,7 @@ func (sub *UniqueSubcommand) Run(args []string) {
 		columns = GetArrayFromCsvString(sub.columnsString)
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
-
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	if sub.sorted {
 		if sub.count {
 			UniqueifySortedWithCount(inputCsvs[0], columns)

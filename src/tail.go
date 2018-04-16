@@ -35,11 +35,7 @@ func (sub *TailSubcommand) Run(args []string) {
 		os.Exit(1)
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
-
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	if strings.HasPrefix(sub.numRowsStr, "+") {
 		numRowsStr := strings.TrimPrefix(sub.numRowsStr, "+")
 		numRows, err := strconv.Atoi(numRowsStr)

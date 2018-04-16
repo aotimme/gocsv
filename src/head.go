@@ -36,10 +36,7 @@ func (sub *HeadSubcommand) Run(args []string) {
 		return
 	}
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 
 	if strings.HasPrefix(sub.numRowsStr, "+") {
 		sub.numRowsStr = strings.TrimPrefix(sub.numRowsStr, "+")

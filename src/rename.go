@@ -40,11 +40,7 @@ func (sub *RenameSubcommand) Run(args []string) {
 	columns := GetArrayFromCsvString(sub.columnsString)
 	names := GetArrayFromCsvString(sub.namesString)
 
-	inputCsvs, err := GetInputCsvs(args, 1)
-	if err != nil {
-		panic(err)
-	}
-
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	RenameColumns(inputCsvs[0], columns, names)
 }
 
