@@ -46,7 +46,7 @@ Subcommands:
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
 - [xlsx](#xlsx) - Convert sheets of a XLSX file to CSV.
-- [sql](#sql) - Run SQL queries on CSVs.
+- [sql](#sql) (BETA) - Run SQL queries on CSVs.
 
 
 ## Subcommands
@@ -411,6 +411,8 @@ By default the `xlsx` subcommand will convert all the sheets in `FILE` to CSVs t
 
 ### sql
 
+Note that this subcommand is in _**BETA**_.
+
 Run SQL queries on CSVs.
 
 Usage:
@@ -469,7 +471,7 @@ cat test-files/left-table.csv \
 | unique        |  &#x2714;           | &#x2714; |
 | join          |  &#x2714;           | &#x2714; |
 | xlsx          |     N/A             | &#x2021; |
-| sql           |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
+| sql (BETA)    |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 
 &#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
 

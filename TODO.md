@@ -2,8 +2,7 @@
 
 ## Roadmap
 
-- [ ] Implement `format` subcommand to output with different delimiters, etc. This might replace the `tsv` subcommand.
-- [ ] Support `-` as a filename specifying `stdin` like csvkit does.
+- [ ] Develop the `sql` subcommand to get it out of beta.
 
 ## Maybe
 
