@@ -150,18 +150,19 @@ Filter a CSV by rows whose columns match some criterion.
 Usage:
 
 ```shell
-gocsv filter [--columns COLUMNS] [--regex REGEX] [--gt N] [--gte N] [--lt N] [--lte N] [--exclude] FILE
+gocsv filter [--columns COLUMNS] [--equals STR] [--regex REGEX] [--gt N] [--gte N] [--lt N] [--lte N] [--exclude] FILE
 ```
 
 Arguments:
 
 - `--columns` (optional, shorthand `-c`) A comma-separated list of the columns to filter against. If no columns are specified, then filter checks every column on a row. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
+- `--equals` (optional, shorthand `-eq`) String to match against.
 - `--regex` (optional) Regular expression to use to match against.
 - `--case-insensitive` (optional, shorthand `-i`) When using the `--regex` flag, use this flag to specify a case insensitive match rather than the default case sensitive match.
 - `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against a number.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
 
-Note that one of `--regex`, `--gt` , `--gte`, `--lt`, or `--lte` must be specified.
+Note that one of `--regex`, `--equals` (`-eq`), `--gt` , `--gte`, `--lt`, or `--lte` must be specified.
 
 ### head
 

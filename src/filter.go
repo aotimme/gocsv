@@ -15,6 +15,7 @@ type FilterSubcommand struct {
 	exclude         bool
 	regex           string
 	caseInsensitive bool
+	equals          string
 	gtStr           string
 	gteStr          string
 	ltStr           string
@@ -35,6 +36,8 @@ func (sub *FilterSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.StringVar(&sub.columnsString, "c", "", "Columns to filter against (shorthand)")
 	fs.BoolVar(&sub.exclude, "exclude", false, "Exclude matching rows")
 	fs.StringVar(&sub.regex, "regex", "", "Regular expression for filtering")
+	fs.StringVar(&sub.equals, "equals", "", "Exact equality")
+	fs.StringVar(&sub.equals, "eq", "", "Exact equality")
 	fs.BoolVar(&sub.caseInsensitive, "case-insensitive", false, "Make regular expression case insensitive")
 	fs.BoolVar(&sub.caseInsensitive, "i", false, "Make regular expression case insensitive (shorthand)")
 	fs.StringVar(&sub.gtStr, "gt", "", "Greater than")
@@ -64,6 +67,10 @@ func (sub *FilterSubcommand) Run(args []string) {
 		}
 		matchFunc = func(elem string) bool {
 			return re.MatchString(elem)
+		}
+	} else if sub.equals != "" {
+		matchFunc = func(elem string) bool {
+			return elem == sub.equals
 		}
 	} else if sub.gtStr != "" {
 		if IsFloatType(sub.gtStr) {
