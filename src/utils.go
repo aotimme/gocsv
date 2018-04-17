@@ -23,7 +23,7 @@ func GetIndicesForColumnsOrPanic(headers []string, columns []string) (indices []
 // into a slice of the indices of the matching columns.
 func GetIndicesForColumns(headers []string, columns []string) (indices []int, err error) {
 	if len(columns) == 0 {
-		indices = make([]int, len(columns))
+		indices = make([]int, len(headers))
 		for i := range indices {
 			indices[i] = i
 		}
