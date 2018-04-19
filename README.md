@@ -5,7 +5,7 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 To install on Apple OS X, open a Terminal window and run
 
 ```shell
-/bin/bash <(curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install-latest-darwin-amd64.sh)
+curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install-latest-darwin-amd64.sh | bash
 ```
 
 ### Table of Contents
