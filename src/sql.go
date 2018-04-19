@@ -92,7 +92,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	allVariables := make([]interface{}, 2*len(imc.header)+1)
 	allVariables[0] = tableName
-	createStatement := "CREATE TABLE \"%s\"("
+	createStatement := "CREATE TABLE [%s]("
 	for i, headerName := range imc.header {
 		allVariables[2*i+1] = headerName
 		columnType := imc.InferType(i)
@@ -100,7 +100,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 		if i > 0 {
 			createStatement += ", "
 		}
-		createStatement += "\"%s\" %s NULL"
+		createStatement += "[%s] %s NULL"
 	}
 	createStatement += ");"
 	// Unfortunately using `db.Prepare` with `?` variables wouldn't work
@@ -110,7 +110,11 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 		panic(err)
 	}
 
-	tableColumns := fmt.Sprintf("\"%s\"(%s)", tableName, strings.Join(imc.header, ", "))
+	escapedHeaders := make([]string, len(imc.header))
+	for i, headerName := range imc.header {
+		escapedHeaders[i] = fmt.Sprintf("[%s]", headerName)
+	}
+	tableColumns := fmt.Sprintf("[%s](%s)", tableName, strings.Join(escapedHeaders, ", "))
 	valuesQuestions := make([]string, len(imc.header))
 	for i := range valuesQuestions {
 		valuesQuestions[i] = "?"
