@@ -106,7 +106,7 @@ func GetIndicesOfString(haystack []string, needle string) (indices []int) {
 // that will simply panic if GetIndexForColumn returns -1.
 func GetIndexForColumnOrPanic(headers []string, column string) int {
 	index := GetIndexForColumn(headers, column)
-	if index > -1 {
+	if index == -1 {
 		panic(fmt.Errorf("Unable to find column specified: %s", column))
 	}
 	return index
