@@ -24,6 +24,7 @@ func RegisterSubcommand(sub Subcommand) {
 func init() {
 	RegisterSubcommand(&AutoincrementSubcommand{})
 	RegisterSubcommand(&BeheadSubcommand{})
+	RegisterSubcommand(&CapSubcommand{})
 	RegisterSubcommand(&CleanSubcommand{})
 	RegisterSubcommand(&DelimiterSubcommand{})
 	RegisterSubcommand(&DescribeSubcommand{})

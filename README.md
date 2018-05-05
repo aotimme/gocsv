@@ -25,6 +25,7 @@ Subcommands:
 
 - [autoincrement](#autoincrement) (alias: `autoinc`) - Add a column of incrementing integers to a CSV.
 - [behead](#behead) - Remove header row(s) from a CSV.
+- [cap](#cap) - Add a header row to a CSV.
 - [clean](#clean) - Clean a CSV of common formatting issues.
 - [delimiter](#delimiter) (alias: `delim`) - Change the delimiter being used for a CSV.
 - [describe](#describe) - Get basic information about a CSV.
@@ -82,6 +83,27 @@ gocsv behead [-n N] FILE
 Arguments:
 
 - `-n` (optional) Number of header rows to remove. Defaults to 1.
+
+### cap
+
+Add a header row to a CSV
+
+Usage:
+
+```shell
+gocsv cap --names NAMES [--truncate-names] [--default-name DEFAULT_NAME] FILE
+```
+
+Arguments:
+
+- `--names` A comma-separated list of names to add as headers to each column.
+- `--truncate-names` [optional] If there are fewer columns than the number of names provided by `--names`, drop the extra column names.
+- `--default-name` [optional] If there are more columns than the number of names provided by `--names`, use this as the base of the default names for any additional column. If the default name is `DEFAULT_NAME`, then the first additional column will be named DEFAULT_NAME, the second "{DEFAULT_NAME} 1", the third "{DEFAULT_NAME} 2", etc.
+
+The subcommand will error if:
+* The number of names provided by `--names` is greater than the number of columns and `--truncate-names` is not specified, or
+* the number of names provided by `--names` is less than the number of columns and `--default-name` is not specified.
+
 
 ### clean
 
