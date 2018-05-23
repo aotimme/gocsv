@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/csv"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+
+	"./csv"
 
 	"github.com/tealeg/xlsx"
 )

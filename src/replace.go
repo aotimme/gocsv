@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"io"
 	"os"
 	"regexp"
+
+	"./csv"
 )
 
 type ReplaceSubcommand struct {

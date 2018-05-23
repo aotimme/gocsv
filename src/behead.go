@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+
+	"./csv"
 )
 
 type BeheadSubcommand struct {

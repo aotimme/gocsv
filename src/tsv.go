@@ -1,10 +1,11 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"io"
 	"os"
+
+	"./csv"
 )
 
 type TsvSubcommand struct{}

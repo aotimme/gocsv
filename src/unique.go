@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"io"
 	"os"
 	"strconv"
+
+	"./csv"
 
 	"github.com/alphagov/router/trie"
 )

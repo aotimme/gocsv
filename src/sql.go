@@ -2,11 +2,12 @@ package main
 
 import (
 	"database/sql"
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+
+	"./csv"
 
 	_ "github.com/mattn/go-sqlite3"
 )

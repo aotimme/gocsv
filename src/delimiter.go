@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"io"
 	"os"
 	"unicode/utf8"
+
+	"./csv"
 )
 
 type DelimiterSubcommand struct {

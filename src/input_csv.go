@@ -1,9 +1,10 @@
 package main
 
 import (
-	"encoding/csv"
 	"errors"
 	"os"
+
+	"./csv"
 )
 
 type AbstractInputCsv interface {

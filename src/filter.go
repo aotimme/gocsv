@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"regexp"
 	"strconv"
+
+	"./csv"
 )
 
 type FilterSubcommand struct {

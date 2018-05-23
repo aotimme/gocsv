@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"io"
@@ -9,6 +8,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"./csv"
 )
 
 type TailSubcommand struct {

@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
+
+	"./csv"
 )
 
 const (

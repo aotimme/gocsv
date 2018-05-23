@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
 	"path"
 	"sort"
 	"strconv"
 	"strings"
+
+	"./csv"
 )
 
 // GetIndicesForColumnsOrPanic is a simple wrapper around GetIndicesForColumns

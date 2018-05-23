@@ -1,10 +1,11 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"os"
+
+	"./csv"
 )
 
 type SortSubcommand struct {

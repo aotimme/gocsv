@@ -1,0 +1,60 @@
+Only in gocsv/src/csv: README.md
+diff -r go/src/encoding/csv/reader.go gocsv/src/csv/reader.go
+19,21d18
+< // Blank lines are ignored. A line with only whitespace characters (excluding
+< // the ending newline character) is not considered a blank line.
+< //
+260c257
+< 	// Read line (automatically skipping past empty lines and any comments).
+---
+> 	// Read line (automatically skipping past comments).
+269,272d265
+< 		if errRead == nil && len(line) == lengthNL(line) {
+< 			line = nil
+< 			continue // Skip empty lines
+< 		}
+diff -r go/src/encoding/csv/reader_test.go gocsv/src/csv/reader_test.go
+78a79
+> 			{""},
+79a81
+> 			{""},
+82,83c84,85
+< 		Name:  "BlankLineFieldCount",
+< 		Input: "a,b,c\n\nd,e,f\n\n",
+---
+> 		Name:  "BlankLineSingleFieldCount",
+> 		Input: "a\n\nd\n\n",
+85,86c87,90
+< 			{"a", "b", "c"},
+< 			{"d", "e", "f"},
+---
+> 			{"a"},
+> 			{""},
+> 			{"d"},
+> 			{""},
+90a95,100
+> 		Name:               "BlankLineFieldCount",
+> 		Input:              "a,b,c\n\nd,e,f\n\n",
+> 		Error:              &ParseError{StartLine: 2, Line: 2, Err: ErrFieldCount},
+> 		UseFieldsPerRecord: true,
+> 		FieldsPerRecord:    0,
+> 	}, {
+271,273c281,287
+< 		Name:   "FieldCRCRLFCR",
+< 		Input:  "field\r\r\n\rfield\r\r\n\r",
+< 		Output: [][]string{{"field\r"}, {"\rfield\r"}},
+---
+> 		Name:  "FieldCRCRLFCR",
+> 		Input: "field\r\r\n\rfield\r\r\n\r",
+> 		Output: [][]string{
+> 			{"field\r"},
+> 			{"\rfield\r"},
+> 			{""},
+> 		},
+318a333,338
+> 		Output: [][]string{
+> 			{""},
+> 			{""},
+> 			{""},
+> 			{""},
+> 		},

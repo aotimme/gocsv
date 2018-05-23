@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/csv"
 	"errors"
 	"flag"
 	"io"
 	"os"
+
+	"./csv"
 )
 
 type StackSubcommand struct {
