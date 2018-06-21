@@ -223,9 +223,9 @@ gocsv join --columns COLUMNS [--left] [--right] [--outer] LEFT_FILE RIGHT_FILE
 Arguments:
 
 - `--columns` (shorthand `-c`) A comma-separated list (in order) of the columns to use for joining. You must specify either 1 or 2 columns. When 1 is specified, it will join the CSVs using that column in both the left and right CSV. When 2 are specified, it will join using the first column on the left CSV and the second column on the right CSV. See [Specifying Columns](#specifying-columns) for more details.
-- `--left` (optional) Perform a left join.
-- `--right` (optional) Perform a right join.
-- `--outer` (optional) Perform an outer join.
+- `--left` (optional) Perform a left join (i.e. left outer join).
+- `--right` (optional) Perform a right join (i.e. right outer join).
+- `--outer` (optional) Perform an outer join (i.e. full outer join).
 
 Note that by default it will perform an inner join. It will exit if you specify multiple types of join.
 
