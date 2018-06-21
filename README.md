@@ -49,6 +49,7 @@ Subcommands:
 - [view](#view) - Display a CSV in a pretty tabular format.
 - [xlsx](#xlsx) - Convert sheets of a XLSX file to CSV.
 
+To view the useage of `gocsv` at the command line, use the `help` subcommand (i.e. `gocsv help`). This will also print out the version of the `gocsv` binary as well as the hash of the git commit of this repository on which the binary was built. To view only the version and git hash, use the `version` subcommand (i.e. `gocsv version`).
 
 ## Subcommands
 
