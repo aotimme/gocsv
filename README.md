@@ -13,8 +13,10 @@ curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install
 - [Introduction](#introduction)
 - [Subcommands](#subcommands)
 - [Specifying Columns](#specifying-columns)
+- [Regular Expression Syntax](#regular-expression-syntax)
 - [Pipelining](#pipelining)
 - [Examples](#examples)
+- [Debugging](#debugging)
 - [Installation](#installation)
 
 ## Introduction
@@ -608,6 +610,10 @@ To do the same via pipelining through standard input,
 ```shell
 cat test-files/stack-1.csv | gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" - test-files/stack-2.csv test-files/stack-3.csv
 ```
+
+## Debugging
+
+To enable debugging mode when running a `gocsv` command, specify the `--debug` command line argument to any subcommand (other than `gocsv help` and `gocsv version`). Any errors will then also print out a stack trace.
 
 ## Installation
 

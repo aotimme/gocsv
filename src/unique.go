@@ -69,7 +69,7 @@ func rowMatchesOnIndices(rowA, rowB []string, columnIndices []int) bool {
 func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	shellRow := make([]string, len(header)+1)
@@ -90,7 +90,7 @@ func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 		if err == io.EOF {
 			return
 		} else {
-			panic(err)
+			ExitWithError(err)
 		}
 	}
 	numInRun := 1
@@ -102,7 +102,7 @@ func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		if rowMatchesOnIndices(row, lastRow, columnIndices) {
@@ -125,7 +125,7 @@ func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
@@ -142,7 +142,7 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 		if err == io.EOF {
 			return
 		} else {
-			panic(err)
+			ExitWithError(err)
 		}
 	}
 	writer.Write(lastRow)
@@ -155,7 +155,7 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		if !rowMatchesOnIndices(row, lastRow, columnIndices) {
@@ -169,7 +169,7 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
@@ -190,7 +190,7 @@ func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		for i, columnIndex := range columnIndices {

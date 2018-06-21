@@ -7,11 +7,14 @@ import (
 	"strings"
 )
 
-// GIT_HASH is set during the build process using the -ldflags option.
-var GIT_HASH string
-
-// VERSION is set during the build process using the -ldflags option.
-var VERSION string
+var (
+	// GIT_HASH is set during the build process using the -ldflags option.
+	GIT_HASH string
+	// VERSION is set during the build process using the -ldflags option.
+	VERSION string
+	// DEBUG is set by the common --debug flag
+	DEBUG bool
+)
 
 type Subcommand interface {
 	Name() string
@@ -99,10 +102,11 @@ func main() {
 	for _, subcommand := range subcommands {
 		if MatchesSubcommand(subcommand, subcommandName) {
 			fs := flag.NewFlagSet(subcommand.Name(), flag.ExitOnError)
+			fs.BoolVar(&DEBUG, "debug", false, "Enable debug mode")
 			subcommand.SetFlags(fs)
 			err := fs.Parse(args[2:])
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			subcommand.Run(fs.Args())
 			return

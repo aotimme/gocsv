@@ -47,7 +47,7 @@ func Behead(inputCsv AbstractInputCsv, numHeaders int) {
 				// If we remove _all_ the headers, then end early.
 				return
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 	}
@@ -59,7 +59,7 @@ func Behead(inputCsv AbstractInputCsv, numHeaders int) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		writer.Write(row)

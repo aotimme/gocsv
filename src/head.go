@@ -43,13 +43,13 @@ func (sub *HeadSubcommand) Run(args []string) {
 		sub.numRowsStr = strings.TrimPrefix(sub.numRowsStr, "+")
 		numRows, err := strconv.Atoi(sub.numRowsStr)
 		if err != nil {
-			panic(err)
+			ExitWithError(err)
 		}
 		HeadFromBottom(inputCsvs[0], numRows)
 	} else {
 		numRows, err := strconv.Atoi(sub.numRowsStr)
 		if err != nil {
-			panic(err)
+			ExitWithError(err)
 		}
 		HeadFromTop(inputCsvs[0], numRows)
 	}
@@ -60,7 +60,7 @@ func HeadFromBottom(inputCsv AbstractInputCsv, numRows int) {
 
 	rows, err := inputCsv.ReadAll()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	// Write header.
@@ -84,7 +84,7 @@ func HeadFromTop(inputCsv AbstractInputCsv, numRows int) {
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	writer.Write(header)
 	writer.Flush()
@@ -100,7 +100,7 @@ func HeadFromTop(inputCsv AbstractInputCsv, numRows int) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		curRow++

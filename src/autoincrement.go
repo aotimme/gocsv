@@ -35,7 +35,7 @@ func (sub *AutoincrementSubcommand) Run(args []string) {
 	AutoIncrement(inputCsvs[0], sub.name, sub.seed, sub.prepend)
 	err := inputCsvs[0].Close()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 }
 
@@ -45,7 +45,7 @@ func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend boo
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	numInputColumns := len(header)
 	shellRow := make([]string, numInputColumns+1)
@@ -69,7 +69,7 @@ func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend boo
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		incStr := strconv.Itoa(inc)

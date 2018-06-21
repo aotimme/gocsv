@@ -50,7 +50,7 @@ func (sub *ReplaceSubcommand) Run(args []string) {
 	}
 	re, err := regexp.Compile(sub.regex)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	replaceFunc = func(elem string) string {
 		return re.ReplaceAllString(elem, sub.repl)
@@ -67,7 +67,7 @@ func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc fu
 	// Read header to get column index and write.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
@@ -83,7 +83,7 @@ func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc fu
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		copy(rowToWrite, row)

@@ -64,7 +64,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		}
 		re, err := regexp.Compile(sub.regex)
 		if err != nil {
-			panic(err)
+			ExitWithError(err)
 		}
 		matchFunc = func(elem string) bool {
 			return re.MatchString(elem)
@@ -77,7 +77,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		if IsFloatType(sub.gtStr) {
 			gt, err := strconv.ParseFloat(sub.gtStr, 64)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elem64, err := strconv.ParseFloat(elem, 64)
@@ -89,7 +89,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		} else if IsDateType(sub.gtStr) {
 			gt, err := ParseDate(sub.gtStr)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elemDate, err := ParseDate(elem)
@@ -106,7 +106,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		if IsFloatType(sub.gteStr) {
 			gte, err := strconv.ParseFloat(sub.gteStr, 64)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elem64, err := strconv.ParseFloat(elem, 64)
@@ -118,7 +118,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		} else if IsDateType(sub.gteStr) {
 			gte, err := ParseDate(sub.gteStr)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elemDate, err := ParseDate(elem)
@@ -135,7 +135,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		if IsFloatType(sub.ltStr) {
 			lt, err := strconv.ParseFloat(sub.ltStr, 64)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elem64, err := strconv.ParseFloat(elem, 64)
@@ -147,7 +147,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		} else if IsDateType(sub.ltStr) {
 			lt, err := ParseDate(sub.ltStr)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elemDate, err := ParseDate(elem)
@@ -164,7 +164,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		if IsFloatType(sub.lteStr) {
 			lte, err := strconv.ParseFloat(sub.lteStr, 64)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elem64, err := strconv.ParseFloat(elem, 64)
@@ -176,7 +176,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 		} else if IsDateType(sub.lteStr) {
 			lte, err := ParseDate(sub.lteStr)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			matchFunc = func(elem string) bool {
 				elemDate, err := ParseDate(elem)
@@ -204,7 +204,7 @@ func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, 
 	// Read header to get column index and write.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	// Get indices to compare against.
@@ -221,7 +221,7 @@ func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, 
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		rowMatches := false

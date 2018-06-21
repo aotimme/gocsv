@@ -39,7 +39,7 @@ func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	// 1. Create the SQLite DB
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	defer db.Close()
 
@@ -50,7 +50,7 @@ func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	// 3. Run the query
 	rows, err := db.Query(query)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	defer rows.Close()
 
@@ -58,7 +58,7 @@ func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	writer := csv.NewWriter(os.Stdout)
 	columns, err := rows.Columns()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	writer.Write(columns)
 	writer.Flush()
@@ -74,7 +74,7 @@ func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	for rows.Next() {
 		err := rows.Scan(readRow...)
 		if err != nil {
-			panic(err)
+			ExitWithError(err)
 		}
 		for i, elem := range writeRow {
 			if elem.Valid {
@@ -108,7 +108,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 	preparedStatement := fmt.Sprintf(createStatement, allVariables...)
 	_, err := db.Exec(preparedStatement)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	escapedHeaders := make([]string, len(imc.header))
@@ -124,7 +124,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 	insertStatement := fmt.Sprintf("INSERT INTO %s %s", tableColumns, tableValues)
 	preparedInsert, err := db.Prepare(insertStatement)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	valuesRow := make([]interface{}, len(imc.header))
 	for _, row := range imc.rows {
@@ -133,7 +133,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
 		}
 		_, err = preparedInsert.Exec(valuesRow...)
 		if err != nil {
-			panic(err)
+			ExitWithError(err)
 		}
 	}
 }

@@ -22,7 +22,7 @@ func NewInMemoryCsvFromInputCsv(inputCsv AbstractInputCsv) *InMemoryCsv {
 	imc := new(InMemoryCsv)
 	rows, err := inputCsv.ReadAll()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	imc.header = rows[0]
 	imc.rows = rows[1:]

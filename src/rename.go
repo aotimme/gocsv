@@ -51,7 +51,7 @@ func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	renamedHeader := make([]string, len(header))
 	copy(renamedHeader, header)
@@ -75,7 +75,7 @@ func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		writer.Write(row)

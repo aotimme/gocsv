@@ -84,7 +84,7 @@ func Clean(inputCsv AbstractInputCsv, noTrim, excel, numbers, verbose bool) {
 	// Read in rows.
 	rows, err := reader.ReadAll()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	// Determine how many columns there actually should be.

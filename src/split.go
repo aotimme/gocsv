@@ -54,7 +54,7 @@ func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	fileNumber := 1
@@ -62,7 +62,7 @@ func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
 	curFilename := filenameBase + "-" + strconv.Itoa(fileNumber) + ".csv"
 	curFile, err := os.Create(curFilename)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	defer curFile.Close()
 	writer := csv.NewWriter(curFile)
@@ -75,7 +75,7 @@ func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		// Switch to the next file.
@@ -85,7 +85,7 @@ func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
 			curFilename = filenameBase + "-" + strconv.Itoa(fileNumber) + ".csv"
 			curFile, err = os.Create(curFilename)
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			defer curFile.Close()
 			writer = csv.NewWriter(curFile)

@@ -62,7 +62,7 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 
 	file, err := os.Create(filename)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	defer file.Close()
 	writer := csv.NewWriter(file)
@@ -71,7 +71,7 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 		for _, cell := range row.Cells {
 			cellValue, err := cell.FormattedValue()
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			csvRow = append(csvRow, cellValue)
 		}
@@ -83,7 +83,7 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 func ConvertXlsxFull(filename, dirname string) {
 	xlsxFile, err := xlsx.OpenFile(filename)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	err = os.Mkdir(dirname, os.ModeDir|0755)
 	for _, sheet := range xlsxFile.Sheets {
@@ -94,7 +94,7 @@ func ConvertXlsxFull(filename, dirname string) {
 func ConvertXlsxSheet(filename, sheetName string) {
 	xlsxFile, err := xlsx.OpenFile(filename)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	sheetNames := make([]string, len(xlsxFile.Sheets))
@@ -103,7 +103,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 	}
 	sheetIndex := GetIndexForColumn(sheetNames, sheetName)
 	if sheetIndex == -1 {
-		panic(errors.New("Could not find sheet from sheet name"))
+		ExitWithError(errors.New("Could not find sheet from sheet name"))
 	}
 
 	sheet := xlsxFile.Sheets[sheetIndex]
@@ -113,7 +113,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 		for _, cell := range row.Cells {
 			cellValue, err := cell.FormattedValue()
 			if err != nil {
-				panic(err)
+				ExitWithError(err)
 			}
 			csvRow = append(csvRow, cellValue)
 		}
@@ -125,7 +125,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 func ListXlxsSheets(filename string) {
 	xlsxFile, err := xlsx.OpenFile(filename)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 
 	for i, sheet := range xlsxFile.Sheets {

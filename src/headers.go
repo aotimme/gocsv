@@ -27,7 +27,7 @@ func (sub *HeadersSubcommand) Run(args []string) {
 func ShowHeaders(inputCsv AbstractInputCsv) {
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	for i, name := range header {
 		fmt.Printf("%d: %s\n", i+1, name)

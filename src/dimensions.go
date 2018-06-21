@@ -28,7 +28,7 @@ func (sub *DimensionsSubcommand) Run(args []string) {
 func GetDimensions(inputCsv AbstractInputCsv) {
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	numColumns := len(header)
 
@@ -39,7 +39,7 @@ func GetDimensions(inputCsv AbstractInputCsv) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		numRows++

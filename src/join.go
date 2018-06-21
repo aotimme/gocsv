@@ -77,7 +77,7 @@ func (sub *JoinSubcommand) Run(args []string) {
 func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
 	leftHeader, err := leftInputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	leftColIndex := GetIndexForColumnOrPanic(leftHeader, leftColname)
 	numLeftColumns := len(leftHeader)
@@ -103,7 +103,7 @@ func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		rightRows := rightCsv.GetRowsMatchingIndexedColumn(row[leftColIndex])
@@ -120,7 +120,7 @@ func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
 	leftHeader, err := leftInputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	leftColIndex := GetIndexForColumnOrPanic(leftHeader, leftColname)
 	numLeftColumns := len(leftHeader)
@@ -147,7 +147,7 @@ func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightCo
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		rightRows := rightCsv.GetRowsMatchingIndexedColumn(row[leftColIndex])
@@ -168,7 +168,7 @@ func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightCo
 func RightJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
 	rightHeader, err := rightInputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	rightColIndex := GetIndexForColumnOrPanic(rightHeader, rightColname)
 	numRightColumns := len(rightHeader)
@@ -195,7 +195,7 @@ func RightJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		leftRows := leftCsv.GetRowsMatchingIndexedColumn(row[rightColIndex])
@@ -219,7 +219,7 @@ func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 
 	leftHeader, err := leftInputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	leftColIndex := GetIndexForColumnOrPanic(leftHeader, leftColname)
 	numLeftColumns := len(leftHeader)
@@ -250,7 +250,7 @@ func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		rightRowIndices := rightCsv.GetRowIndicesMatchingIndexedColumn(row[leftColIndex])

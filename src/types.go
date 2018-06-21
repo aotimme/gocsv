@@ -114,7 +114,7 @@ func IsDateType(elem string) bool {
 func ParseDatetimeOrPanic(elem string) time.Time {
 	t, err := ParseDatetime(elem)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return t
 }
@@ -143,7 +143,7 @@ func ParseDatetime(elem string) (time.Time, error) {
 func ParseDateOrPanic(elem string) time.Time {
 	t, err := ParseDate(elem)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return t
 }
@@ -167,7 +167,7 @@ func ParseDate(elem string) (time.Time, error) {
 func ParseFloat64OrPanic(strVal string) float64 {
 	floatVal, err := ParseFloat64(strVal)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return floatVal
 }
@@ -179,7 +179,7 @@ func ParseFloat64(strVal string) (float64, error) {
 func ParseInt64OrPanic(strVal string) int64 {
 	intVal, err := ParseInt64(strVal)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return intVal
 }

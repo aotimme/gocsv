@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"sort"
 	"strconv"
@@ -15,7 +16,7 @@ import (
 func GetIndicesForColumnsOrPanic(headers []string, columns []string) (indices []int) {
 	indices, err := GetIndicesForColumns(headers, columns)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return
 }
@@ -108,7 +109,7 @@ func GetIndicesOfString(haystack []string, needle string) (indices []int) {
 func GetIndexForColumnOrPanic(headers []string, column string) int {
 	index := GetIndexForColumn(headers, column)
 	if index == -1 {
-		panic(fmt.Errorf("Unable to find column specified: %s", column))
+		ExitWithError(fmt.Errorf("Unable to find column specified: %s", column))
 	}
 	return index
 }
@@ -142,7 +143,7 @@ func GetArrayFromCsvString(s string) []string {
 	c := csv.NewReader(strings.NewReader(s))
 	rows, err := c.ReadAll()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return rows[0]
 }
@@ -187,5 +188,14 @@ func concat(outrow, row1, row2 []string) {
 	for _, elem := range row2 {
 		outrow[i] = elem
 		i++
+	}
+}
+
+func ExitWithError(err error) {
+	if DEBUG {
+		panic(err)
+	} else {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
+		os.Exit(1)
 	}
 }

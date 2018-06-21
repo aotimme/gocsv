@@ -38,7 +38,7 @@ func Tsv(inputCsv AbstractInputCsv) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		writer.Write(row)

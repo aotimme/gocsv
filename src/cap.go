@@ -41,7 +41,7 @@ func Cap(inputCsv AbstractInputCsv, names []string, truncateNames bool, defaultN
 
 	firstRow, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	numColumns := len(firstRow)
 	numNames := len(names)
@@ -82,7 +82,7 @@ func Cap(inputCsv AbstractInputCsv, names []string, truncateNames bool, defaultN
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		writer.Write(row)

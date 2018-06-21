@@ -86,7 +86,7 @@ func (fic *FileInputCsv) Filename() string {
 func GetInputCsvsOrPanic(filenames []string, numInputCsvs int) (csvs []AbstractInputCsv) {
 	csvs, err := GetInputCsvs(filenames, numInputCsvs)
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	return
 }

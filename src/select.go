@@ -50,7 +50,7 @@ func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 	// Get the column indices to exclude.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 	columnIndicesToExclude := make(map[int]bool)
@@ -79,7 +79,7 @@ func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		curIdx = 0
@@ -101,7 +101,7 @@ func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
 	if err != nil {
-		panic(err)
+		ExitWithError(err)
 	}
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 	outrow := make([]string, len(columnIndices))
@@ -117,7 +117,7 @@ func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
 			if err == io.EOF {
 				break
 			} else {
-				panic(err)
+				ExitWithError(err)
 			}
 		}
 		for i, columnIndex := range columnIndices {
