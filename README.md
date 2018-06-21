@@ -179,7 +179,7 @@ Arguments:
 
 - `--columns` (optional, shorthand `-c`) A comma-separated list of the columns to filter against. If no columns are specified, then filter checks every column on a row. If a row matches on any of the columns, the row is considered a match. See [Specifying Columns](#specifying-columns) for more details.
 - `--equals` (optional, shorthand `-eq`) String to match against.
-- `--regex` (optional) Regular expression to use to match against.
+- `--regex` (optional) Regular expression to use to match against. See [Regular Expression Syntax](#regular-expression-syntax) for the syntax.
 - `--case-insensitive` (optional, shorthand `-i`) When using the `--regex` flag, use this flag to specify a case insensitive match rather than the default case sensitive match.
 - `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against a number.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
@@ -257,7 +257,7 @@ gocsv replace [--columns COLUMNS] --regex REGEX --repl REPLACEMENT FILE
 Arguments:
 
 - `--columns` (optional, shorthand `-c`) A comma-separated list of the columns to run replacements on. If no columns are specified, then replace runs the replacement operation on cells in every column. See [Specifying Columns](#specifying-columns) for more details.
-- `--regex` Regular expression to use to match against for replacement.
+- `--regex` Regular expression to use to match against for replacement. See [Regular Expression Syntax](#regular-expression-syntax) for the syntax.
 - `--case-insensitive` (optional, shorthand `-i`) Use this flag to specify a case insensitive match for replacement rather than the default case sensitive match.
 - `--repl` String to use for replacement.
 
@@ -482,6 +482,12 @@ or
 gocsv select -c Hello\ World test.csv
 ```
 
+## Regular Expression Syntax
+
+A few of the subcommands allow the ability to pass in regular expressions via a `--regex` flag (e.g. [filter](#filter) and [replace](#replace)).
+
+Because the regular expressions passed in to the `--regex` flag are parsed by the underlying [regexp](https://golang.org/pkg/regexp/) Go package, see the [regexp/syntax](https://golang.org/pkg/regexp/syntax/) documentation for more details on the syntax. It is based on the syntax accepted by [RE2](https://github.com/google/re2/wiki/Syntax).
+
 ## Pipelining
 
 Because all of the subcommands support receiving a CSV from standard input, you can easily pipeline:
@@ -570,6 +576,13 @@ gocsv select --columns LID test-files/left-table.csv | gocsv behead | sort | uni
 ```shell
 gocsv filter --columns ABC --regex "-1$" test-files/left-table.csv
 ```
+
+##### Extract Rows with Blank Values in Column
+
+```shell
+gocsv filter --columns Stringer --regex "^$" test-files/stats.csv
+```
+If you also want to match on cells that have only whitespace, you can use a regular expression like `"^s*$"`.
 
 ##### Replace Content in Cells By Regular Expression
 
