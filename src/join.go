@@ -34,6 +34,10 @@ func (sub *JoinSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *JoinSubcommand) Run(args []string) {
+	if sub.columnsString == "" {
+		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
+		os.Exit(1)
+	}
 	numJoins := 0
 	if sub.left {
 		numJoins++

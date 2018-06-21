@@ -32,7 +32,7 @@ func (sub *SortSubcommand) SetFlags(fs *flag.FlagSet) {
 
 func (sub *SortSubcommand) Run(args []string) {
 	if sub.columnsString == "" {
-		fmt.Fprintln(os.Stderr, "Missing argument --columns")
+		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)

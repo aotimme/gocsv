@@ -31,11 +31,11 @@ func (sub *RenameSubcommand) SetFlags(fs *flag.FlagSet) {
 
 func (sub *RenameSubcommand) Run(args []string) {
 	if sub.columnsString == "" {
-		fmt.Fprintf(os.Stderr, "Missing required argument --columns")
+		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
 	if sub.namesString == "" {
-		fmt.Fprintf(os.Stderr, "Missing required argument --names")
+		fmt.Fprintln(os.Stderr, "Missing required argument --names")
 		os.Exit(1)
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)

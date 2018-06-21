@@ -31,7 +31,7 @@ func (sub *SelectSubcommand) SetFlags(fs *flag.FlagSet) {
 
 func (sub *SelectSubcommand) Run(args []string) {
 	if sub.columnsString == "" {
-		fmt.Fprintf(os.Stderr, "Missing required argument --columns")
+		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)
