@@ -16,9 +16,7 @@ test:
 	cd $(SRC_DIR) && go test -cover
 
 bin:
-	rm -rf $(BIN_DIR)
-	mkdir -p $(BIN_DIR)
-	go build -o $(BIN_DIR)/$(EXECUTABLE) ./$(SRC_DIR)
+	bash scripts/build-bin.sh
 
 cleanall:
 	rm -rf $(BIN_DIR)

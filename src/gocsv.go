@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+// GIT_HASH is set during the build process using the -ldflags option.
+var GIT_HASH string
+
+// VERSION is set during the build process using the -ldflags option.
+var VERSION string
+
 type Subcommand interface {
 	Name() string
 	Aliases() []string
@@ -63,8 +69,9 @@ func usageForSubcommand(subcommand Subcommand) string {
 
 // Keep this in sync with the README.
 func usage() string {
-	usage := "Usage:\n"
-	usage += "  Valid subcommands are:\n"
+	usage := "GoCSV is a command line CSV processing tool.\n"
+	usage += fmt.Sprintf("Version: %s (%s)\n", VERSION, GIT_HASH)
+	usage += "Subcommands:\n"
 	for _, subcommand := range subcommands {
 		usage += usageForSubcommand(subcommand)
 	}
@@ -81,6 +88,10 @@ func main() {
 		return
 	}
 	subcommandName := args[1]
+	if subcommandName == "version" {
+		fmt.Printf("%s (%s)\n", VERSION, GIT_HASH)
+		return
+	}
 	if subcommandName == "help" {
 		fmt.Fprintf(os.Stderr, "%s\n", usage())
 		return
