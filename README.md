@@ -460,10 +460,27 @@ By default the `xlsx` subcommand will convert all the sheets in `FILE` to CSVs t
 ## Specifying Columns
 
 When specifying columns on the command line (i.e. with the `--columns` or `-c` flags), you can specify either the indices or the names of the columns. The tool will always try to interpret columns first by index and then by name.
+
+#### Specifying Columns by Index
+
 The tool uses 1-based indexing (as in the output of the [headers](#headers) subcommand).
-The tool also allows for specification of ranges with indices (e.g. `2-4`) including reverse ranges (e.g. `4-2`).
-It also allows for open-ended ranges on indexes (e.g. `2-` or `-4`). In the former case (a-) it will include all columns from `a` on. In the latter case (`-b`) it will include all columns before `b` and `b` itself.
+
+The tool also allows for specification of ranges with indices (e.g. `2-4`) including reverse ranges (e.g. `4-2`). It also allows for open-ended ranges on indexes (e.g. `2-` or `-4`). In the former case (a-) it will include all columns from `a` on. In the latter case (`-b`) it will include all columns before `b` and `b` itself.
+
+### Specifying Columns by Name
+
 When specifying the name of a column, it will match all columns that are exact case-sensitive matches.
+
+When referencing a column name that has whitespace, either escape the whitespace with `\` or use quotes (`"`) around the column name.
+
+For example, if you have a column named `Hello World`,
+```shell
+gocsv select -c "Hello World" test.csv
+```
+or
+```shell
+gocsv select -c Hello\ World test.csv
+```
 
 ## Pipelining
 
