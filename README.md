@@ -117,13 +117,14 @@ Note that this subcommand, along with other subcommands, will include a newline 
 Usage:
 
 ```shell
-gocsv clean [--verbose] [--no-trim] [--excel] [--numbers] FILE
+gocsv clean [--verbose] [--no-trim] [--strip-bom] [--excel] [--numbers] FILE
 ```
 
 Arguments:
 
 - `--verbose` (optional) Print out to stderr when cleaning the CSV.
 - `--no-trim` (optional) Do not remove trailing rows that are empty.
+- `--strip-bom` (optional) Remove any BOM that exists at the beginning of the CSV.
 - `--excel` (optional) Clean the CSV for issues that will cause problems with Excel. See [Excel specifications and limitations](https://support.office.com/en-us/article/Excel-specifications-and-limits-16c69c74-3d6a-4aaf-ba35-e6eb276e8eaa).
   - Truncate any cells that exceed the maximum character limit of 32767.
 - `--numbers` (optional) Clean the CSV for issues that will cause problems with Numbers.

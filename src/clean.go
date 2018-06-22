@@ -12,13 +12,15 @@ import (
 const (
 	EXCEL_CELL_CHAR_LIMIT = 32767
 	NUMBERS_ROW_LIMIT     = 65535
+	BOM                   = "\uFEFF"
 )
 
 type CleanSubcommand struct {
-	noTrim  bool
-	excel   bool
-	numbers bool
-	verbose bool
+	noTrim   bool
+	excel    bool
+	numbers  bool
+	stripBom bool
+	verbose  bool
 }
 
 func (sub *CleanSubcommand) Name() string {
@@ -34,45 +36,16 @@ func (sub *CleanSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.BoolVar(&sub.noTrim, "no-trim", false, "Don't trim end of file of empty rows")
 	fs.BoolVar(&sub.excel, "excel", false, "Clean for use in Excel")
 	fs.BoolVar(&sub.numbers, "numbers", false, "Clean for use in Numbers")
+	fs.BoolVar(&sub.stripBom, "strip-bom", false, "Strip leading BOM")
 	fs.BoolVar(&sub.verbose, "verbose", false, "Print messages when cleaning")
 }
 
 func (sub *CleanSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	Clean(inputCsvs[0], sub.noTrim, sub.excel, sub.numbers, sub.verbose)
+	sub.Clean(inputCsvs[0])
 }
 
-func GetStringForRowIndex(index int) string {
-	if index == 0 {
-		return "Header"
-	} else {
-		return fmt.Sprintf("Row %d", index)
-	}
-}
-func GetStringForColumnIndex(index int) string {
-	return fmt.Sprintf("Column %d", index+1)
-}
-
-func PrintCleanCheck(rowIndex, columnIndex int, message string) {
-	preludeParts := make([]string, 0)
-	if rowIndex > -1 {
-		rowString := GetStringForRowIndex(rowIndex)
-		preludeParts = append(preludeParts, rowString)
-	}
-	if columnIndex > -1 {
-		columnString := GetStringForColumnIndex(columnIndex)
-		preludeParts = append(preludeParts, columnString)
-	}
-	var prelude string
-	if len(preludeParts) > 0 {
-		prelude = strings.Join(preludeParts, ", ") + ": "
-	} else {
-		prelude = ""
-	}
-	fmt.Fprintf(os.Stderr, fmt.Sprintf("%s%s\n", prelude, message))
-}
-
-func Clean(inputCsv AbstractInputCsv, noTrim, excel, numbers, verbose bool) {
+func (sub *CleanSubcommand) Clean(inputCsv AbstractInputCsv) {
 	writer := csv.NewWriter(os.Stdout)
 
 	reader := inputCsv.Reader()
@@ -111,43 +84,52 @@ func Clean(inputCsv AbstractInputCsv, noTrim, excel, numbers, verbose bool) {
 	// Fix rows and output them to writer.
 	shellRow := make([]string, numColumns)
 	for i, row := range rows {
-		if numbers && i >= NUMBERS_ROW_LIMIT {
-			if verbose {
+		if sub.numbers && i >= NUMBERS_ROW_LIMIT {
+			if sub.verbose {
 				PrintCleanCheck(i, -1, fmt.Sprintf("Numbers row limit exceeded. Removing last %d rows.", len(rows)-NUMBERS_ROW_LIMIT))
 			}
 			break
 		}
-		if !noTrim && trimFromIndex > -1 && i >= trimFromIndex {
-			if verbose {
+		if !sub.noTrim && trimFromIndex > -1 && i >= trimFromIndex {
+			if sub.verbose {
 				PrintCleanCheck(i, -1, fmt.Sprintf("Trimming %d trailing empty rows.", len(rows)-trimFromIndex))
 			}
 			break
 		}
-		if len(row) == numColumns {
-			// Just write the original row.
-			copy(shellRow, row)
+
+		// Copy the row to the output `shellRow`
+		// Only copies the first len(shellRow) elements
+		copy(shellRow, row)
+		if len(row) > numColumns {
+			if sub.verbose {
+				PrintCleanCheck(i, -1, fmt.Sprintf("Trimming %d trailing empty cells.", len(row)-numColumns))
+			}
 		} else if len(row) < numColumns {
-			if verbose {
+			// Pad the row.
+			if sub.verbose {
 				PrintCleanCheck(i, -1, fmt.Sprintf("Padding with %d cells.", numColumns-len(row)))
 			}
-			// Pad the row.
-			copy(shellRow, row)
 			for i := len(row); i < numColumns; i++ {
 				shellRow[i] = ""
 			}
-		} else {
-			// Truncate the row.
-			if verbose {
-				PrintCleanCheck(i, -1, fmt.Sprintf("Trimming %d trailing empty cells.", len(row)-numColumns))
-			}
-			copy(shellRow, row)
 		}
-		if excel {
+
+		// Handle BOM
+		if sub.stripBom && i == 0 {
+			if strings.HasPrefix(row[0], BOM) {
+				if sub.verbose {
+					PrintCleanCheck(i, -1, "Stripping BOM")
+				}
+				shellRow[0] = strings.Replace(row[0], BOM, "", 1)
+			}
+		}
+
+		if sub.excel {
 			for j, cell := range shellRow {
 				if len(cell) > EXCEL_CELL_CHAR_LIMIT {
 					numExtraChars := len(cell) - EXCEL_CELL_CHAR_LIMIT
 					shellRow[j] = cell[0:EXCEL_CELL_CHAR_LIMIT]
-					if verbose {
+					if sub.verbose {
 						PrintCleanCheck(i, j, fmt.Sprintf("Excel cell character limit exceeded. Removing %d characters from cell.", numExtraChars))
 					}
 				}
@@ -156,4 +138,34 @@ func Clean(inputCsv AbstractInputCsv, noTrim, excel, numbers, verbose bool) {
 		writer.Write(shellRow)
 		writer.Flush()
 	}
+}
+
+func GetStringForRowIndex(index int) string {
+	if index == 0 {
+		return "Header"
+	} else {
+		return fmt.Sprintf("Row %d", index)
+	}
+}
+func GetStringForColumnIndex(index int) string {
+	return fmt.Sprintf("Column %d", index+1)
+}
+
+func PrintCleanCheck(rowIndex, columnIndex int, message string) {
+	preludeParts := make([]string, 0)
+	if rowIndex > -1 {
+		rowString := GetStringForRowIndex(rowIndex)
+		preludeParts = append(preludeParts, rowString)
+	}
+	if columnIndex > -1 {
+		columnString := GetStringForColumnIndex(columnIndex)
+		preludeParts = append(preludeParts, columnString)
+	}
+	var prelude string
+	if len(preludeParts) > 0 {
+		prelude = strings.Join(preludeParts, ", ") + ": "
+	} else {
+		prelude = ""
+	}
+	fmt.Fprintf(os.Stderr, fmt.Sprintf("%s%s\n", prelude, message))
 }
