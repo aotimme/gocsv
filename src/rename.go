@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"./csv"
 )
 
 type RenameSubcommand struct {
@@ -45,8 +43,8 @@ func (sub *RenameSubcommand) Run(args []string) {
 	RenameColumns(inputCsvs[0], columns, names)
 }
 
-func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
-	writer := csv.NewWriter(os.Stdout)
+func RenameColumns(inputCsv *InputCsv, columns, names []string) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
@@ -66,8 +64,7 @@ func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
 		renamedHeader[columnIndex] = names[i]
 	}
 
-	writer.Write(renamedHeader)
-	writer.Flush()
+	outputCsv.Write(renamedHeader)
 
 	for {
 		row, err := inputCsv.Read()
@@ -78,7 +75,6 @@ func RenameColumns(inputCsv AbstractInputCsv, columns, names []string) {
 				ExitWithError(err)
 			}
 		}
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

@@ -24,7 +24,7 @@ func (sub *HeadersSubcommand) Run(args []string) {
 	ShowHeaders(inputCsvs[0])
 }
 
-func ShowHeaders(inputCsv AbstractInputCsv) {
+func ShowHeaders(inputCsv *InputCsv) {
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)

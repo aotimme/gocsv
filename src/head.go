@@ -8,8 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"./csv"
 )
 
 type HeadSubcommand struct {
@@ -55,8 +53,8 @@ func (sub *HeadSubcommand) Run(args []string) {
 	}
 }
 
-func HeadFromBottom(inputCsv AbstractInputCsv, numRows int) {
-	writer := csv.NewWriter(os.Stdout)
+func HeadFromBottom(inputCsv *InputCsv, numRows int) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	rows, err := inputCsv.ReadAll()
 	if err != nil {
@@ -64,8 +62,7 @@ func HeadFromBottom(inputCsv AbstractInputCsv, numRows int) {
 	}
 
 	// Write header.
-	writer.Write(rows[0])
-	writer.Flush()
+	outputCsv.Write(rows[0])
 
 	// Write rows up to last `numRows` rows.
 	maxRow := len(rows) - numRows
@@ -73,21 +70,19 @@ func HeadFromBottom(inputCsv AbstractInputCsv, numRows int) {
 		return
 	}
 	for i := 1; i < maxRow; i++ {
-		writer.Write(rows[i])
-		writer.Flush()
+		outputCsv.Write(rows[i])
 	}
 }
 
-func HeadFromTop(inputCsv AbstractInputCsv, numRows int) {
-	writer := csv.NewWriter(os.Stdout)
+func HeadFromTop(inputCsv *InputCsv, numRows int) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
 	}
-	writer.Write(header)
-	writer.Flush()
+	outputCsv.Write(header)
 
 	// Write first `numRows` rows.
 	curRow := 0
@@ -104,7 +99,6 @@ func HeadFromTop(inputCsv AbstractInputCsv, numRows int) {
 			}
 		}
 		curRow++
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

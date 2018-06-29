@@ -124,11 +124,14 @@ Arguments:
 
 - `--verbose` (optional) Print out to stderr when cleaning the CSV.
 - `--no-trim` (optional) Do not remove trailing rows that are empty.
+- `--add-bom` (optional) Ensure that a BOM that exists at the beginning of the CSV.
 - `--strip-bom` (optional) Remove any BOM that exists at the beginning of the CSV.
 - `--excel` (optional) Clean the CSV for issues that will cause problems with Excel. See [Excel specifications and limitations](https://support.office.com/en-us/article/Excel-specifications-and-limits-16c69c74-3d6a-4aaf-ba35-e6eb276e8eaa).
   - Truncate any cells that exceed the maximum character limit of 32767.
 - `--numbers` (optional) Clean the CSV for issues that will cause problems with Numbers.
   - Truncate the number of rows in the CSV at 65535, the maximum amount of rows that Numbers displays.
+
+Note that only one of `--add-bom` or `--strip-bom` can be specified.
 
 ### delimiter
 

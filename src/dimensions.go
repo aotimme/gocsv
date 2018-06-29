@@ -25,7 +25,7 @@ func (sub *DimensionsSubcommand) Run(args []string) {
 	GetDimensions(inputCsvs[0])
 }
 
-func GetDimensions(inputCsv AbstractInputCsv) {
+func GetDimensions(inputCsv *InputCsv) {
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)

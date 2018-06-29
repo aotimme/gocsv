@@ -11,6 +11,12 @@ import (
 	"./csv"
 )
 
+const (
+	BOM_RUNE      = '\uFEFF'
+	BOM_STRING    = "\uFEFF"
+	NUM_BOM_BYTES = 3
+)
+
 // GetIndicesForColumnsOrPanic is a simple wrapper around GetIndicesForColumns
 // that will simply panic if GetIndicesForColumns returns an error.
 func GetIndicesForColumnsOrPanic(headers []string, columns []string) (indices []int) {

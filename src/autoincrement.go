@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"io"
-	"os"
 	"strconv"
-
-	"./csv"
 )
 
 type AutoincrementSubcommand struct {
@@ -39,8 +36,8 @@ func (sub *AutoincrementSubcommand) Run(args []string) {
 	}
 }
 
-func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend bool) {
-	writer := csv.NewWriter(os.Stdout)
+func AutoIncrement(inputCsv *InputCsv, name string, seed int, prepend bool) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read and write header.
 	header, err := inputCsv.Read()
@@ -58,8 +55,7 @@ func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend boo
 		copy(shellRow, header)
 		shellRow[numInputColumns] = name
 	}
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Write rows with autoincrement.
 	inc := seed
@@ -83,7 +79,6 @@ func AutoIncrement(inputCsv AbstractInputCsv, name string, seed int, prepend boo
 			shellRow[numInputColumns] = incStr
 		}
 		inc++
-		writer.Write(shellRow)
-		writer.Flush()
+		outputCsv.Write(shellRow)
 	}
 }

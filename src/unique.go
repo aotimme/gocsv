@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"io"
-	"os"
 	"strconv"
-
-	"./csv"
 
 	"github.com/alphagov/router/trie"
 )
@@ -66,7 +63,7 @@ func rowMatchesOnIndices(rowA, rowB []string, columnIndices []int) bool {
 	return true
 }
 
-func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
+func UniqueifySortedWithCount(inputCsv *InputCsv, columns []string) {
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -76,13 +73,12 @@ func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Write header.
 	copy(shellRow, header)
 	shellRow[len(shellRow)-1] = "Count"
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Read and write first row.
 	lastRow, err := inputCsv.Read()
@@ -110,19 +106,17 @@ func UniqueifySortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 		} else {
 			copy(shellRow, lastRow)
 			shellRow[len(shellRow)-1] = strconv.Itoa(numInRun)
-			writer.Write(shellRow)
-			writer.Flush()
+			outputCsv.Write(shellRow)
 			lastRow = row
 			numInRun = 1
 		}
 	}
 	copy(shellRow, lastRow)
 	shellRow[len(shellRow)-1] = strconv.Itoa(numInRun)
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 }
 
-func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
+func UniqueifySorted(inputCsv *InputCsv, columns []string) {
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -130,11 +124,10 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Write header.
-	writer.Write(header)
-	writer.Flush()
+	outputCsv.Write(header)
 
 	// Read and write first row.
 	lastRow, err := inputCsv.Read()
@@ -145,8 +138,7 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 			ExitWithError(err)
 		}
 	}
-	writer.Write(lastRow)
-	writer.Flush()
+	outputCsv.Write(lastRow)
 
 	// Write unique rows in order.
 	for {
@@ -160,13 +152,12 @@ func UniqueifySorted(inputCsv AbstractInputCsv, columns []string) {
 		}
 		if !rowMatchesOnIndices(row, lastRow, columnIndices) {
 			lastRow = row
-			writer.Write(row)
-			writer.Flush()
+			outputCsv.Write(row)
 		}
 	}
 }
 
-func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
+func UniqueifyUnsorted(inputCsv *InputCsv, columns []string) {
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -174,11 +165,10 @@ func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Write header.
-	writer.Write(header)
-	writer.Flush()
+	outputCsv.Write(header)
 
 	seenRowsTrie := trie.NewTrie()
 	lastRowArray := make([]string, len(columnIndices))
@@ -199,13 +189,12 @@ func UniqueifyUnsorted(inputCsv AbstractInputCsv, columns []string) {
 		_, ok := seenRowsTrie.Get(lastRowArray)
 		if !ok {
 			seenRowsTrie.Set(lastRowArray, true)
-			writer.Write(row)
-			writer.Flush()
+			outputCsv.Write(row)
 		}
 	}
 }
 
-func UniqueifyUnsortedWithCount(inputCsv AbstractInputCsv, columns []string) {
+func UniqueifyUnsortedWithCount(inputCsv *InputCsv, columns []string) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
 	columnIndices := GetIndicesForColumnsOrPanic(imc.header, columns)
@@ -234,11 +223,10 @@ func UniqueifyUnsortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 	copy(shellRow, imc.header)
 	shellRow[len(shellRow)-1] = "Count"
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Write header.
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Write unique rows with count.
 	for rowIndex, row := range imc.rows {
@@ -246,8 +234,7 @@ func UniqueifyUnsortedWithCount(inputCsv AbstractInputCsv, columns []string) {
 		if ok {
 			copy(shellRow, row)
 			shellRow[len(shellRow)-1] = strconv.Itoa(count)
-			writer.Write(shellRow)
-			writer.Flush()
+			outputCsv.Write(shellRow)
 		}
 	}
 }

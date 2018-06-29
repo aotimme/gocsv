@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"./csv"
 )
 
 type BeheadSubcommand struct {
@@ -36,8 +34,8 @@ func (sub *BeheadSubcommand) Run(args []string) {
 	Behead(inputCsvs[0], sub.numHeaders)
 }
 
-func Behead(inputCsv AbstractInputCsv, numHeaders int) {
-	writer := csv.NewWriter(os.Stdout)
+func Behead(inputCsv *InputCsv, numHeaders int) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Get rid of the header rows.
 	for i := 0; i < numHeaders; i++ {
@@ -62,7 +60,6 @@ func Behead(inputCsv AbstractInputCsv, numHeaders int) {
 				ExitWithError(err)
 			}
 		}
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

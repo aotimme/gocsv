@@ -4,9 +4,6 @@ import (
 	"errors"
 	"flag"
 	"io"
-	"os"
-
-	"./csv"
 )
 
 type StackSubcommand struct {
@@ -66,9 +63,9 @@ func (sub *StackSubcommand) Run(args []string) {
 	StackFiles(inputCsvs, groupColumnName, groups)
 }
 
-func StackFiles(inputCsvs []AbstractInputCsv, groupName string, groups []string) {
+func StackFiles(inputCsvs []*InputCsv, groupName string, groups []string) {
 	shouldAppendGroup := groupName != ""
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
 
 	// Check that the headers match
 	headers := make([][]string, len(inputCsvs))
@@ -96,8 +93,7 @@ func StackFiles(inputCsvs []AbstractInputCsv, groupName string, groups []string)
 	if shouldAppendGroup {
 		firstHeader = append(firstHeader, groupName)
 	}
-	writer.Write(firstHeader)
-	writer.Flush()
+	outputCsv.Write(firstHeader)
 
 	// Go through the files
 	for i, inputCsv := range inputCsvs {
@@ -113,8 +109,7 @@ func StackFiles(inputCsvs []AbstractInputCsv, groupName string, groups []string)
 			if shouldAppendGroup {
 				row = append(row, groups[i])
 			}
-			writer.Write(row)
-			writer.Flush()
+			outputCsv.Write(row)
 		}
 	}
 }

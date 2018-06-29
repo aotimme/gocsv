@@ -7,8 +7,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"./csv"
 )
 
 type SplitSubcommand struct {
@@ -40,7 +38,7 @@ func (sub *SplitSubcommand) Run(args []string) {
 	Split(inputCsvs[0], sub.maxRows, sub.filenameBase)
 }
 
-func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
+func Split(inputCsv *InputCsv, maxRows int, filenameBase string) {
 	if filenameBase == "" {
 		inputFilename := inputCsv.Filename()
 		if inputFilename == "-" {
@@ -65,9 +63,9 @@ func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
 		ExitWithError(err)
 	}
 	defer curFile.Close()
-	writer := csv.NewWriter(curFile)
-	writer.Write(header)
-	writer.Flush()
+
+	outputCsv := NewFileOutputCsvFromInputCsv(inputCsv, curFile)
+	outputCsv.Write(header)
 
 	for {
 		row, err := inputCsv.Read()
@@ -88,13 +86,11 @@ func Split(inputCsv AbstractInputCsv, maxRows int, filenameBase string) {
 				ExitWithError(err)
 			}
 			defer curFile.Close()
-			writer = csv.NewWriter(curFile)
-			writer.Write(header)
-			writer.Flush()
+			outputCsv := NewFileOutputCsvFromInputCsv(inputCsv, curFile)
+			outputCsv.Write(header)
 		}
 
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 		numRowsWritten++
 	}
 }

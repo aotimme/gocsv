@@ -5,20 +5,18 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"./csv"
 )
 
 const (
 	EXCEL_CELL_CHAR_LIMIT = 32767
 	NUMBERS_ROW_LIMIT     = 65535
-	BOM                   = "\uFEFF"
 )
 
 type CleanSubcommand struct {
 	noTrim   bool
 	excel    bool
 	numbers  bool
+	addBom   bool
 	stripBom bool
 	verbose  bool
 }
@@ -36,26 +34,51 @@ func (sub *CleanSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.BoolVar(&sub.noTrim, "no-trim", false, "Don't trim end of file of empty rows")
 	fs.BoolVar(&sub.excel, "excel", false, "Clean for use in Excel")
 	fs.BoolVar(&sub.numbers, "numbers", false, "Clean for use in Numbers")
+	fs.BoolVar(&sub.addBom, "add-bom", false, "Add (or ensure) leading BOM")
 	fs.BoolVar(&sub.stripBom, "strip-bom", false, "Strip leading BOM")
 	fs.BoolVar(&sub.verbose, "verbose", false, "Print messages when cleaning")
 }
 
 func (sub *CleanSubcommand) Run(args []string) {
+	if sub.stripBom && sub.addBom {
+		fmt.Fprintln(os.Stderr, "Cannot specify both --strip-bom or --add-bom")
+		os.Exit(1)
+	}
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	sub.Clean(inputCsvs[0])
 }
 
-func (sub *CleanSubcommand) Clean(inputCsv AbstractInputCsv) {
-	writer := csv.NewWriter(os.Stdout)
-
-	reader := inputCsv.Reader()
+func (sub *CleanSubcommand) Clean(inputCsv *InputCsv) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	if sub.stripBom {
+		if sub.verbose {
+			if inputCsv.hasBom {
+				PrintCleanCheck(0, -1, "Stripping BOM")
+			} else {
+				PrintCleanCheck(0, -1, "No BOM to strip")
+			}
+		}
+		// Ensure the `writeBom` field is false
+		outputCsv.writeBom = false
+	}
+	if sub.addBom && !inputCsv.hasBom {
+		if sub.verbose {
+			if inputCsv.hasBom {
+				PrintCleanCheck(0, -1, "BOM already exists")
+			} else {
+				PrintCleanCheck(0, -1, "Adding BOM")
+			}
+		}
+		// Ensure the `writeBom` field is true
+		outputCsv.writeBom = true
+	}
 
 	// Disable errors when fields are varying length
-	reader.FieldsPerRecord = -1
-	reader.LazyQuotes = true
+	inputCsv.SetFieldsPerRecord(-1)
+	inputCsv.SetLazyQuotes(true)
 
 	// Read in rows.
-	rows, err := reader.ReadAll()
+	rows, err := inputCsv.ReadAll()
 	if err != nil {
 		ExitWithError(err)
 	}
@@ -81,7 +104,7 @@ func (sub *CleanSubcommand) Clean(inputCsv AbstractInputCsv) {
 		}
 	}
 
-	// Fix rows and output them to writer.
+	// Fix rows and output them to outputCsv.
 	shellRow := make([]string, numColumns)
 	for i, row := range rows {
 		if sub.numbers && i >= NUMBERS_ROW_LIMIT {
@@ -116,11 +139,11 @@ func (sub *CleanSubcommand) Clean(inputCsv AbstractInputCsv) {
 
 		// Handle BOM
 		if sub.stripBom && i == 0 {
-			if strings.HasPrefix(row[0], BOM) {
+			if strings.HasPrefix(row[0], BOM_STRING) {
 				if sub.verbose {
 					PrintCleanCheck(i, -1, "Stripping BOM")
 				}
-				shellRow[0] = strings.Replace(row[0], BOM, "", 1)
+				shellRow[0] = strings.TrimPrefix(row[0], BOM_STRING)
 			}
 		}
 
@@ -135,8 +158,7 @@ func (sub *CleanSubcommand) Clean(inputCsv AbstractInputCsv) {
 				}
 			}
 		}
-		writer.Write(shellRow)
-		writer.Flush()
+		outputCsv.Write(shellRow)
 	}
 }
 

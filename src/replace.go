@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"io"
-	"os"
 	"regexp"
-
-	"./csv"
 )
 
 type ReplaceSubcommand struct {
@@ -61,8 +58,8 @@ func (sub *ReplaceSubcommand) Run(args []string) {
 	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
 }
 
-func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc func(string) string) {
-	writer := csv.NewWriter(os.Stdout)
+func ReplaceWithFunc(inputCsv *InputCsv, columns []string, replaceFunc func(string) string) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read header to get column index and write.
 	header, err := inputCsv.Read()
@@ -72,8 +69,7 @@ func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc fu
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	writer.Write(header)
-	writer.Flush()
+	outputCsv.Write(header)
 
 	// Write replaced rows
 	rowToWrite := make([]string, len(header))
@@ -90,7 +86,6 @@ func ReplaceWithFunc(inputCsv AbstractInputCsv, columns []string, replaceFunc fu
 		for _, columnIndex := range columnIndices {
 			rowToWrite[columnIndex] = replaceFunc(rowToWrite[columnIndex])
 		}
-		writer.Write(rowToWrite)
-		writer.Flush()
+		outputCsv.Write(rowToWrite)
 	}
 }

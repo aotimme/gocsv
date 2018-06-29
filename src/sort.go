@@ -4,8 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"./csv"
 )
 
 type SortSubcommand struct {
@@ -41,7 +39,7 @@ func (sub *SortSubcommand) Run(args []string) {
 	SortCsv(inputCsvs[0], columns, sub.reverse, sub.noInference)
 }
 
-func SortCsv(inputCsv AbstractInputCsv, columns []string, reverse, noInference bool) {
+func SortCsv(inputCsv *InputCsv, columns []string, reverse, noInference bool) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	columnIndices := GetIndicesForColumnsOrPanic(imc.header, columns)
 	columnTypes := make([]ColumnType, len(columnIndices))
@@ -54,15 +52,13 @@ func SortCsv(inputCsv AbstractInputCsv, columns []string, reverse, noInference b
 	}
 	imc.SortRows(columnIndices, columnTypes, reverse)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Write header.
-	writer.Write(imc.header)
-	writer.Flush()
+	outputCsv.Write(imc.header)
 
 	// Write sorted rows.
 	for _, row := range imc.rows {
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

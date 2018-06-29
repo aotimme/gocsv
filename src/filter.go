@@ -7,8 +7,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-
-	"./csv"
 )
 
 type FilterSubcommand struct {
@@ -198,8 +196,8 @@ func (sub *FilterSubcommand) Run(args []string) {
 	FilterMatchFunc(inputCsvs[0], columns, sub.exclude, matchFunc)
 }
 
-func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, matchFunc func(string) bool) {
-	writer := csv.NewWriter(os.Stdout)
+func FilterMatchFunc(inputCsv *InputCsv, columns []string, exclude bool, matchFunc func(string) bool) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read header to get column index and write.
 	header, err := inputCsv.Read()
@@ -211,8 +209,7 @@ func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, 
 	// If no columns are specified, then check against all.
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	writer.Write(header)
-	writer.Flush()
+	outputCsv.Write(header)
 
 	// Write filtered rows.
 	for {
@@ -233,8 +230,7 @@ func FilterMatchFunc(inputCsv AbstractInputCsv, columns []string, exclude bool, 
 		}
 		shouldOutputRow := (!exclude && rowMatches) || (exclude && !rowMatches)
 		if shouldOutputRow {
-			writer.Write(row)
-			writer.Flush()
+			outputCsv.Write(row)
 		}
 	}
 }

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"./csv"
 )
 
 type SelectSubcommand struct {
@@ -44,8 +42,8 @@ func (sub *SelectSubcommand) Run(args []string) {
 	}
 }
 
-func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
-	writer := csv.NewWriter(os.Stdout)
+func ExcludeColumns(inputCsv *InputCsv, columns []string) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Get the column indices to exclude.
 	header, err := inputCsv.Read()
@@ -70,8 +68,7 @@ func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 		}
 	}
 
-	writer.Write(outrow)
-	writer.Flush()
+	outputCsv.Write(outrow)
 
 	for {
 		row, err := inputCsv.Read()
@@ -90,13 +87,12 @@ func ExcludeColumns(inputCsv AbstractInputCsv, columns []string) {
 				curIdx++
 			}
 		}
-		writer.Write(outrow)
-		writer.Flush()
+		outputCsv.Write(outrow)
 	}
 }
 
-func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
-	writer := csv.NewWriter(os.Stdout)
+func SelectColumns(inputCsv *InputCsv, columns []string) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
@@ -108,8 +104,7 @@ func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
 	for i, columnIndex := range columnIndices {
 		outrow[i] = header[columnIndex]
 	}
-	writer.Write(outrow)
-	writer.Flush()
+	outputCsv.Write(outrow)
 
 	for {
 		row, err := inputCsv.Read()
@@ -123,7 +118,6 @@ func SelectColumns(inputCsv AbstractInputCsv, columns []string) {
 		for i, columnIndex := range columnIndices {
 			outrow[i] = row[columnIndex]
 		}
-		writer.Write(outrow)
-		writer.Flush()
+		outputCsv.Write(outrow)
 	}
 }

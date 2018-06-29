@@ -3,9 +3,6 @@ package main
 import (
 	"flag"
 	"io"
-	"os"
-
-	"./csv"
 )
 
 type TsvSubcommand struct{}
@@ -27,9 +24,9 @@ func (sub *TsvSubcommand) Run(args []string) {
 	Tsv(inputCsvs[0])
 }
 
-func Tsv(inputCsv AbstractInputCsv) {
-	writer := csv.NewWriter(os.Stdout)
-	writer.Comma = '\t'
+func Tsv(inputCsv *InputCsv) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	outputCsv.SetDelimiter('\t')
 
 	// Write all rows with tabs.
 	for {
@@ -41,7 +38,6 @@ func Tsv(inputCsv AbstractInputCsv) {
 				ExitWithError(err)
 			}
 		}
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

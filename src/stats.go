@@ -23,7 +23,7 @@ func (sub *StatsSubcommand) Run(args []string) {
 	Stats(inputCsvs[0])
 }
 
-func Stats(inputCsv AbstractInputCsv) {
+func Stats(inputCsv *InputCsv) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	imc.PrintStats()
 }

@@ -3,10 +3,7 @@ package main
 import (
 	"flag"
 	"io"
-	"os"
 	"unicode/utf8"
-
-	"./csv"
 )
 
 type DelimiterSubcommand struct {
@@ -35,26 +32,27 @@ func (sub *DelimiterSubcommand) Run(args []string) {
 	ChangeDelimiter(inputCsvs[0], sub.inputDelimiter, sub.outputDelimiter)
 }
 
-func ChangeDelimiter(inputCsv AbstractInputCsv, inputDelimiter, outputDelimiter string) {
-	reader := inputCsv.Reader()
+func ChangeDelimiter(inputCsv *InputCsv, inputDelimiter, outputDelimiter string) {
 	if inputDelimiter == "\\t" {
-		reader.Comma = '\t'
+		inputCsv.SetDelimiter('\t')
 	} else if len(inputDelimiter) > 0 {
-		reader.Comma, _ = utf8.DecodeRuneInString(inputDelimiter)
+		delimiterRune, _ := utf8.DecodeRuneInString(inputDelimiter)
+		inputCsv.SetDelimiter(delimiterRune)
 	}
 	// Be lenient when reading in the file.
-	reader.FieldsPerRecord = -1
+	inputCsv.SetFieldsPerRecord(-1)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 	if outputDelimiter == "\\t" {
-		writer.Comma = '\t'
+		outputCsv.SetDelimiter('\t')
 	} else if len(outputDelimiter) > 0 {
-		writer.Comma, _ = utf8.DecodeRuneInString(outputDelimiter)
+		delimiterRune, _ := utf8.DecodeRuneInString(outputDelimiter)
+		outputCsv.SetDelimiter(delimiterRune)
 	}
 
 	// Write all rows with tabs.
 	for {
-		row, err := reader.Read()
+		row, err := inputCsv.Read()
 		if err != nil {
 			if err == io.EOF {
 				break
@@ -62,7 +60,6 @@ func ChangeDelimiter(inputCsv AbstractInputCsv, inputDelimiter, outputDelimiter 
 				ExitWithError(err)
 			}
 		}
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

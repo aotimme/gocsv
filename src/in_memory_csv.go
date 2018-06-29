@@ -18,7 +18,7 @@ type InMemoryCsv struct {
 	index     map[string][]int
 }
 
-func NewInMemoryCsvFromInputCsv(inputCsv AbstractInputCsv) *InMemoryCsv {
+func NewInMemoryCsvFromInputCsv(inputCsv *InputCsv) *InMemoryCsv {
 	imc := new(InMemoryCsv)
 	rows, err := inputCsv.ReadAll()
 	if err != nil {

@@ -7,8 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"./csv"
-
 	"github.com/tealeg/xlsx"
 )
 
@@ -65,7 +63,7 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 		ExitWithError(err)
 	}
 	defer file.Close()
-	writer := csv.NewWriter(file)
+	outputCsv := NewOutputCsvFromFile(file)
 	for _, row := range sheet.Rows {
 		csvRow := make([]string, 0)
 		for _, cell := range row.Cells {
@@ -75,8 +73,7 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 			}
 			csvRow = append(csvRow, cellValue)
 		}
-		writer.Write(csvRow)
-		writer.Flush()
+		outputCsv.Write(csvRow)
 	}
 }
 
@@ -107,7 +104,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 	}
 
 	sheet := xlsxFile.Sheets[sheetIndex]
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsv()
 	for _, row := range sheet.Rows {
 		csvRow := make([]string, 0)
 		for _, cell := range row.Cells {
@@ -117,8 +114,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 			}
 			csvRow = append(csvRow, cellValue)
 		}
-		writer.Write(csvRow)
-		writer.Flush()
+		outputCsv.Write(csvRow)
 	}
 }
 

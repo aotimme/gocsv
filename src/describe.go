@@ -24,7 +24,7 @@ func (sub *DescribeSubcommand) Run(args []string) {
 	DescribeCsv(inputCsvs[0])
 }
 
-func DescribeCsv(inputCsv AbstractInputCsv) {
+func DescribeCsv(inputCsv *InputCsv) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
 	numRows := imc.NumRows()

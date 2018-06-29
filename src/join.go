@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"./csv"
 )
 
 type JoinSubcommand struct {
@@ -74,7 +72,7 @@ func (sub *JoinSubcommand) Run(args []string) {
 	}
 }
 
-func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
+func InnerJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname string) {
 	leftHeader, err := leftInputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -89,12 +87,11 @@ func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 
 	shellRow := make([]string, numLeftColumns+numRightColumns)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
 
 	// Write header.
 	concat(shellRow, leftHeader, rightCsv.header)
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Write inner-joined rows.
 	for {
@@ -110,14 +107,13 @@ func InnerJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 		if len(rightRows) > 0 {
 			for _, rightRow := range rightRows {
 				concat(shellRow, row, rightRow)
-				writer.Write(shellRow)
-				writer.Flush()
+				outputCsv.Write(shellRow)
 			}
 		}
 	}
 }
 
-func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
+func LeftJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname string) {
 	leftHeader, err := leftInputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -133,12 +129,11 @@ func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightCo
 	emptyRightRow := make([]string, numRightColumns)
 	shellRow := make([]string, numLeftColumns+numRightColumns)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
 
 	// Write header.
 	concat(shellRow, leftHeader, rightCsv.header)
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Write left-joined rows.
 	for {
@@ -154,18 +149,16 @@ func LeftJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightCo
 		if len(rightRows) > 0 {
 			for _, rightRow := range rightRows {
 				concat(shellRow, row, rightRow)
-				writer.Write(shellRow)
-				writer.Flush()
+				outputCsv.Write(shellRow)
 			}
 		} else {
 			concat(shellRow, row, emptyRightRow)
-			writer.Write(shellRow)
-			writer.Flush()
+			outputCsv.Write(shellRow)
 		}
 	}
 }
 
-func RightJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
+func RightJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname string) {
 	rightHeader, err := rightInputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -181,12 +174,11 @@ func RightJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 	emptyLeftRow := make([]string, numLeftColumns)
 	shellRow := make([]string, numLeftColumns+numRightColumns)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
 
 	// Write header.
 	concat(shellRow, leftCsv.header, rightHeader)
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Write right-joined rows.
 	for {
@@ -202,18 +194,16 @@ func RightJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 		if len(leftRows) > 0 {
 			for _, leftRow := range leftRows {
 				concat(shellRow, leftRow, row)
-				writer.Write(shellRow)
-				writer.Flush()
+				outputCsv.Write(shellRow)
 			}
 		} else {
 			concat(shellRow, emptyLeftRow, row)
-			writer.Write(shellRow)
-			writer.Flush()
+			outputCsv.Write(shellRow)
 		}
 	}
 }
 
-func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightColname string) {
+func OuterJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname string) {
 	// Basically do a left join and then append any rows from the right table
 	// that weren't already included.
 
@@ -236,12 +226,11 @@ func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 	// whether the row in the right column has been included already.
 	rightIncludeStatus := make([]bool, len(rightCsv.rows))
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
 
 	// Write header.
 	concat(shellRow, leftHeader, rightCsv.header)
-	writer.Write(shellRow)
-	writer.Flush()
+	outputCsv.Write(shellRow)
 
 	// Write left-joined rows.
 	for {
@@ -258,13 +247,11 @@ func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 			for _, rightRowIndex := range rightRowIndices {
 				rightIncludeStatus[rightRowIndex] = true
 				concat(shellRow, row, rightCsv.rows[rightRowIndex])
-				writer.Write(shellRow)
-				writer.Flush()
+				outputCsv.Write(shellRow)
 			}
 		} else {
 			concat(shellRow, row, emptyRightRow)
-			writer.Write(shellRow)
-			writer.Flush()
+			outputCsv.Write(shellRow)
 		}
 	}
 
@@ -274,7 +261,6 @@ func OuterJoin(leftInputCsv, rightInputCsv AbstractInputCsv, leftColname, rightC
 			continue
 		}
 		concat(shellRow, emptyLeftRow, row)
-		writer.Write(shellRow)
-		writer.Flush()
+		outputCsv.Write(shellRow)
 	}
 }

@@ -4,10 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"os"
 	"strings"
-
-	"./csv"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -35,7 +32,7 @@ func (sub *SqlSubcommand) Run(args []string) {
 	DoSqlQuery(inputCsvs, sub.queryString)
 }
 
-func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
+func DoSqlQuery(inputCsvs []*InputCsv, query string) {
 	// 1. Create the SQLite DB
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
@@ -55,13 +52,12 @@ func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 	defer rows.Close()
 
 	// 4. Write the results
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
 	columns, err := rows.Columns()
 	if err != nil {
 		ExitWithError(err)
 	}
-	writer.Write(columns)
-	writer.Flush()
+	outputCsv.Write(columns)
 
 	// See: https://stackoverflow.com/a/14500756
 	readRow := make([]interface{}, len(columns))
@@ -83,12 +79,11 @@ func DoSqlQuery(inputCsvs []AbstractInputCsv, query string) {
 				csvRow[i] = ""
 			}
 		}
-		writer.Write(csvRow)
-		writer.Flush()
+		outputCsv.Write(csvRow)
 	}
 }
 
-func PopulateSqlTable(db *sql.DB, inputCsv AbstractInputCsv) {
+func PopulateSqlTable(db *sql.DB, inputCsv *InputCsv) {
 	tableName := inputCsv.Name()
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	allVariables := make([]interface{}, 2*len(imc.header)+1)

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"./csv"
 )
 
 type CapSubcommand struct {
@@ -36,8 +34,8 @@ func (sub *CapSubcommand) Run(args []string) {
 	Cap(inputCsvs[0], names, sub.truncateNames, sub.defaultName)
 }
 
-func Cap(inputCsv AbstractInputCsv, names []string, truncateNames bool, defaultName string) {
-	writer := csv.NewWriter(os.Stdout)
+func Cap(inputCsv *InputCsv, names []string, truncateNames bool, defaultName string) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	firstRow, err := inputCsv.Read()
 	if err != nil {
@@ -69,11 +67,8 @@ func Cap(inputCsv AbstractInputCsv, names []string, truncateNames bool, defaultN
 		}
 	}
 
-	writer.Write(newHeader)
-	writer.Flush()
-
-	writer.Write(firstRow)
-	writer.Flush()
+	outputCsv.Write(newHeader)
+	outputCsv.Write(firstRow)
 
 	// Write the rest of the rows.
 	for {
@@ -85,7 +80,6 @@ func Cap(inputCsv AbstractInputCsv, names []string, truncateNames bool, defaultN
 				ExitWithError(err)
 			}
 		}
-		writer.Write(row)
-		writer.Flush()
+		outputCsv.Write(row)
 	}
 }

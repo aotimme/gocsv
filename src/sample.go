@@ -4,8 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"./csv"
 )
 
 type SampleSubcommand struct {
@@ -39,7 +37,7 @@ func (sub *SampleSubcommand) Run(args []string) {
 	Sample(inputCsvs[0], sub.numRows, sub.replace, sub.seed)
 }
 
-func Sample(inputCsv AbstractInputCsv, numRows int, replace bool, seed int) {
+func Sample(inputCsv *InputCsv, numRows int, replace bool, seed int) {
 
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
@@ -50,15 +48,13 @@ func Sample(inputCsv AbstractInputCsv, numRows int, replace bool, seed int) {
 
 	rowIndices := imc.SampleRowIndices(numRows, replace, seed)
 
-	writer := csv.NewWriter(os.Stdout)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Write header.
-	writer.Write(imc.header)
-	writer.Flush()
+	outputCsv.Write(imc.header)
 
 	for _, rowIndex := range rowIndices {
-		writer.Write(imc.rows[rowIndex])
-		writer.Flush()
+		outputCsv.Write(imc.rows[rowIndex])
 	}
 
 }

@@ -8,8 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"./csv"
 )
 
 type TailSubcommand struct {
@@ -53,8 +51,8 @@ func (sub *TailSubcommand) Run(args []string) {
 	}
 }
 
-func TailFromBottom(inputCsv AbstractInputCsv, numRows int) {
-	writer := csv.NewWriter(os.Stdout)
+func TailFromBottom(inputCsv *InputCsv, numRows int) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read all rows.
 	rows, err := inputCsv.ReadAll()
@@ -63,8 +61,7 @@ func TailFromBottom(inputCsv AbstractInputCsv, numRows int) {
 	}
 
 	// Write header.
-	writer.Write(rows[0])
-	writer.Flush()
+	outputCsv.Write(rows[0])
 
 	// Write rows.
 	startRow := len(rows) - numRows
@@ -72,21 +69,19 @@ func TailFromBottom(inputCsv AbstractInputCsv, numRows int) {
 		startRow = 1
 	}
 	for i := startRow; i < len(rows); i++ {
-		writer.Write(rows[i])
-		writer.Flush()
+		outputCsv.Write(rows[i])
 	}
 }
 
-func TailFromTop(inputCsv AbstractInputCsv, numRows int) {
-	writer := csv.NewWriter(os.Stdout)
+func TailFromTop(inputCsv *InputCsv, numRows int) {
+	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
 	}
-	writer.Write(header)
-	writer.Flush()
+	outputCsv.Write(header)
 
 	// Write rows after first `numRows` rows.
 	curRow := 0
@@ -101,8 +96,7 @@ func TailFromTop(inputCsv AbstractInputCsv, numRows int) {
 		}
 		curRow++
 		if curRow > numRows {
-			writer.Write(row)
-			writer.Flush()
+			outputCsv.Write(row)
 		}
 	}
 }

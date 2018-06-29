@@ -80,7 +80,7 @@ func getRowSeparator(widths []int) string {
 	return fmt.Sprintf("+-%s-+", strings.Join(cells, "-+-"))
 }
 
-func View(inputCsv AbstractInputCsv, maxWidth, maxRows int) {
+func View(inputCsv *InputCsv, maxWidth, maxRows int) {
 
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 
