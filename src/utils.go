@@ -128,7 +128,7 @@ func GetIndexForColumn(headers []string, column string) int {
 	if errParse == nil {
 		intVal := int(int64Val)
 		if intVal > 0 && intVal <= len(headers) {
-			return intVal
+			return intVal - 1
 		}
 	}
 	return GetFirstIndexOfString(headers, column)
