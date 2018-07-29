@@ -46,6 +46,7 @@ Subcommands:
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [stats](#stats) - Get some basic statistics on a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
+- [template](#template) (alias: `tmpl`) - Add a column with values based on a template using other columns.
 - [tsv](#tsv) - Transform a CSV into a TSV.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [view](#view) - Display a CSV in a pretty tabular format.
@@ -401,6 +402,38 @@ Arguments:
 
 - `-n` (optional) The number of rows to extract. If `N` is an integer, it will extract the last _N_ rows. If `N` is prepended with `+`, it will extract all except the first _N_ rows.
 
+### template
+
+_Alias_: `tmpl`
+
+Add a column with values based on a template using other columns.
+
+Usage:
+
+```shell
+gocsv template -t TEMPLATE  [--prepend] [--name NAME] FILE
+```
+
+Arguments:
+
+- `--template` (shorthand `-t`) Template for colum.
+- `--prepend` (optional) Prepend the templated column rather than the default append.
+- `--name` (optional) Specify a name for the templated column. Defaults to `Templated`.
+
+Note that the `--template` argument for this subcommand is a string providing a template for the new column. Templates are parsed using the [text/template](https://golang.org/pkg/text/template/) package provided by Go and can reference any column by the _name_ of the column, along with a special variable `index` that represents the row number (starting at `1`).
+
+For example, if your CSV has a column named `Name`, you can do
+```shell
+gocsv template -t "Hello, {{.Name}}! You are number {{.index}} in line."
+```
+
+For multi-word columns there is a slightly different syntax. Say you have a column called `Full Name`. Then the following template would work:
+```shell
+gocsv template -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
+```
+
+For further reference on the options available to you in a template, see the [text/template](https://golang.org/pkg/text/template/) documentation.
+
 ### tsv
 
 Transform a CSV into a TSV. It is shortand for `gocsv delim -o "\t" FILE`. This can very useful if you want to pipe the result to `pbcopy` (OS X) in order to paste it into a spreadsheet tool.
@@ -531,6 +564,7 @@ cat test-files/left-table.csv \
 | stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 | stats         |  &#x2714;           |   N/A    |
 | tail          |  &#x2714;           | &#x2714; |
+| template      |  &#x2714;           | &#x2714; |
 | tsv           |  &#x2714;           | &#x2714; |
 | unique        |  &#x2714;           | &#x2714; |
 | view          |  &#x2714;           |   N/A    |
@@ -613,6 +647,12 @@ To do the same via pipelining through standard input,
 
 ```shell
 cat test-files/stack-1.csv | gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" - test-files/stack-2.csv test-files/stack-3.csv
+```
+
+##### Create a Column from a TEmplate
+
+```shell
+cat test-files/stats.csv | gocsv template -t "Row {{.index}}: {{if eq .Boolean \"T\"}}{{.Floater}}{{else}}{{.Integer}}{{end}}" -name "Integer or Floater"
 ```
 
 ## Debugging
