@@ -52,7 +52,7 @@ Subcommands:
 - [view](#view) - Display a CSV in a pretty tabular format.
 - [xlsx](#xlsx) - Convert sheets of a XLSX file to CSV.
 
-To view the useage of `gocsv` at the command line, use the `help` subcommand (i.e. `gocsv help`). This will also print out the version of the `gocsv` binary as well as the hash of the git commit of this repository on which the binary was built. To view only the version and git hash, use the `version` subcommand (i.e. `gocsv version`).
+To view the usage of `gocsv` at the command line, use the `help` subcommand (i.e. `gocsv help`). This will also print out the version of the `gocsv` binary as well as the hash of the git commit of this repository on which the binary was built. To view only the version and git hash, use the `version` subcommand (i.e. `gocsv version`).
 
 ## Subcommands
 
@@ -475,9 +475,10 @@ gocsv view [-n N] [--max-width N] FILE
 Arguments:
 
 - `-n` (optional) Display only the first _N_ rows of the CSV.
-- `--max-width` (optional, default 20, shorthand `-w`) The maximum width of each cell for display. If a cell exceeds the maximum width, it will be truncated in the display.
+- `--max-width` (optional, shorthand `-w`) The maximum width of each cell for display. If a cell exceeds the maximum width, it will be truncated in the display.
+- `--max-lines` (optional, shorthand `-l`) The maximum number of lines to display per cell.
 
-If the length of a cell exceeds `--max-width` it will be truncated with an ellipsis. If a cell contains a new-line character, only the first line will be displayed.
+If the length of a cell exceeds `--max-width` it will be truncated with an ellipsis.
 
 ### xlsx
 
