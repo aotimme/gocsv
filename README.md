@@ -170,8 +170,12 @@ Get the dimensions of a CSV.
 Usage
 
 ```shell
-gocsv dimensions FILE
+gocsv dimensions [--csv] FILE
 ```
+
+Arguments:
+
+- `--csv` (optional) Output the results as a CSV.
 
 ### filter
 
@@ -215,8 +219,12 @@ View the headers of a CSV along with the index of each header.
 Usage:
 
 ```bash
-gocsv headers FILE
+gocsv headers [--csv] FILE
 ```
+
+Arguments:
+
+- `--csv` (optional) Output the results as a CSV.
 
 ### join
 
@@ -550,10 +558,10 @@ cat test-files/left-table.csv \
 | clean         |  &#x2714;           | &#x2714; |
 | delimiter     |  &#x2714;           | &#x2714; |
 | describe      |  &#x2714;           |   N/A    |
-| dimensions    |  &#x2714;           |   N/A    |
+| dimensions    |  &#x2714;           | &#x2714;<sup>*</sup> |
 | filter        |  &#x2714;           | &#x2714; |
 | head          |  &#x2714;           | &#x2714; |
-| headers       |  &#x2714;           |   N/A    |
+| headers       |  &#x2714;           | &#x2714;<sup>*</sup> |
 | join          |  &#x2714;           | &#x2714; |
 | rename        |  &#x2714;           | &#x2714; |
 | replace       |  &#x2714;           | &#x2714; |
@@ -570,6 +578,8 @@ cat test-files/left-table.csv \
 | unique        |  &#x2714;           | &#x2714; |
 | view          |  &#x2714;           |   N/A    |
 | xlsx          |     N/A             | &#x2021; |
+
+\* `dimensions` and `headers` write to CSV format when using the `--csv` argument.
 
 &#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
 

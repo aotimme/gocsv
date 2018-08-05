@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"strconv"
 )
 
-type DimensionsSubcommand struct{}
+type DimensionsSubcommand struct {
+	asCsv bool
+}
 
 func (sub *DimensionsSubcommand) Name() string {
 	return "dimensions"
@@ -18,14 +21,15 @@ func (sub *DimensionsSubcommand) Description() string {
 	return "Get the dimensions of a CSV."
 }
 func (sub *DimensionsSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.BoolVar(&sub.asCsv, "csv", false, "Output results as CSV")
 }
 
 func (sub *DimensionsSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	GetDimensions(inputCsvs[0])
+	GetDimensions(inputCsvs[0], sub.asCsv)
 }
 
-func GetDimensions(inputCsv *InputCsv) {
+func GetDimensions(inputCsv *InputCsv, asCsv bool) {
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -45,7 +49,14 @@ func GetDimensions(inputCsv *InputCsv) {
 		numRows++
 	}
 
-	fmt.Println("Dimensions:")
-	fmt.Printf("  Rows: %d\n", numRows)
-	fmt.Printf("  Columns: %d\n", numColumns)
+	if asCsv {
+		outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+		outputCsv.Write([]string{"Dimension", "Size"})
+		outputCsv.Write([]string{"Rows", strconv.Itoa(numRows)})
+		outputCsv.Write([]string{"Columns", strconv.Itoa(numColumns)})
+	} else {
+		fmt.Println("Dimensions:")
+		fmt.Printf("  Rows: %d\n", numRows)
+		fmt.Printf("  Columns: %d\n", numColumns)
+	}
 }
