@@ -86,7 +86,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string) {
 				ExitWithError(err)
 			}
 			defer curFile.Close()
-			outputCsv := NewFileOutputCsvFromInputCsv(inputCsv, curFile)
+			outputCsv = NewFileOutputCsvFromInputCsv(inputCsv, curFile)
 			outputCsv.Write(header)
 		}
 
