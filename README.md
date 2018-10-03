@@ -531,6 +531,12 @@ or
 gocsv select -c Hello\ World test.csv
 ```
 
+When referencing multiple columns, specify column names as a comma-delimited list with no spaces between the columns. If any of the column names have whitespace, enclose the entire list in a single set of quotes. 
+
+```shell
+gocsv select -c "Hello World,Foo Bar" test.csv
+```
+
 ## Regular Expression Syntax
 
 A few of the subcommands allow the ability to pass in regular expressions via a `--regex` flag (e.g. [filter](#filter) and [replace](#replace)).
