@@ -78,12 +78,12 @@ Note that the `--template` argument for this subcommand is a string providing a 
 
 For example, if your CSV has a column named `Name`, you can do
 ```shell
-gocsv template -t "Hello, {{.Name}}! You are number {{.index}} in line."
+gocsv add -t "Hello, {{.Name}}! You are number {{.index}} in line."
 ```
 
 For multi-word columns there is a slightly different syntax. Say you have a column called `Full Name`. Then the following template would work:
 ```shell
-gocsv template -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
+gocsv add -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
 ```
 
 For further reference on the options available to you in a template, see the [text/template](https://golang.org/pkg/text/template/) documentation.
@@ -666,10 +666,10 @@ To do the same via pipelining through standard input,
 cat test-files/stack-1.csv | gocsv stack --groups "Primer Archivo,Segundo Archivo,Tercer Archivo" --group-name "Orden de Archivo" - test-files/stack-2.csv test-files/stack-3.csv
 ```
 
-##### Create a Column from a TEmplate
+##### Create a Column from a Template
 
 ```shell
-cat test-files/stats.csv | gocsv template -t "Row {{.index}}: {{if eq .Boolean \"T\"}}{{.Floater}}{{else}}{{.Integer}}{{end}}" -name "Integer or Floater"
+cat test-files/stats.csv | gocsv add -t "Row {{.index}}: {{if eq .Boolean \"T\"}}{{.Floater}}{{else}}{{.Integer}}{{end}}" -name "Integer or Floater"
 ```
 
 ## Debugging
