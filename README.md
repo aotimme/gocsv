@@ -309,7 +309,7 @@ Arguments:
 - `--case-insensitive` (optional, shorthand `-i`) Use this flag to specify a case insensitive match for replacement rather than the default case sensitive match.
 - `--repl` String to use for replacement.
 
-Note that if you have a capture group in the `--regex` argument, you can use expand the replacement using, for example `"\$1"`.
+Note that if you have a capture group in the `--regex` argument you can reference that in the replacement argument using `"\$1"` for the first capture group, `"\$2"` for the second capture group, etc.
 
 ### sample
 
