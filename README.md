@@ -557,6 +557,7 @@ cat test-files/left-table.csv \
 
 | Subcommand    |    Input            |  Output  |
 | ------------- | :-----------------: | :------: |
+| add           |  &#x2714;           | &#x2714; |
 | autoincrement |  &#x2714;           | &#x2714; |
 | behead        |  &#x2714;           | &#x2714; |
 | clean         |  &#x2714;           | &#x2714; |
@@ -577,7 +578,6 @@ cat test-files/left-table.csv \
 | stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 | stats         |  &#x2714;           |   N/A    |
 | tail          |  &#x2714;           | &#x2714; |
-| template      |  &#x2714;           | &#x2714; |
 | tsv           |  &#x2714;           | &#x2714; |
 | unique        |  &#x2714;           | &#x2714; |
 | view          |  &#x2714;           |   N/A    |
