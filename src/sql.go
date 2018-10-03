@@ -20,7 +20,7 @@ func (sub *SqlSubcommand) Aliases() []string {
 	return []string{}
 }
 func (sub *SqlSubcommand) Description() string {
-	return "[BETA] Run SQL queries on CSVs."
+	return "Run SQL queries on CSVs."
 }
 func (sub *SqlSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.StringVar(&sub.queryString, "query", "", "SQL query")

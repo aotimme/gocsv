@@ -43,7 +43,7 @@ Subcommands:
 - [select](#select) - Extract specified columns.
 - [sort](#sort) - Sort a CSV based on one or more columns.
 - [split](#split) - Split a CSV into multiple files.
-- [sql](#sql) (BETA) - Run SQL queries on CSVs.
+- [sql](#sql) - Run SQL queries on CSVs.
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [stats](#stats) - Get some basic statistics on a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
@@ -375,8 +375,6 @@ Arguments:
 
 ### sql
 
-Note that this subcommand is in _**BETA**_.
-
 Run SQL queries on CSVs.
 
 Usage:
@@ -575,7 +573,7 @@ cat test-files/left-table.csv \
 | select        |  &#x2714;           | &#x2714; |
 | sort          |  &#x2714;           | &#x2714; |
 | split         |  &#x2714;           |   N/A    |
-| sql (BETA)    |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
+| sql           |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 | stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 | stats         |  &#x2714;           |   N/A    |
 | tail          |  &#x2714;           | &#x2714; |
