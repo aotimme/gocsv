@@ -31,6 +31,7 @@ func RegisterSubcommand(sub Subcommand) {
 }
 
 func init() {
+	RegisterSubcommand(&AddSubcommand{})
 	RegisterSubcommand(&AutoincrementSubcommand{})
 	RegisterSubcommand(&BeheadSubcommand{})
 	RegisterSubcommand(&CapSubcommand{})
@@ -52,7 +53,6 @@ func init() {
 	RegisterSubcommand(&StackSubcommand{})
 	RegisterSubcommand(&StatsSubcommand{})
 	RegisterSubcommand(&TailSubcommand{})
-	RegisterSubcommand(&TemplateSubcommand{})
 	RegisterSubcommand(&TsvSubcommand{})
 	RegisterSubcommand(&UniqueSubcommand{})
 	RegisterSubcommand(&ViewSubcommand{})

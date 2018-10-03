@@ -3,53 +3,49 @@ package main
 import (
 	"bytes"
 	"flag"
-	"fmt"
 	"io"
-	"os"
 	"strconv"
 	"text/template"
 )
 
-type TemplateSubcommand struct {
+type AddSubcommand struct {
 	name     string
 	template string
 	prepend  bool
 }
 
-func (sub *TemplateSubcommand) Name() string {
-	return "template"
+func (sub *AddSubcommand) Name() string {
+	return "add"
 }
-func (sub *TemplateSubcommand) Aliases() []string {
-	return []string{"tmpl"}
+func (sub *AddSubcommand) Aliases() []string {
+	// Adding "template" and "tmpl" for backwards compatibility
+	return []string{"template", "tmpl"}
 }
-func (sub *TemplateSubcommand) Description() string {
-	return "Add a column with values based on a template using other columns."
+func (sub *AddSubcommand) Description() string {
+	return "Add a column to a CSV."
 }
-func (sub *TemplateSubcommand) SetFlags(fs *flag.FlagSet) {
-	fs.StringVar(&sub.name, "name", "Templated", "Name of templated column")
-	fs.StringVar(&sub.template, "template", "", "Template for column")
-	fs.StringVar(&sub.template, "t", "", "Template for column (shorthand)")
-	fs.BoolVar(&sub.prepend, "prepend", false, "Prepend the templated column (defaults to append)")
+func (sub *AddSubcommand) SetFlags(fs *flag.FlagSet) {
+	fs.StringVar(&sub.name, "name", "", "Name of new column")
+	fs.StringVar(&sub.name, "n", "", "Name of new column (shorthand)")
+	fs.StringVar(&sub.template, "template", "", "Template for the new column")
+	fs.StringVar(&sub.template, "t", "", "Template for the new column (shorthand)")
+	fs.BoolVar(&sub.prepend, "prepend", false, "Prepend the new column (defaults to append)")
 }
 
-func (sub *TemplateSubcommand) Run(args []string) {
-	if sub.template == "" {
-		fmt.Fprintln(os.Stderr, "Missing argument --template (-t)")
-		os.Exit(1)
-	}
+func (sub *AddSubcommand) Run(args []string) {
 	tmpl, err := template.New("template").Parse(sub.template)
 	if err != nil {
 		ExitWithError(err)
 	}
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	RenderTemplate(inputCsvs[0], tmpl, sub.name, sub.prepend)
+	AddColumn(inputCsvs[0], tmpl, sub.name, sub.prepend)
 	err = inputCsvs[0].Close()
 	if err != nil {
 		ExitWithError(err)
 	}
 }
 
-func RenderTemplate(inputCsv *InputCsv, tmpl *template.Template, name string, prepend bool) {
+func AddColumn(inputCsv *InputCsv, tmpl *template.Template, name string, prepend bool) {
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 
 	// Read and write header.

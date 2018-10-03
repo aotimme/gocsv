@@ -25,6 +25,7 @@ The tool is built for [pipelining](#pipelining), so most commands accept a CSV f
 
 Subcommands:
 
+- [add](#add) (aliases: `template`, `tmpl`) - Add a column to a CSV.
 - [autoincrement](#autoincrement) (alias: `autoinc`) - Add a column of incrementing integers to a CSV.
 - [behead](#behead) - Remove header row(s) from a CSV.
 - [cap](#cap) - Add a header row to a CSV.
@@ -46,7 +47,6 @@ Subcommands:
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [stats](#stats) - Get some basic statistics on a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
-- [template](#template) (alias: `tmpl`) - Add a column with values based on a template using other columns.
 - [tsv](#tsv) - Transform a CSV into a TSV.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [view](#view) - Display a CSV in a pretty tabular format.
@@ -55,6 +55,38 @@ Subcommands:
 To view the usage of `gocsv` at the command line, use the `help` subcommand (i.e. `gocsv help`). This will also print out the version of the `gocsv` binary as well as the hash of the git commit of this repository on which the binary was built. To view only the version and git hash, use the `version` subcommand (i.e. `gocsv version`).
 
 ## Subcommands
+
+### add
+
+_Aliases:_ `template`, `tmpl`
+
+Add a column to a CSV.
+
+Usage:
+
+```shell
+gocsv add [--prepend] [--name NAME] [--template TEMPLATE] FILE
+```
+
+Arguments:
+
+- `--prepend` (optional) Prepend the new column rather than the default append.
+- `--name` (shorthand `-n`, optional) Specify a name for the new column. Defaults to the empty string.
+- `--template` (shorthand `-t`, optional) Template for column.
+
+Note that the `--template` argument for this subcommand is a string providing a template for the new column. Templates are parsed using the [text/template](https://golang.org/pkg/text/template/) package provided by Go and can reference any column by the _name_ of the column, along with a special variable `index` that represents the row number (starting at `1`).
+
+For example, if your CSV has a column named `Name`, you can do
+```shell
+gocsv template -t "Hello, {{.Name}}! You are number {{.index}} in line."
+```
+
+For multi-word columns there is a slightly different syntax. Say you have a column called `Full Name`. Then the following template would work:
+```shell
+gocsv template -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
+```
+
+For further reference on the options available to you in a template, see the [text/template](https://golang.org/pkg/text/template/) documentation.
 
 ### autoincrement
 
@@ -409,38 +441,6 @@ gocsv tail [-n N] FILE
 Arguments:
 
 - `-n` (optional) The number of rows to extract. If `N` is an integer, it will extract the last _N_ rows. If `N` is prepended with `+`, it will extract all except the first _N_ rows.
-
-### template
-
-_Alias_: `tmpl`
-
-Add a column with values based on a template using other columns.
-
-Usage:
-
-```shell
-gocsv template -t TEMPLATE  [--prepend] [--name NAME] FILE
-```
-
-Arguments:
-
-- `--template` (shorthand `-t`) Template for colum.
-- `--prepend` (optional) Prepend the templated column rather than the default append.
-- `--name` (optional) Specify a name for the templated column. Defaults to `Templated`.
-
-Note that the `--template` argument for this subcommand is a string providing a template for the new column. Templates are parsed using the [text/template](https://golang.org/pkg/text/template/) package provided by Go and can reference any column by the _name_ of the column, along with a special variable `index` that represents the row number (starting at `1`).
-
-For example, if your CSV has a column named `Name`, you can do
-```shell
-gocsv template -t "Hello, {{.Name}}! You are number {{.index}} in line."
-```
-
-For multi-word columns there is a slightly different syntax. Say you have a column called `Full Name`. Then the following template would work:
-```shell
-gocsv template -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
-```
-
-For further reference on the options available to you in a template, see the [text/template](https://golang.org/pkg/text/template/) documentation.
 
 ### tsv
 
