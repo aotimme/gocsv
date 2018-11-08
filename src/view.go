@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 type ViewSubcommand struct {
@@ -54,7 +55,7 @@ func View(inputCsv *InputCsv, maxWidth, maxLines, maxRows int) {
 	// Default to 0
 	columnWidths := make([]int, imc.NumColumns())
 	for j, cell := range imc.header {
-		cellLength := getCellWidth(cell)
+		cellLength := getCellWidth(cell, maxLines)
 		if cellLength > columnWidths[j] {
 			if maxWidth > 0 && cellLength > maxWidth {
 				columnWidths[j] = maxWidth
@@ -76,7 +77,7 @@ func View(inputCsv *InputCsv, maxWidth, maxLines, maxRows int) {
 			if columnWidths[j] == maxWidth {
 				continue
 			}
-			cellLength := getCellWidth(cell)
+			cellLength := getCellWidth(cell, maxLines)
 			if cellLength > columnWidths[j] {
 				if maxWidth > 0 && cellLength > maxWidth {
 					columnWidths[j] = maxWidth
@@ -112,13 +113,18 @@ func getRowSeparator(widths []int) string {
 	return fmt.Sprintf("+-%s-+", strings.Join(cells, "-+-"))
 }
 
-func getCellWidth(cell string) int {
-	indexOfNewline := strings.Index(cell, "\n")
-	if indexOfNewline > -1 {
-		return indexOfNewline + 1
-	} else {
-		return len(cell)
+func getCellWidth(cell string, maxLines int) int {
+	cellLines := strings.Split(cell, "\n")
+	cellWidth := 0
+	for i, line := range cellLines {
+		if maxLines == 0 || i < maxLines {
+			lineLen := utf8.RuneCountInString(line)
+			if lineLen > cellWidth {
+				cellWidth = lineLen
+			}
+		}
 	}
+	return cellWidth
 }
 
 func printRow(row []string, columnWidths []int, maxLines int) {
@@ -136,15 +142,20 @@ func printRow(row []string, columnWidths []int, maxLines int) {
 func getRowHeight(row []string, maxLines int) int {
 	rowHeight := 1
 	for _, cell := range row {
-		numLines := strings.Count(cell, "\n") + 1
-		if maxLines > 0 && numLines >= maxLines {
-			return maxLines
-		}
-		if numLines > rowHeight {
-			rowHeight = numLines
+		cellHeight := getCellHeight(cell, maxLines)
+		if cellHeight > rowHeight {
+			rowHeight = cellHeight
 		}
 	}
 	return rowHeight
+}
+
+func getCellHeight(cell string, maxLines int) int {
+	numLines := strings.Count(cell, "\n") + 1
+	if maxLines > 0 && numLines >= maxLines {
+		return maxLines
+	}
+	return numLines
 }
 
 func copyTruncatedAndPaddedCellToOutputRow(outrowLines [][]string, row []string, widths []int) {
@@ -162,10 +173,11 @@ func copyTruncatedAndPaddedCellToOutputRow(outrowLines [][]string, row []string,
 }
 
 func getTruncatedLine(line string, width int) string {
-	if len(line) == width {
+	lineLen := utf8.RuneCountInString(line)
+	if lineLen == width {
 		return line
-	} else if len(line) < width {
-		return line + strings.Repeat(" ", width-len(line))
+	} else if lineLen < width {
+		return line + strings.Repeat(" ", width-lineLen)
 	} else {
 		return line[:width-3] + "..."
 	}
