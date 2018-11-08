@@ -41,6 +41,7 @@ func ChangeDelimiter(inputCsv *InputCsv, inputDelimiter, outputDelimiter string)
 	}
 	// Be lenient when reading in the file.
 	inputCsv.SetFieldsPerRecord(-1)
+	inputCsv.SetLazyQuotes(true)
 
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
 	if outputDelimiter == "\\t" {
