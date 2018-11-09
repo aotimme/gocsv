@@ -59,6 +59,7 @@ func init() {
 	RegisterSubcommand(&UniqueSubcommand{})
 	RegisterSubcommand(&ViewSubcommand{})
 	RegisterSubcommand(&XlsxSubcommand{})
+	RegisterSubcommand(&ZipSubcommand{})
 }
 
 func usageForSubcommand(subcommand Subcommand) string {
