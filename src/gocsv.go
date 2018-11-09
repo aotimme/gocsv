@@ -43,6 +43,8 @@ func init() {
 	RegisterSubcommand(&HeadSubcommand{})
 	RegisterSubcommand(&HeadersSubcommand{})
 	RegisterSubcommand(&JoinSubcommand{})
+	RegisterSubcommand(&NcolSubcommand{})
+	RegisterSubcommand(&NrowSubcommand{})
 	RegisterSubcommand(&RenameSubcommand{})
 	RegisterSubcommand(&ReplaceSubcommand{})
 	RegisterSubcommand(&SampleSubcommand{})

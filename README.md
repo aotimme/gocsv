@@ -37,6 +37,8 @@ Subcommands:
 - [head](#head) - Extract the first _N_ rows from a CSV.
 - [headers](#headers) - View the headers from a CSV.
 - [join](#join) - Join two CSVs based on equality of elements in a column.
+- [ncol](#ncol) - Get the number of columns in a CSV.
+- [nrow](#nrow) - Get the number of rows in a CSV.
 - [rename](#rename) - Rename the headers of a CSV.
 - [replace](#replace) - Replace values in cells by regular expression.
 - [sample](#sample) - Sample rows.
@@ -276,6 +278,26 @@ Arguments:
 - `--outer` (optional) Perform an outer join (i.e. full outer join).
 
 Note that by default it will perform an inner join. It will exit if you specify multiple types of join.
+
+### ncol
+
+Get the number of columns in a CSV.
+
+Usage:
+
+```shell
+gocsv ncol FILE
+```
+
+### nrow
+
+Get the number of rows in a CSV.
+
+Usage:
+
+```shell
+gocsv nrow FILE
+```
 
 ### rename
 
@@ -568,6 +590,8 @@ cat test-files/left-table.csv \
 | head          |  &#x2714;           | &#x2714; |
 | headers       |  &#x2714;           | &#x2714;<sup>*</sup> |
 | join          |  &#x2714;           | &#x2714; |
+| ncol          |  &#x2714;           |   N/A    |
+| nrow          |  &#x2714;           |   N/A    |
 | rename        |  &#x2714;           | &#x2714; |
 | replace       |  &#x2714;           | &#x2714; |
 | sample        |  &#x2714;           | &#x2714; |
