@@ -55,6 +55,20 @@ func (sub *XlsxSubcommand) Run(args []string) {
 	}
 }
 
+func ConvertXlsxFull(filename, dirname string) {
+	xlsxFile, err := xlsx.OpenFile(filename)
+	if err != nil {
+		ExitWithError(err)
+	}
+	err = os.Mkdir(dirname, os.ModeDir|0755)
+	if err != nil {
+		ExitWithError(err)
+	}
+	for _, sheet := range xlsxFile.Sheets {
+		ConvertXlsxSheetToDirectory(dirname, sheet)
+	}
+}
+
 func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 	filename := fmt.Sprintf("%s/%s.csv", dirname, sheet.Name)
 
@@ -64,28 +78,7 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 	}
 	defer file.Close()
 	outputCsv := NewOutputCsvFromFile(file)
-	for _, row := range sheet.Rows {
-		csvRow := make([]string, 0)
-		for _, cell := range row.Cells {
-			cellValue, err := cell.FormattedValue()
-			if err != nil {
-				ExitWithError(err)
-			}
-			csvRow = append(csvRow, cellValue)
-		}
-		outputCsv.Write(csvRow)
-	}
-}
-
-func ConvertXlsxFull(filename, dirname string) {
-	xlsxFile, err := xlsx.OpenFile(filename)
-	if err != nil {
-		ExitWithError(err)
-	}
-	err = os.Mkdir(dirname, os.ModeDir|0755)
-	for _, sheet := range xlsxFile.Sheets {
-		ConvertXlsxSheetToDirectory(dirname, sheet)
-	}
+	WriteSheetToOutputCsv(sheet, outputCsv)
 }
 
 func ConvertXlsxSheet(filename, sheetName string) {
@@ -105,13 +98,16 @@ func ConvertXlsxSheet(filename, sheetName string) {
 
 	sheet := xlsxFile.Sheets[sheetIndex]
 	outputCsv := NewOutputCsv()
+	WriteSheetToOutputCsv(sheet, outputCsv)
+}
+
+func WriteSheetToOutputCsv(sheet *xlsx.Sheet, outputCsv *OutputCsv) {
 	for _, row := range sheet.Rows {
 		csvRow := make([]string, 0)
 		for _, cell := range row.Cells {
-			cellValue, err := cell.FormattedValue()
-			if err != nil {
-				ExitWithError(err)
-			}
+			// We only care about the string value of the cell,
+			// so just ignore any error.
+			cellValue, _ := cell.FormattedValue()
 			csvRow = append(csvRow, cellValue)
 		}
 		outputCsv.Write(csvRow)
