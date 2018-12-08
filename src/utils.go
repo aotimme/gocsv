@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"./csv"
+	"gocsv/csv"
 )
 
 const (

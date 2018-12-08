@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"./csv"
+	"gocsv/csv"
 )
 
 type InputCsv struct {

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BIN_DIR=bin
+BIN_DIR=$(pwd)/bin
 SRC_DIR=src
 EXECUTABLE=gocsv
 
@@ -10,4 +10,5 @@ LD_FLAGS="-X main.VERSION=${VERSION} -X main.GIT_HASH=${GIT_HASH}"
 
 rm -rf ${BIN_DIR}
 mkdir -p ${BIN_DIR}
-go build -ldflags "${LD_FLAGS}" -o ${BIN_DIR}/${EXECUTABLE} ./${SRC_DIR}
+cd ${SRC_DIR}
+go build -ldflags "${LD_FLAGS}" -o ${BIN_DIR}/${EXECUTABLE}
