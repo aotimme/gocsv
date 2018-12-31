@@ -25,18 +25,20 @@ func (sub *BeheadSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *BeheadSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunBehead(inputCsvs[0], outputCsv)
+}
+
+func (sub *BeheadSubcommand) RunBehead(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	if sub.numHeaders < 1 {
 		fmt.Fprintln(os.Stderr, "Invalid argument -n")
 		os.Exit(1)
 	}
-
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	Behead(inputCsvs[0], sub.numHeaders)
+	Behead(inputCsv, outputCsvWriter, sub.numHeaders)
 }
 
-func Behead(inputCsv *InputCsv, numHeaders int) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func Behead(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, numHeaders int) {
 	// Get rid of the header rows.
 	for i := 0; i < numHeaders; i++ {
 		_, err := inputCsv.Read()
@@ -60,6 +62,6 @@ func Behead(inputCsv *InputCsv, numHeaders int) {
 				ExitWithError(err)
 			}
 		}
-		outputCsv.Write(row)
+		outputCsvWriter.Write(row)
 	}
 }

@@ -29,36 +29,35 @@ func (sub *SortSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *SortSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	sub.SortCsv(inputCsvs[0], outputCsv)
+}
+
+func (sub *SortSubcommand) SortCsv(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	if sub.columnsString == "" {
 		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)
 
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	SortCsv(inputCsvs[0], columns, sub.reverse, sub.noInference)
-}
-
-func SortCsv(inputCsv *InputCsv, columns []string, reverse, noInference bool) {
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	columnIndices := GetIndicesForColumnsOrPanic(imc.header, columns)
 	columnTypes := make([]ColumnType, len(columnIndices))
 	for i, columnIndex := range columnIndices {
-		if noInference {
+		if sub.noInference {
 			columnTypes[i] = STRING_TYPE
 		} else {
 			columnTypes[i] = imc.InferType(columnIndex)
 		}
 	}
-	imc.SortRows(columnIndices, columnTypes, reverse)
-
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	imc.SortRows(columnIndices, columnTypes, sub.reverse)
 
 	// Write header.
-	outputCsv.Write(imc.header)
+	outputCsvWriter.Write(imc.header)
 
 	// Write sorted rows.
 	for _, row := range imc.rows {
-		outputCsv.Write(row)
+		outputCsvWriter.Write(row)
 	}
 }

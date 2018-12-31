@@ -32,6 +32,12 @@ func (sub *ReplaceSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *ReplaceSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunReplace(inputCsvs[0], outputCsv)
+}
+
+func (sub *ReplaceSubcommand) RunReplace(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	// Get columns to compare against
 	var columns []string
 	if sub.columnsString == "" {
@@ -53,14 +59,10 @@ func (sub *ReplaceSubcommand) Run(args []string) {
 		return re.ReplaceAllString(elem, sub.repl)
 	}
 
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
-
-	ReplaceWithFunc(inputCsvs[0], columns, replaceFunc)
+	ReplaceWithFunc(inputCsv, outputCsvWriter, columns, replaceFunc)
 }
 
-func ReplaceWithFunc(inputCsv *InputCsv, columns []string, replaceFunc func(string) string) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func ReplaceWithFunc(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, columns []string, replaceFunc func(string) string) {
 	// Read header to get column index and write.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -69,7 +71,7 @@ func ReplaceWithFunc(inputCsv *InputCsv, columns []string, replaceFunc func(stri
 
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	outputCsv.Write(header)
+	outputCsvWriter.Write(header)
 
 	// Write replaced rows
 	rowToWrite := make([]string, len(header))
@@ -86,6 +88,6 @@ func ReplaceWithFunc(inputCsv *InputCsv, columns []string, replaceFunc func(stri
 		for _, columnIndex := range columnIndices {
 			rowToWrite[columnIndex] = replaceFunc(rowToWrite[columnIndex])
 		}
-		outputCsv.Write(rowToWrite)
+		outputCsvWriter.Write(rowToWrite)
 	}
 }

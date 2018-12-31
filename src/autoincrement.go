@@ -29,16 +29,19 @@ func (sub *AutoincrementSubcommand) SetFlags(fs *flag.FlagSet) {
 
 func (sub *AutoincrementSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	AutoIncrement(inputCsvs[0], sub.name, sub.seed, sub.prepend)
-	err := inputCsvs[0].Close()
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunAutoincrement(inputCsvs[0], outputCsv)
+}
+
+func (sub *AutoincrementSubcommand) RunAutoincrement(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
+	AutoIncrement(inputCsv, outputCsvWriter, sub.name, sub.seed, sub.prepend)
+	err := inputCsv.Close()
 	if err != nil {
 		ExitWithError(err)
 	}
 }
 
-func AutoIncrement(inputCsv *InputCsv, name string, seed int, prepend bool) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func AutoIncrement(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, name string, seed int, prepend bool) {
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -55,7 +58,7 @@ func AutoIncrement(inputCsv *InputCsv, name string, seed int, prepend bool) {
 		copy(shellRow, header)
 		shellRow[numInputColumns] = name
 	}
-	outputCsv.Write(shellRow)
+	outputCsvWriter.Write(shellRow)
 
 	// Write rows with autoincrement.
 	inc := seed
@@ -79,6 +82,6 @@ func AutoIncrement(inputCsv *InputCsv, name string, seed int, prepend bool) {
 			shellRow[numInputColumns] = incStr
 		}
 		inc++
-		outputCsv.Write(shellRow)
+		outputCsvWriter.Write(shellRow)
 	}
 }

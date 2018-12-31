@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+type OutputCsvWriter interface {
+	Write(row []string) error
+}
+
 type OutputCsv struct {
 	writeBom         bool
 	hasWrittenHeader bool

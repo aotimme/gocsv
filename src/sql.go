@@ -29,10 +29,13 @@ func (sub *SqlSubcommand) SetFlags(fs *flag.FlagSet) {
 
 func (sub *SqlSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, -1)
-	DoSqlQuery(inputCsvs, sub.queryString)
+	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	sub.RunSql(inputCsvs, outputCsv)
 }
 
-func DoSqlQuery(inputCsvs []*InputCsv, query string) {
+func (sub *SqlSubcommand) RunSql(inputCsvs []*InputCsv, outputCsvWriter OutputCsvWriter) {
+	query := sub.queryString
+
 	// 1. Create the SQLite DB
 	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
@@ -52,12 +55,11 @@ func DoSqlQuery(inputCsvs []*InputCsv, query string) {
 	defer rows.Close()
 
 	// 4. Write the results
-	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
 	columns, err := rows.Columns()
 	if err != nil {
 		ExitWithError(err)
 	}
-	outputCsv.Write(columns)
+	outputCsvWriter.Write(columns)
 
 	// See: https://stackoverflow.com/a/14500756
 	readRow := make([]interface{}, len(columns))
@@ -79,7 +81,7 @@ func DoSqlQuery(inputCsvs []*InputCsv, query string) {
 				csvRow[i] = ""
 			}
 		}
-		outputCsv.Write(csvRow)
+		outputCsvWriter.Write(csvRow)
 	}
 }
 

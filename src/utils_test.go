@@ -36,3 +36,24 @@ func TestGetIndicesForColumns(t *testing.T) {
 		}
 	}
 }
+
+func TestGetBaseFilenameWithoutExtension(t *testing.T) {
+	testCases := []struct {
+		filename     string
+		baseFilename string
+	}{
+		{"../test-files/simple.csv", "simple"},
+		{"../test-files/simple", "simple"},
+		{"simple.csv", "simple"},
+		{"/simple.csv", "simple"},
+		{"./simple.csv", "simple"},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.filename, func(t *testing.T) {
+			baseFilename := GetBaseFilenameWithoutExtension(tt.filename)
+			if baseFilename != tt.baseFilename {
+				t.Errorf("Expected %q but got %q", tt.baseFilename, baseFilename)
+			}
+		})
+	}
+}

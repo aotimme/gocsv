@@ -28,6 +28,12 @@ func (sub *RenameSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *RenameSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunRename(inputCsvs[0], outputCsv)
+}
+
+func (sub *RenameSubcommand) RunRename(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	if sub.columnsString == "" {
 		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
@@ -38,14 +44,10 @@ func (sub *RenameSubcommand) Run(args []string) {
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)
 	names := GetArrayFromCsvString(sub.namesString)
-
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	RenameColumns(inputCsvs[0], columns, names)
+	RenameColumns(inputCsv, outputCsvWriter, columns, names)
 }
 
-func RenameColumns(inputCsv *InputCsv, columns, names []string) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func RenameColumns(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, columns, names []string) {
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -64,7 +66,7 @@ func RenameColumns(inputCsv *InputCsv, columns, names []string) {
 		renamedHeader[columnIndex] = names[i]
 	}
 
-	outputCsv.Write(renamedHeader)
+	outputCsvWriter.Write(renamedHeader)
 
 	for {
 		row, err := inputCsv.Read()
@@ -75,6 +77,6 @@ func RenameColumns(inputCsv *InputCsv, columns, names []string) {
 				ExitWithError(err)
 			}
 		}
-		outputCsv.Write(row)
+		outputCsvWriter.Write(row)
 	}
 }

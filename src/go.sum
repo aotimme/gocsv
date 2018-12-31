@@ -1,6 +1,10 @@
 github.com/alphagov/router v0.0.0-20161125164013-5d98b0d9fc19 h1:LX9H/VztLww9xtRK5O1coSCiRkF0UqLZytIMzg8CYUU=
 github.com/alphagov/router v0.0.0-20161125164013-5d98b0d9fc19/go.mod h1:Mp21fDX6h4wMwSzsItDP+UtNLAlQOZZIXu6/YsyQae0=
+github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57 h1:eqyIo2HjKhKe/mJzTG8n4VqvLXIOEG+SLdDqX7xGtkY=
+github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/mattn/go-sqlite3 v1.0.1-0.20150807032509-0fa27b5cb05c h1:zs99zFsZn1DKeW4wkNZjFxNC4lWawORDE6IFej7do9A=
 github.com/mattn/go-sqlite3 v1.0.1-0.20150807032509-0fa27b5cb05c/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
 github.com/tealeg/xlsx v0.0.0-20161026161224-a8490cf686de h1:PC5Hwqy6Muk6JOroE699iNIxzZLlnls3iEDXbClQsKc=
 github.com/tealeg/xlsx v0.0.0-20161026161224-a8490cf686de/go.mod h1:uxu5UY2ovkuRPWKQ8Q7JG0JbSivrISjdPzZQKeo74mA=
+golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045 h1:Pn8fQdvx+z1avAi7fdM2kRYWQNxGlavNDSyzrQg2SsU=
+golang.org/x/arch v0.0.0-20181203225421-5a4828bb7045/go.mod h1:cYlCBUl1MsqxdiKgmc4uh7TxZfWSFLOGSRR090WDxt8=

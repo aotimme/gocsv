@@ -28,32 +28,34 @@ func (sub *TailSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *TailSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunTail(inputCsvs[0], outputCsv)
+}
+
+func (sub *TailSubcommand) RunTail(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
 	if !numRowsRegex.MatchString(sub.numRowsStr) {
 		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
 		os.Exit(1)
 	}
-
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	if strings.HasPrefix(sub.numRowsStr, "+") {
 		numRowsStr := strings.TrimPrefix(sub.numRowsStr, "+")
 		numRows, err := strconv.Atoi(numRowsStr)
 		if err != nil {
 			ExitWithError(err)
 		}
-		TailFromTop(inputCsvs[0], numRows)
+		TailFromTop(inputCsv, outputCsvWriter, numRows)
 	} else {
 		numRows, err := strconv.Atoi(sub.numRowsStr)
 		if err != nil {
 			ExitWithError(err)
 		}
-		TailFromBottom(inputCsvs[0], numRows)
+		TailFromBottom(inputCsv, outputCsvWriter, numRows)
 	}
 }
 
-func TailFromBottom(inputCsv *InputCsv, numRows int) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func TailFromBottom(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, numRows int) {
 	// Read all rows.
 	rows, err := inputCsv.ReadAll()
 	if err != nil {
@@ -61,7 +63,7 @@ func TailFromBottom(inputCsv *InputCsv, numRows int) {
 	}
 
 	// Write header.
-	outputCsv.Write(rows[0])
+	outputCsvWriter.Write(rows[0])
 
 	// Write rows.
 	startRow := len(rows) - numRows
@@ -69,19 +71,17 @@ func TailFromBottom(inputCsv *InputCsv, numRows int) {
 		startRow = 1
 	}
 	for i := startRow; i < len(rows); i++ {
-		outputCsv.Write(rows[i])
+		outputCsvWriter.Write(rows[i])
 	}
 }
 
-func TailFromTop(inputCsv *InputCsv, numRows int) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func TailFromTop(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, numRows int) {
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
 	}
-	outputCsv.Write(header)
+	outputCsvWriter.Write(header)
 
 	// Write rows after first `numRows` rows.
 	curRow := 0
@@ -96,7 +96,7 @@ func TailFromTop(inputCsv *InputCsv, numRows int) {
 		}
 		curRow++
 		if curRow > numRows {
-			outputCsv.Write(row)
+			outputCsvWriter.Write(row)
 		}
 	}
 }

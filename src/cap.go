@@ -29,14 +29,17 @@ func (sub *CapSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *CapSubcommand) Run(args []string) {
-	names := GetArrayFromCsvString(sub.namesString)
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	Cap(inputCsvs[0], names, sub.truncateNames, sub.defaultName)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunCap(inputCsvs[0], outputCsv)
 }
 
-func Cap(inputCsv *InputCsv, names []string, truncateNames bool, defaultName string) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+func (sub *CapSubcommand) RunCap(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
+	names := GetArrayFromCsvString(sub.namesString)
+	Cap(inputCsv, outputCsvWriter, names, sub.truncateNames, sub.defaultName)
+}
 
+func Cap(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, names []string, truncateNames bool, defaultName string) {
 	firstRow, err := inputCsv.Read()
 	if err != nil {
 		ExitWithError(err)
@@ -67,8 +70,8 @@ func Cap(inputCsv *InputCsv, names []string, truncateNames bool, defaultName str
 		}
 	}
 
-	outputCsv.Write(newHeader)
-	outputCsv.Write(firstRow)
+	outputCsvWriter.Write(newHeader)
+	outputCsvWriter.Write(firstRow)
 
 	// Write the rest of the rows.
 	for {
@@ -80,6 +83,6 @@ func Cap(inputCsv *InputCsv, names []string, truncateNames bool, defaultName str
 				ExitWithError(err)
 			}
 		}
-		outputCsv.Write(row)
+		outputCsvWriter.Write(row)
 	}
 }

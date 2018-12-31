@@ -33,21 +33,24 @@ func (sub *AddSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *AddSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	sub.RunAdd(inputCsvs[0], outputCsv)
+}
+
+func (sub *AddSubcommand) RunAdd(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	tmpl, err := template.New("template").Parse(sub.template)
 	if err != nil {
 		ExitWithError(err)
 	}
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	AddColumn(inputCsvs[0], tmpl, sub.name, sub.prepend)
-	err = inputCsvs[0].Close()
+	AddColumn(inputCsv, outputCsvWriter, tmpl, sub.name, sub.prepend)
+	err = inputCsv.Close()
 	if err != nil {
 		ExitWithError(err)
 	}
 }
 
-func AddColumn(inputCsv *InputCsv, tmpl *template.Template, name string, prepend bool) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func AddColumn(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, tmpl *template.Template, name string, prepend bool) {
 	// Read and write header.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -65,7 +68,7 @@ func AddColumn(inputCsv *InputCsv, tmpl *template.Template, name string, prepend
 		copy(shellRow, header)
 		shellRow[numInputColumns] = name
 	}
-	outputCsv.Write(shellRow)
+	outputCsvWriter.Write(shellRow)
 
 	// Create the holding map for the template data.
 	templateData := make(map[string]string)
@@ -105,6 +108,6 @@ func AddColumn(inputCsv *InputCsv, tmpl *template.Template, name string, prepend
 			copy(shellRow, row)
 			shellRow[numInputColumns] = newElem
 		}
-		outputCsv.Write(shellRow)
+		outputCsvWriter.Write(shellRow)
 	}
 }

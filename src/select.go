@@ -28,23 +28,26 @@ func (sub *SelectSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *SelectSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	sub.RunSelect(inputCsvs[0], outputCsv)
+}
+
+func (sub *SelectSubcommand) RunSelect(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	if sub.columnsString == "" {
 		fmt.Fprintln(os.Stderr, "Missing required argument --columns")
 		os.Exit(1)
 	}
 	columns := GetArrayFromCsvString(sub.columnsString)
 
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	if sub.exclude {
-		ExcludeColumns(inputCsvs[0], columns)
+		ExcludeColumns(inputCsv, outputCsvWriter, columns)
 	} else {
-		SelectColumns(inputCsvs[0], columns)
+		SelectColumns(inputCsv, outputCsvWriter, columns)
 	}
 }
 
-func ExcludeColumns(inputCsv *InputCsv, columns []string) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func ExcludeColumns(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, columns []string) {
 	// Get the column indices to exclude.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -68,7 +71,7 @@ func ExcludeColumns(inputCsv *InputCsv, columns []string) {
 		}
 	}
 
-	outputCsv.Write(outrow)
+	outputCsvWriter.Write(outrow)
 
 	for {
 		row, err := inputCsv.Read()
@@ -87,13 +90,11 @@ func ExcludeColumns(inputCsv *InputCsv, columns []string) {
 				curIdx++
 			}
 		}
-		outputCsv.Write(outrow)
+		outputCsvWriter.Write(outrow)
 	}
 }
 
-func SelectColumns(inputCsv *InputCsv, columns []string) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func SelectColumns(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, columns []string) {
 	// Get the column indices to write.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -104,7 +105,7 @@ func SelectColumns(inputCsv *InputCsv, columns []string) {
 	for i, columnIndex := range columnIndices {
 		outrow[i] = header[columnIndex]
 	}
-	outputCsv.Write(outrow)
+	outputCsvWriter.Write(outrow)
 
 	for {
 		row, err := inputCsv.Read()
@@ -118,6 +119,6 @@ func SelectColumns(inputCsv *InputCsv, columns []string) {
 		for i, columnIndex := range columnIndices {
 			outrow[i] = row[columnIndex]
 		}
-		outputCsv.Write(outrow)
+		outputCsvWriter.Write(outrow)
 	}
 }

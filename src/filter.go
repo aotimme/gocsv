@@ -1,10 +1,9 @@
 package main
 
 import (
+	"errors"
 	"flag"
-	"fmt"
 	"io"
-	"os"
 	"regexp"
 	"strconv"
 )
@@ -46,6 +45,12 @@ func (sub *FilterSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *FilterSubcommand) Run(args []string) {
+	inputCsvs := GetInputCsvsOrPanic(args, 1)
+	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	sub.RunFilter(inputCsvs[0], outputCsv)
+}
+
+func (sub *FilterSubcommand) RunFilter(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
 	// Get columns to compare against
 	var columns []string
 	if sub.columnsString == "" {
@@ -97,8 +102,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 				return elemDate.After(gt)
 			}
 		} else {
-			fmt.Fprintln(os.Stderr, "Invalid argument for -gt")
-			os.Exit(1)
+			ExitWithError(errors.New("Invalid argument for -gt"))
 		}
 	} else if sub.gteStr != "" {
 		if IsFloatType(sub.gteStr) {
@@ -126,8 +130,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 				return elemDate.Equal(gte) || elemDate.After(gte)
 			}
 		} else {
-			fmt.Fprintln(os.Stderr, "Invalid argument for -gte")
-			os.Exit(1)
+			ExitWithError(errors.New("Invalid argument for -gte"))
 		}
 	} else if sub.ltStr != "" {
 		if IsFloatType(sub.ltStr) {
@@ -155,8 +158,7 @@ func (sub *FilterSubcommand) Run(args []string) {
 				return elemDate.Before(lt)
 			}
 		} else {
-			fmt.Fprintln(os.Stderr, "Invalid argument for -lt")
-			os.Exit(1)
+			ExitWithError(errors.New("Invalid argument for -lt"))
 		}
 	} else if sub.lteStr != "" {
 		if IsFloatType(sub.lteStr) {
@@ -184,21 +186,15 @@ func (sub *FilterSubcommand) Run(args []string) {
 				return elemDate.Equal(lte) || elemDate.Before(lte)
 			}
 		} else {
-			fmt.Fprintln(os.Stderr, "Invalid argument for -lte")
-			os.Exit(1)
+			ExitWithError(errors.New("Invalid argument for -lte"))
 		}
 	} else {
-		fmt.Fprintln(os.Stderr, "Missing filter function")
-		os.Exit(1)
+		ExitWithError(errors.New("Missing filter function"))
 	}
-
-	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	FilterMatchFunc(inputCsvs[0], columns, sub.exclude, matchFunc)
+	FilterMatchFunc(inputCsv, outputCsvWriter, columns, sub.exclude, matchFunc)
 }
 
-func FilterMatchFunc(inputCsv *InputCsv, columns []string, exclude bool, matchFunc func(string) bool) {
-	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-
+func FilterMatchFunc(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter, columns []string, exclude bool, matchFunc func(string) bool) {
 	// Read header to get column index and write.
 	header, err := inputCsv.Read()
 	if err != nil {
@@ -209,7 +205,7 @@ func FilterMatchFunc(inputCsv *InputCsv, columns []string, exclude bool, matchFu
 	// If no columns are specified, then check against all.
 	columnIndices := GetIndicesForColumnsOrPanic(header, columns)
 
-	outputCsv.Write(header)
+	outputCsvWriter.Write(header)
 
 	// Write filtered rows.
 	for {
@@ -230,7 +226,7 @@ func FilterMatchFunc(inputCsv *InputCsv, columns []string, exclude bool, matchFu
 		}
 		shouldOutputRow := (!exclude && rowMatches) || (exclude && !rowMatches)
 		if shouldOutputRow {
-			outputCsv.Write(row)
+			outputCsvWriter.Write(row)
 		}
 	}
 }
