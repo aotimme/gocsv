@@ -1,6 +1,7 @@
 BIN_DIR=bin
 DIST_DIR=dist
-SRC_DIR=src
+CMD_DIR=cmd
+CSV_DIR=csv
 EXECUTABLE=gocsv
 
 .DEFAULT_GOAL := bin
@@ -13,7 +14,8 @@ tag:
 	bash scripts/update-latest-tag.sh
 
 test:
-	cd $(SRC_DIR) && go test -cover
+	cd $(CMD_DIR) && GO111MODULE=on go test -cover
+	cd $(CSV_DIR) && GO111MODULE=on go test -cover
 
 bin:
 	bash scripts/build-bin.sh
