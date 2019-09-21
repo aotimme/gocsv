@@ -49,6 +49,7 @@ Subcommands:
 - [stack](#stack) - Stack multiple CSVs into one CSV.
 - [stats](#stats) - Get some basic statistics on a CSV.
 - [tail](#tail) - Extract the last _N_ rows from a CSV.
+- [transpose](#transpose) - Transpose a CSV.
 - [tsv](#tsv) - Transform a CSV into a TSV.
 - [unique](#unique) (alias: `uniq`) - Extract unique rows based upon certain columns.
 - [view](#view) - Display a CSV in a pretty tabular format.
@@ -463,6 +464,16 @@ Arguments:
 
 - `-n` (optional) The number of rows to extract. If `N` is an integer, it will extract the last _N_ rows. If `N` is prepended with `+`, it will extract all except the first _N_ rows.
 
+### tranpose
+
+Transpose a CSV.
+
+Usage:
+
+```shell
+gocsv tranpose FILE
+```
+
 ### tsv
 
 Transform a CSV into a TSV. It is shortand for `gocsv delim -o "\t" FILE`. This can very useful if you want to pipe the result to `pbcopy` (OS X) in order to paste it into a spreadsheet tool.
@@ -615,6 +626,7 @@ cat test-files/left-table.csv \
 | stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
 | stats         |  &#x2714;           |   N/A    |
 | tail          |  &#x2714;           | &#x2714; |
+| transpose     |  &#x2714;           | &#x2714; |
 | tsv           |  &#x2714;           | &#x2714; |
 | unique        |  &#x2714;           | &#x2714; |
 | view          |  &#x2714;           |   N/A    |

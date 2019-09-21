@@ -55,6 +55,7 @@ func init() {
 	RegisterSubcommand(&StackSubcommand{})
 	RegisterSubcommand(&StatsSubcommand{})
 	RegisterSubcommand(&TailSubcommand{})
+	RegisterSubcommand(&TransposeSubcommand{})
 	RegisterSubcommand(&TsvSubcommand{})
 	RegisterSubcommand(&UniqueSubcommand{})
 	RegisterSubcommand(&ViewSubcommand{})
