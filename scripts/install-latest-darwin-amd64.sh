@@ -3,8 +3,7 @@
 BINARY_DIRNAME="gocsv-darwin-amd64"
 ZIP_FILENAME="${BINARY_DIRNAME}.zip"
 ZIP_URL="https://github.com/DataFoxCo/gocsv/releases/download/latest/${ZIP_FILENAME}"
-RAND=`date +%s | shasum | base64 | head -c 32; echo;`
-TMP_DIR=/tmp/${RAND}
+TMP_DIR=$(mktemp -d)
 INSTALL_DIR="/usr/local/bin"
 INSTALL_LOCATION="${INSTALL_DIR}/gocsv"
 
