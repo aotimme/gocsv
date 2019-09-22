@@ -464,7 +464,7 @@ Arguments:
 
 - `-n` (optional) The number of rows to extract. If `N` is an integer, it will extract the last _N_ rows. If `N` is prepended with `+`, it will extract all except the first _N_ rows.
 
-### tranpose
+### transpose
 
 Transpose a CSV.
 
