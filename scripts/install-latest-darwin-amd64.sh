@@ -33,7 +33,6 @@ fi
 mark_pass
 
 echo -n "Fetching binary... "
-mkdir ${TMP_DIR}
 ZIP_ACTUAL_URL=`curl -s -I ${ZIP_URL} | grep "^Location: " | sed -n -e 's/^Location: //p' | tr -d '\r\n'`
 curl -s ${ZIP_ACTUAL_URL} > ${TMP_DIR}/${ZIP_FILENAME}
 mark_pass
