@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx/v2"
 )
 
 type XlsxSubcommand struct {
