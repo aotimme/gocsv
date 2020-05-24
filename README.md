@@ -5,7 +5,7 @@ Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io
 To install on Apple OS X, open a Terminal window and run
 
 ```shell
-curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install-latest-darwin-amd64.sh | bash
+curl -s https://raw.githubusercontent.com/aotimme/gocsv/latest/scripts/install-latest-darwin-amd64.sh | bash
 ```
 
 ### Table of Contents
@@ -725,7 +725,7 @@ To enable debugging mode when running a `gocsv` command, specify the `--debug` c
 
 ## Installation
 
-For the latest pre-built binaries, see the [Latest Release](https://github.com/DataFoxCo/gocsv/releases/tag/latest) page.
+For the latest pre-built binaries, see the [Latest Release](https://github.com/aotimme/gocsv/releases/tag/latest) page.
 
 ### Apple OS X
 
@@ -734,7 +734,7 @@ For the latest pre-built binaries, see the [Latest Release](https://github.com/D
 Open a Terminal window and paste the following command:
 
 ```shell
-/bin/bash <(curl -s https://raw.githubusercontent.com/DataFoxCo/gocsv/latest/scripts/install-latest-darwin-amd64.sh)
+/bin/bash <(curl -s https://raw.githubusercontent.com/aotimme/gocsv/latest/scripts/install-latest-darwin-amd64.sh)
 ```
 
 This will install `gocsv` at `/usr/local/bin/gocsv`.

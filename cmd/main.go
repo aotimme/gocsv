@@ -83,7 +83,7 @@ func usage() string {
 	for _, subcommand := range subcommands {
 		usage += usageForSubcommand(subcommand)
 	}
-	usage += "See https://github.com/DataFoxCo/gocsv for more documentation."
+	usage += "See https://github.com/aotimme/gocsv for more documentation."
 	return usage
 }
 

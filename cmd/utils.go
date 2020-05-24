@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/DataFoxCo/gocsv/csv"
+	"github.com/aotimme/gocsv/csv"
 )
 
 const (

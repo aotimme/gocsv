@@ -5,7 +5,7 @@ EXECUTABLE=gocsv
 
 GIT_HASH=$(git rev-parse HEAD)
 VERSION=$(cat VERSION)
-LD_FLAGS="-X github.com/DataFoxCo/gocsv/cmd.VERSION=${VERSION} -X github.com/DataFoxCo/gocsv/cmd.GIT_HASH=${GIT_HASH}"
+LD_FLAGS="-X github.com/aotimme/gocsv/cmd.VERSION=${VERSION} -X github.com/aotimme/gocsv/cmd.GIT_HASH=${GIT_HASH}"
 
 rm -rf ${DIST_DIR}
 mkdir ${DIST_DIR}
