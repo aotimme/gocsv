@@ -8,6 +8,7 @@ import (
 
 type SortSubcommand struct {
 	columnsString string
+	stable        bool
 	reverse       bool
 	noInference   bool
 }
@@ -24,6 +25,7 @@ func (sub *SortSubcommand) Description() string {
 func (sub *SortSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.StringVar(&sub.columnsString, "columns", "", "Columns to select")
 	fs.StringVar(&sub.columnsString, "c", "", "Columns to select (shorthand)")
+	fs.BoolVar(&sub.stable, "stable", false, "Sort stably")
 	fs.BoolVar(&sub.reverse, "reverse", false, "Sort in reverse")
 	fs.BoolVar(&sub.noInference, "no-inference", false, "Skip inference of input")
 }
@@ -51,7 +53,7 @@ func (sub *SortSubcommand) SortCsv(inputCsv *InputCsv, outputCsvWriter OutputCsv
 			columnTypes[i] = imc.InferType(columnIndex)
 		}
 	}
-	imc.SortRows(columnIndices, columnTypes, sub.reverse)
+	imc.SortRows(columnIndices, columnTypes, sub.stable, sub.reverse)
 
 	// Write header.
 	outputCsvWriter.Write(imc.header)
