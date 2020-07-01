@@ -16,13 +16,13 @@ func TestSortCsv(t *testing.T) {
 			[]string{"Number", "String"},
 			[]string{"-1", "Minus One"},
 			[]string{"1", "One"},
-			[]string{"2", "Another Two"},
 			[]string{"2", "Two"},
+			[]string{"2", "Another Two"},
 		}},
 		{"Number", true, false, [][]string{
 			[]string{"Number", "String"},
-			[]string{"2", "Another Two"},
 			[]string{"2", "Two"},
+			[]string{"2", "Another Two"},
 			[]string{"1", "One"},
 			[]string{"-1", "Minus One"},
 		}},
@@ -30,13 +30,13 @@ func TestSortCsv(t *testing.T) {
 			[]string{"Number", "String"},
 			[]string{"-1", "Minus One"},
 			[]string{"1", "One"},
-			[]string{"2", "Another Two"},
 			[]string{"2", "Two"},
+			[]string{"2", "Another Two"},
 		}},
 		{"Number", true, true, [][]string{
 			[]string{"Number", "String"},
-			[]string{"2", "Another Two"},
 			[]string{"2", "Two"},
+			[]string{"2", "Another Two"},
 			[]string{"1", "One"},
 			[]string{"-1", "Minus One"},
 		}},
@@ -64,6 +64,7 @@ func TestSortCsv(t *testing.T) {
 			toc := new(testOutputCsv)
 			sub := new(SortSubcommand)
 			sub.columnsString = tt.columns
+			sub.stable = true
 			sub.reverse = tt.reverse
 			sub.noInference = tt.noInference
 			sub.SortCsv(ic, toc)

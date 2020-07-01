@@ -373,14 +373,17 @@ Sort a CSV by multiple columns, with or without type inference. The currently su
 Usage:
 
 ```shell
-gocsv sort --columns COLUMNS [--reverse] [--no-inference] FILE
+gocsv sort --columns COLUMNS [--stable] [--reverse] [--no-inference] FILE
 ```
 
 Arguments:
 
 - `--columns` (shorthand `-c`) A comma-separated list (in order) of the columns to sort against. See [Specifying Columns](#specifying-columns) for more details.
+- `--stable` (optional) Keep the original order of equal rows while sorting.
 - `--reverse` (optional) Reverse the order of sorting. By default the sort order is ascending.
 - `--no-inference` (optional) Skip type inference when sorting.
+
+When `--stable` and `--reverse` are both specified, the original order of equal rows is preserved (and not reversed).
 
 ### split
 

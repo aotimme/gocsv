@@ -161,12 +161,16 @@ type RowSorter struct {
 	by   func(r1, r2 *[]string) bool
 }
 
-func (by SortRowsBy) Sort(rows [][]string, reverse bool) {
+func (by SortRowsBy) Sort(rows [][]string, stable bool, reverse bool) {
 	rs := &RowSorter{rows: rows, by: by}
+	var sortFunc = sort.Sort
+	if stable {
+		sortFunc = sort.Stable
+	}
 	if reverse {
-		sort.Sort(sort.Reverse(rs))
+		sortFunc(sort.Reverse(rs))
 	} else {
-		sort.Sort(rs)
+		sortFunc(rs)
 	}
 }
 func (rs *RowSorter) Len() int {

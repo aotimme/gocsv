@@ -85,7 +85,7 @@ func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
 	return curType
 }
 
-func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, reverse bool) {
+func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, stable bool, reverse bool) {
 	isLessFunc := func(row1Ptr, row2Ptr *[]string) bool {
 		row1 := *row1Ptr
 		row2 := *row2Ptr
@@ -144,10 +144,10 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
 				}
 			}
 		}
-		return true
+		return false // all values to sort by are equal (hence, not 'less')
 	}
 
-	SortRowsBy(isLessFunc).Sort(imc.rows, reverse)
+	SortRowsBy(isLessFunc).Sort(imc.rows, stable, reverse)
 }
 
 func (imc *InMemoryCsv) SampleRowIndicesWithReplacement(numRows, seed int) []int {
