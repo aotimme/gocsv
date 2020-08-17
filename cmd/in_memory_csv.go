@@ -636,7 +636,7 @@ func (scs *StringColumnStats) CalculateAllStats() {
 }
 
 func (scs *StringColumnStats) CalculateMaxLength() {
-	scs.maxLength = math.MinInt64
+	scs.maxLength = -1
 	for _, elem := range scs.array {
 		if len(elem) > scs.maxLength {
 			scs.maxLength = len(elem)
