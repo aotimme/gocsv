@@ -8,4 +8,5 @@ replace (
 require (
 	github.com/aotimme/gocsv/cmd v0.0.0
 	github.com/aotimme/gocsv/csv v0.0.0
+	github.com/tealeg/xlsx v1.0.5
 )
