@@ -92,7 +92,7 @@ gocsv add -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
 
 GoCSV has been loaded with utility functions from [Sprig](https://github.com/Masterminds/sprig). This will help you to perform wide range of text manipulation on your template on top of built-in Go template functionalities.
 
-Here is an example of how tp add a new column of extacting hashtags using RegEx (RE2), sort, remove duplicates and then join with comma seperated from an existing column:
+Here is an example of how to add a new column of extracting hashtags using [RegEx (RE2)](https://github.com/google/re2/wiki/Syntax), sort, remove duplicates and then join with comma seperated from an existing column:
 
 ```shell
 gocsv add -t '{{ regexFindAll "#[\\w\\-]+" .Comments -1 | sortAlpha | uniq | join ", " }}' --name 'Hashtags'
@@ -100,7 +100,7 @@ gocsv add -t '{{ regexFindAll "#[\\w\\-]+" .Comments -1 | sortAlpha | uniq | joi
 
 For further reference on the options available for text manipulation see [Sprig documentation](http://masterminds.github.io/sprig/).
 
-> **TIP:** You will have to take note that Regular Experessions need to be escaped.
+> **TIP:** You will have to take note that Regular Expressions need to be escaped.
 
 ### autoincrement
 
