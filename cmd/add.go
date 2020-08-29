@@ -5,7 +5,8 @@ import (
 	"flag"
 	"io"
 	"strconv"
-	"text/template"
+	"html/template"
+	"github.com/Masterminds/sprig"
 )
 
 type AddSubcommand struct {
@@ -39,7 +40,7 @@ func (sub *AddSubcommand) Run(args []string) {
 }
 
 func (sub *AddSubcommand) RunAdd(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
-	tmpl, err := template.New("template").Parse(sub.template)
+	tmpl, err := template.New("template").Funcs(sprig.FuncMap()).Parse(sub.template)
 	if err != nil {
 		ExitWithError(err)
 	}
