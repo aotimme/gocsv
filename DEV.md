@@ -25,6 +25,6 @@ To release an update to `gocsv`, make sure you have committed and pushed the mos
    make dist
    ```
 
-   This will create zip files in the `dist` directory holding the `gocsv` binaries for Linux, Unix, and Windows.
+   This will create zip files in the `dist` directory holding the `gocsv` binaries for various platforms and architectures. It relies on [xgo](https://github.com/karalabe/xgo) to faithfully cross-compile.
 
 3. Upload the newly created distribution binaries to the [Latest Release](https://github.com/aotimme/gocsv/releases/tag/latest) page. You will need to [edit](https://github.com/aotimme/gocsv/releases/edit/latest) the release, remove the existing zip files, and upload the recently created zip files in `dist/`.
