@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -184,8 +184,8 @@ func (rs *RowSorter) Less(i, j int) bool {
 }
 
 func GetBaseFilenameWithoutExtension(filename string) string {
-	baseFilename := path.Base(filename)
-	extension := path.Ext(baseFilename)
+	baseFilename := filepath.Base(filename)
+	extension := filepath.Ext(baseFilename)
 	return strings.TrimSuffix(baseFilename, extension)
 }
 
