@@ -792,4 +792,4 @@ You should see the `gocsv` help message.
 
 ### Windows
 
-Download `gocsv-windows-4.0-amd64.zip`. Then good luck.
+Download `gocsv-windows-4.0-amd64.zip`. Unzip the file and you should see a file `gocsv.exe`. Put that executable in the appropriate location and it should work.
