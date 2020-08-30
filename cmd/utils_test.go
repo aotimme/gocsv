@@ -57,3 +57,25 @@ func TestGetBaseFilenameWithoutExtension(t *testing.T) {
 		})
 	}
 }
+
+func TestGetDelimiterFromString(t *testing.T) {
+	testCases := []struct {
+		delimiter string
+		comma     rune
+	}{
+		{",", ','},
+		{";", ';'},
+		{"\\t", '\t'},
+		{"", rune(0)},
+		{"|", '|'},
+		{"lolcats", 'l'},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.delimiter, func(t *testing.T) {
+			delimiterRune := GetDelimiterFromString(tt.delimiter)
+			if delimiterRune != tt.comma {
+				t.Errorf("Expected \"%#U\" but got \"%#U\"", tt.comma, delimiterRune)
+			}
+		})
+	}
+}

@@ -3,7 +3,6 @@ package cmd
 import (
 	"flag"
 	"io"
-	"unicode/utf8"
 )
 
 type DelimiterSubcommand struct {
@@ -33,22 +32,18 @@ func (sub *DelimiterSubcommand) Run(args []string) {
 }
 
 func ChangeDelimiter(inputCsv *InputCsv, inputDelimiter, outputDelimiter string) {
-	if inputDelimiter == "\\t" {
-		inputCsv.SetDelimiter('\t')
-	} else if len(inputDelimiter) > 0 {
-		delimiterRune, _ := utf8.DecodeRuneInString(inputDelimiter)
-		inputCsv.SetDelimiter(delimiterRune)
+	inputDelimiterRune := GetDelimiterFromString(inputDelimiter)
+	if inputDelimiterRune != rune(0) {
+		inputCsv.SetDelimiter(inputDelimiterRune)
 	}
 	// Be lenient when reading in the file.
 	inputCsv.SetFieldsPerRecord(-1)
 	inputCsv.SetLazyQuotes(true)
 
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-	if outputDelimiter == "\\t" {
-		outputCsv.SetDelimiter('\t')
-	} else if len(outputDelimiter) > 0 {
-		delimiterRune, _ := utf8.DecodeRuneInString(outputDelimiter)
-		outputCsv.SetDelimiter(delimiterRune)
+	outputDelimiterRune := GetDelimiterFromString(outputDelimiter)
+	if outputDelimiterRune != rune(0) {
+		outputCsv.SetDelimiter(outputDelimiterRune)
 	}
 
 	// Write all rows with tabs.

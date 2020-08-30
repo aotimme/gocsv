@@ -30,6 +30,10 @@ func NewInputCsv(filename string) (ic *InputCsv, err error) {
 	}
 	ic.bufReader = bufio.NewReader(ic.file)
 	ic.reader = csv.NewReader(ic.bufReader)
+	delimiter := os.Getenv("GOCSV_DELIMITER")
+	if delimiter != "" {
+		ic.reader.Comma = GetDelimiterFromString(delimiter)
+	}
 	err = ic.handleBom()
 	return
 }
