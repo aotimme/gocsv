@@ -792,4 +792,4 @@ You should see the `gocsv` help message.
 
 ### Windows
 
-Download `gocsv-windows-amd64.zip`. Then good luck.
+Download `gocsv-windows-4.0-amd64.zip`. Then good luck.
