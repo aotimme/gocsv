@@ -738,7 +738,7 @@ To enable debugging mode when running a `gocsv` command, specify the `--debug` c
 
 ## Installation
 
-For the latest pre-built binaries, see the [Latest Release](https://github.com/aotimme/gocsv/releases/tag/latest) page.
+For the latest pre-built binaries, cross-compiled using [xgo](https://github.com/karalabe/xgo), see the [Latest Release](https://github.com/aotimme/gocsv/releases/tag/latest) page.
 
 ### Apple OS X
 
@@ -754,13 +754,13 @@ This will install `gocsv` at `/usr/local/bin/gocsv`.
 
 #### Detailed Version
 
-To install the pre-built binary for Apple OS X, download the `gocsv-darwin-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
+To install the pre-built binary for Apple OS X, download the `gocsv-darwin-10.6-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
 
 ```shell
 cd ~/Downloads
-unzip gocsv-darwin-amd64.zip
-mv gocsv-darwin-amd64/gocsv /usr/local/bin
-rmdir gocsv-darwin-amd64
+unzip gocsv-darwin-10.6-amd64.zip
+mv gocsv-darwin-10.6-amd64/gocsv /usr/local/bin
+rmdir gocsv-darwin-10.6-amd64
 ```
 
 To verify that it has installed, open a _new_ Terminal window and run
