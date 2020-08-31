@@ -2,7 +2,7 @@
 
 ## Development
 
-After cloning this repository, set up the pre-commit hook to ensure proper formatting of the Go code:
+After cloning this repository, set up the pre-commit hook to ensure proper formatting of the Go code and the `go.mod` and `go.sum` files:
 ```shell
 ln -s ../../git-hooks/pre-commit .git/hooks/pre-commit
 ```
