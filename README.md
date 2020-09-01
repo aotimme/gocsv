@@ -15,6 +15,7 @@ curl -s https://raw.githubusercontent.com/aotimme/gocsv/latest/scripts/install-l
 - [Specifying Columns](#specifying-columns)
 - [Regular Expression Syntax](#regular-expression-syntax)
 - [Pipelining](#pipelining)
+- [Changing the Default Delimiter](#changing-the-default-delimiter)
 - [Examples](#examples)
 - [Debugging](#debugging)
 - [Installation](#installation)
@@ -650,6 +651,24 @@ cat test-files/left-table.csv \
 &#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
 
 &#x2021; `xlsx` sends output to standard out when using the `--sheet` flag.
+
+## Changing the Default Delimiter
+
+While `gocsv` generally assumes standard CSVs (per [RFC 4180](https://tools.ietf.org/html/rfc4180)), you can specify a default delimiter other than `,` using the `GOCSV_DELIMITER` environment variable.
+
+For example, to use semicolon-delimited files:
+
+```shell
+export GOCSV_DELIMITER=";"
+gocsv select -c 1 semicolon-delimited.scsv
+```
+
+Or, to use tab-delimited files (TSVs):
+
+```shell
+export GOCSV_DELIMITER="\t"
+gocsv select -c 1 tab-delimited.tsv
+```
 
 ## Examples
 
