@@ -13,10 +13,11 @@ When developing, you can build a local version of the `gocsv` binary via running
 
 To release an update to `gocsv`, make sure you have committed and pushed the most recent commit on master. Then:
 
-1. Tag the latest commit as "latest".
+1. Tag the latest commit following [semantic versioning](https://semver.org) and push the tag.
 
    ```shell
-   make tag
+   git tag -a v1.2.3 -m "Release v1.2.3"
+   git push origin v1.2.3
    ```
 
 
@@ -27,6 +28,6 @@ To release an update to `gocsv`, make sure you have committed and pushed the mos
    make dist
    ```
 
-   This will create zip files in the `dist` directory holding the `gocsv` binaries for various platforms and architectures.
+   This will create zip files in the `dist` directory holding the `gocsv` binaries for various platforms and architectures. The version to be returned by `gocsv version` is derived from the Git tag, so make sure to only run this after having carried out step 1.
 
-3. Upload the newly created distribution binaries to the [Latest Release](https://github.com/aotimme/gocsv/releases/tag/latest) page. You will need to [edit](https://github.com/aotimme/gocsv/releases/edit/latest) the release, remove the existing zip files, and upload the recently created zip files in `dist/`.
+3. Navigate to the [Releases page](https://github.com/aotimme/gocsv/releases) and draft a new release. Upload the newly created distribution binaries (zip files in `dist/`) by dropping them on the page.

@@ -2,7 +2,7 @@
 
 BINARY_DIRNAME="gocsv-darwin-10.6-amd64"
 ZIP_FILENAME="${BINARY_DIRNAME}.zip"
-ZIP_URL="https://github.com/aotimme/gocsv/releases/download/latest/${ZIP_FILENAME}"
+ZIP_URL="https://github.com/aotimme/gocsv/releases/latest/download/${ZIP_FILENAME}"
 TMP_DIR=$(mktemp -d)
 INSTALL_DIR="/usr/local/bin"
 INSTALL_LOCATION="${INSTALL_DIR}/gocsv"

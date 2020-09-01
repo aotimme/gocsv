@@ -738,7 +738,7 @@ To enable debugging mode when running a `gocsv` command, specify the `--debug` c
 
 ## Installation
 
-For the latest pre-built binaries, cross-compiled using [xgo](https://github.com/karalabe/xgo), see the [Latest Release](https://github.com/aotimme/gocsv/releases/tag/latest) page.
+For the latest pre-built binaries, cross-compiled using [xgo](https://github.com/karalabe/xgo), see the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page.
 
 ### Apple OS X
 
@@ -747,7 +747,7 @@ For the latest pre-built binaries, cross-compiled using [xgo](https://github.com
 Open a Terminal window and paste the following command:
 
 ```shell
-/bin/bash <(curl -s https://raw.githubusercontent.com/aotimme/gocsv/latest/scripts/install-latest-darwin-amd64.sh)
+/bin/bash <(curl -s https://raw.githubusercontent.com/aotimme/gocsv/master/scripts/install-latest-darwin-amd64.sh)
 ```
 
 This will install `gocsv` at `/usr/local/bin/gocsv`.

@@ -10,9 +10,6 @@ EXECUTABLE=gocsv
 dist:
 	bash scripts/build-dist.sh
 
-tag:
-	bash scripts/update-latest-tag.sh
-
 test:
 	cd $(CMD_DIR) && GO111MODULE=on go test -cover
 	cd $(CSV_DIR) && GO111MODULE=on go test -cover
