@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/aotimme/gocsv/csv"
 )
@@ -16,6 +17,16 @@ const (
 	BOM_STRING    = "\uFEFF"
 	NUM_BOM_BYTES = 3
 )
+
+func GetDelimiterFromString(delimiter string) rune {
+	if delimiter == "\\t" {
+		return '\t'
+	} else if len(delimiter) > 0 {
+		delimiterRune, _ := utf8.DecodeRuneInString(delimiter)
+		return delimiterRune
+	}
+	return rune(0)
+}
 
 // GetIndicesForColumnsOrPanic is a simple wrapper around GetIndicesForColumns
 // that will simply panic if GetIndicesForColumns returns an error.
