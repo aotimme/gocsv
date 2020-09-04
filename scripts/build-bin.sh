@@ -4,7 +4,7 @@ BIN_DIR=$(pwd)/bin
 EXECUTABLE=gocsv
 
 GIT_HASH=$(git rev-parse HEAD)
-VERSION=$(cat VERSION)
+VERSION=$(git describe --tags HEAD)
 LD_FLAGS="-X github.com/aotimme/gocsv/cmd.VERSION=${VERSION} -X github.com/aotimme/gocsv/cmd.GIT_HASH=${GIT_HASH}"
 
 rm -rf ${BIN_DIR}

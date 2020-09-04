@@ -3,10 +3,11 @@ package cmd
 import (
 	"bytes"
 	"flag"
+	"html/template"
 	"io"
 	"strconv"
-	"html/template"
-	"github.com/Masterminds/sprig"
+
+	"github.com/Masterminds/sprig/v3"
 )
 
 type AddSubcommand struct {
