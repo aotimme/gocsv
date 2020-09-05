@@ -1,12 +1,14 @@
 # GoCSV
 
-Command line CSV processing tool based on [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive. And written in Go.
+Command line CSV processing tool inspired by [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive. And written in Go.
 
 To install on Apple OS X, open a Terminal window and run
 
 ```shell
-curl -s https://raw.githubusercontent.com/aotimme/gocsv/latest/scripts/install-latest-darwin-amd64.sh | bash
+/bin/bash <(curl -s https://raw.githubusercontent.com/aotimme/gocsv/master/scripts/install-latest-darwin-amd64.sh)
 ```
+
+For other platforms, see the [Installation](#installation) section.
 
 ### Table of Contents
 
