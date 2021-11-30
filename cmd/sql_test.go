@@ -11,20 +11,20 @@ func TestRunSql(t *testing.T) {
 		rows        [][]string
 	}{
 		{"SELECT * FROM [simple-sort] WHERE [Number] > 0", [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
-			[]string{"2", "Two"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"2", "Two"},
+			{"2", "Another Two"},
 		}},
 		{"SELECT SUM([Number]) AS Total FROM [simple-sort]", [][]string{
-			[]string{"Total"},
-			[]string{"4"},
+			{"Total"},
+			{"4"},
 		}},
 		{"SELECT [Number], COUNT(*) AS Count FROM [simple-sort] GROUP BY [Number] ORDER BY [Number] ASC", [][]string{
-			[]string{"Number", "Count"},
-			[]string{"-1", "1"},
-			[]string{"1", "1"},
-			[]string{"2", "2"},
+			{"Number", "Count"},
+			{"-1", "1"},
+			{"1", "1"},
+			{"2", "2"},
 		}},
 	}
 	for i, tt := range testCases {

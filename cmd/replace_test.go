@@ -14,18 +14,18 @@ func TestRunReplace(t *testing.T) {
 		rows            [][]string
 	}{
 		{"String", "Two", "Dos", false, [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
-			[]string{"2", "Dos"},
-			[]string{"-1", "Minus One"},
-			[]string{"2", "Another Dos"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"2", "Dos"},
+			{"-1", "Minus One"},
+			{"2", "Another Dos"},
 		}},
 		{"String", "^one", "UNO", true, [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "UNO"},
-			[]string{"2", "Two"},
-			[]string{"-1", "Minus One"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"1", "UNO"},
+			{"2", "Two"},
+			{"-1", "Minus One"},
+			{"2", "Another Two"},
 		}},
 	}
 	for i, tt := range testCases {

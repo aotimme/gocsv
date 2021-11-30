@@ -12,25 +12,25 @@ func TestRunSelect(t *testing.T) {
 		rows          [][]string
 	}{
 		{"String", false, [][]string{
-			[]string{"String"},
-			[]string{"One"},
-			[]string{"Two"},
-			[]string{"Minus One"},
-			[]string{"Another Two"},
+			{"String"},
+			{"One"},
+			{"Two"},
+			{"Minus One"},
+			{"Another Two"},
 		}},
 		{"Number", true, [][]string{
-			[]string{"String"},
-			[]string{"One"},
-			[]string{"Two"},
-			[]string{"Minus One"},
-			[]string{"Another Two"},
+			{"String"},
+			{"One"},
+			{"Two"},
+			{"Minus One"},
+			{"Another Two"},
 		}},
 		{"String,Number", false, [][]string{
-			[]string{"String", "Number"},
-			[]string{"One", "1"},
-			[]string{"Two", "2"},
-			[]string{"Minus One", "-1"},
-			[]string{"Another Two", "2"},
+			{"String", "Number"},
+			{"One", "1"},
+			{"Two", "2"},
+			{"Minus One", "-1"},
+			{"Another Two", "2"},
 		}},
 	}
 	for i, tt := range testCases {

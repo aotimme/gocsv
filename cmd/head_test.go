@@ -11,24 +11,24 @@ func TestRunHead(t *testing.T) {
 		rows       [][]string
 	}{
 		{"1", [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
+			{"Number", "String"},
+			{"1", "One"},
 		}},
 		{"0", [][]string{
-			[]string{"Number", "String"},
+			{"Number", "String"},
 		}},
 		{"+1", [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
-			[]string{"2", "Two"},
-			[]string{"-1", "Minus One"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"2", "Two"},
+			{"-1", "Minus One"},
 		}},
 		{"1000", [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
-			[]string{"2", "Two"},
-			[]string{"-1", "Minus One"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"2", "Two"},
+			{"-1", "Minus One"},
+			{"2", "Another Two"},
 		}},
 	}
 	for i, tt := range testCases {

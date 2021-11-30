@@ -130,7 +130,7 @@ func getCellWidth(cell string, maxLines int) int {
 func printRow(row []string, columnWidths []int, maxLines int) {
 	rowHeight := getRowHeight(row, maxLines)
 	outrowLines := make([][]string, rowHeight)
-	for i, _ := range outrowLines {
+	for i := range outrowLines {
 		outrowLines[i] = make([]string, len(row))
 	}
 	copyTruncatedAndPaddedCellToOutputRow(outrowLines, row, columnWidths)
