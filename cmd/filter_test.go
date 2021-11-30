@@ -20,44 +20,44 @@ func TestRunFilter(t *testing.T) {
 	}{
 		// gt
 		{"Number", false, "", "", false, "1", "", "", "", [][]string{
-			[]string{"Number", "String"},
-			[]string{"2", "Two"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"2", "Two"},
+			{"2", "Another Two"},
 		}},
 		// gte
 		{"Number", false, "", "", false, "", "1", "", "", [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
-			[]string{"2", "Two"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"2", "Two"},
+			{"2", "Another Two"},
 		}},
 		// lt
 		{"Number", false, "", "", false, "", "", "1", "", [][]string{
-			[]string{"Number", "String"},
-			[]string{"-1", "Minus One"},
+			{"Number", "String"},
+			{"-1", "Minus One"},
 		}},
 		// lte
 		{"Number", false, "", "", false, "", "", "", "1", [][]string{
-			[]string{"Number", "String"},
-			[]string{"1", "One"},
-			[]string{"-1", "Minus One"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"-1", "Minus One"},
 		}},
 		// equals
 		{"String", false, "", "Two", false, "", "", "", "", [][]string{
-			[]string{"Number", "String"},
-			[]string{"2", "Two"},
+			{"Number", "String"},
+			{"2", "Two"},
 		}},
 		// regex
 		{"String", false, "[tT]wo", "", false, "", "", "", "", [][]string{
-			[]string{"Number", "String"},
-			[]string{"2", "Two"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"2", "Two"},
+			{"2", "Another Two"},
 		}},
 		// regex exclude
 		{"String", true, "[oO]ne", "", false, "", "", "", "", [][]string{
-			[]string{"Number", "String"},
-			[]string{"2", "Two"},
-			[]string{"2", "Another Two"},
+			{"Number", "String"},
+			{"2", "Two"},
+			{"2", "Another Two"},
 		}},
 	}
 	for i, tt := range testCases {

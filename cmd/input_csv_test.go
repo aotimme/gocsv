@@ -34,8 +34,8 @@ func TestReadAll(t *testing.T) {
 		t.Error("Expected 2 rows but got", len(rows))
 	}
 	expected := [][]string{
-		[]string{"Name", "Website"},
-		[]string{"DataFox Intelligence, Inc.", "www.datafox.com"},
+		{"Name", "Website"},
+		{"DataFox Intelligence, Inc.", "www.datafox.com"},
 	}
 	for i, row := range expected {
 		for j, cell := range row {
