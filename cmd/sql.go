@@ -89,16 +89,20 @@ func PopulateSqlTable(db *sql.DB, inputCsv *InputCsv) {
 	tableName := inputCsv.Name()
 	imc := NewInMemoryCsvFromInputCsv(inputCsv)
 	allVariables := make([]interface{}, 2*len(imc.header)+1)
-	allVariables[0] = tableName
-	createStatement := "CREATE TABLE [%s]("
+	createStatement := "CREATE TABLE %s("
+	escapedTableName := escapeSqlName(tableName)
+	allVariables[0] = escapedTableName
+
+	escapedHeaders := make([]string, len(imc.header))
 	for i, headerName := range imc.header {
-		allVariables[2*i+1] = headerName
+		escapedHeaders[i] = escapeSqlName(headerName)
+		allVariables[2*i+1] = escapedHeaders[i]
 		columnType := imc.InferType(i)
 		allVariables[2*i+2] = ColumnTypeToSqliteType(columnType)
 		if i > 0 {
 			createStatement += ", "
 		}
-		createStatement += "[%s] %s NULL"
+		createStatement += "%s %s NULL"
 	}
 	createStatement += ");"
 	// Unfortunately using `db.Prepare` with `?` variables wouldn't work
@@ -108,11 +112,7 @@ func PopulateSqlTable(db *sql.DB, inputCsv *InputCsv) {
 		ExitWithError(err)
 	}
 
-	escapedHeaders := make([]string, len(imc.header))
-	for i, headerName := range imc.header {
-		escapedHeaders[i] = fmt.Sprintf("[%s]", headerName)
-	}
-	tableColumns := fmt.Sprintf("[%s](%s)", tableName, strings.Join(escapedHeaders, ", "))
+	tableColumns := fmt.Sprintf("%s(%s)", escapedTableName, strings.Join(escapedHeaders, ", "))
 	valuesQuestions := make([]string, len(imc.header))
 	for i := range valuesQuestions {
 		valuesQuestions[i] = "?"
@@ -133,4 +133,8 @@ func PopulateSqlTable(db *sql.DB, inputCsv *InputCsv) {
 			ExitWithError(err)
 		}
 	}
+}
+
+func escapeSqlName(name string) string {
+	return fmt.Sprintf("\"%s\"", strings.ReplaceAll(name, "\"", "\"\""))
 }

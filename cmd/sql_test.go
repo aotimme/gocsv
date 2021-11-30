@@ -44,3 +44,25 @@ func TestRunSql(t *testing.T) {
 		})
 	}
 }
+
+func TestEscapeSqlName(t *testing.T) {
+	testCases := []struct {
+		inputName  string
+		outputName string
+	}{
+		{"basic", "\"basic\""},
+		{"single space", "\"single space\""},
+		{"single'quote", "\"single'quote\""},
+		{"square[]brackets", "\"square[]brackets\""},
+		{"\"alreadyquoted\"", "\"\"\"alreadyquoted\"\"\""},
+		{"middle\"quote", "\"middle\"\"quote\""},
+	}
+	for i, tt := range testCases {
+		t.Run(fmt.Sprintf("Test %d", i), func(t *testing.T) {
+			output := escapeSqlName(tt.inputName)
+			if output != tt.outputName {
+				t.Errorf("Expected %s but got %s", tt.outputName, output)
+			}
+		})
+	}
+}
