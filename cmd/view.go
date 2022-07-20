@@ -24,7 +24,7 @@ func (sub *ViewSubcommand) Description() string {
 	return "Display a CSV in a pretty tabular format."
 }
 func (sub *ViewSubcommand) SetFlags(fs *flag.FlagSet) {
-	fs.IntVar(&sub.maxWidth, "max-width", 0, "Maximum width per column")
+	fs.IntVar(&sub.maxWidth, "max-width", 0, "Maximum width per column; mininum of 3")
 	fs.IntVar(&sub.maxWidth, "w", 0, "Maximum width per column (shorthand)")
 	fs.IntVar(&sub.maxLines, "max-lines", 0, "Maximum number of lines per cell")
 	fs.IntVar(&sub.maxLines, "l", 0, "Maximum number of lines per cell (shorthand)")
@@ -32,8 +32,8 @@ func (sub *ViewSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *ViewSubcommand) Run(args []string) {
-	if sub.maxWidth < 0 {
-		fmt.Fprintln(os.Stderr, "Invalid argument --max-width")
+	if sub.maxWidth < 0 || (sub.maxWidth == 1 || sub.maxWidth == 2) {
+		fmt.Fprintln(os.Stderr, "Invalid argument --max-width must be greater-than-or-equal-to 3")
 		os.Exit(1)
 	}
 	if sub.maxLines < 0 {
