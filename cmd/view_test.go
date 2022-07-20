@@ -36,11 +36,17 @@ func TestGetTruncatedLine(t *testing.T) {
 		{"what me worry", 13, "what me worry"},
 		{"what me worry", 14, "what me worry "},
 		{"what me worry", 15, "what me worry  "},
+		// https://github.com/aotimme/gocsv/issues/47
+		{"Foobarbaz 日本のルーン", 14, "Foobarbaz 日..."},
+		{"Foobarbaz 日本のルーン", 15, "Foobarbaz 日本..."},
+		{"Foobarbaz 日本のルーン", 16, "Foobarbaz 日本のルーン"},
+		{"Foobarbaz 日本のルーン", 17, "Foobarbaz 日本のルーン "},
+		{"Foobarbaz 日本のルーン", 18, "Foobarbaz 日本のルーン  "},
 	}
-	for i, testCase := range testCases {
+	for _, testCase := range testCases {
 		truncatedLine := getTruncatedLine(testCase.line, testCase.width)
 		if truncatedLine != testCase.truncatedLine {
-			t.Errorf("Test case %d: expected truncated line \"%s\" but got \"%s\"", i, testCase.truncatedLine, truncatedLine)
+			t.Errorf("getTruncatedLine(%q, %d) = %q; want %q", testCase.line, testCase.width, truncatedLine, testCase.truncatedLine)
 		}
 	}
 }

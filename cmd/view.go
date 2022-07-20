@@ -179,6 +179,7 @@ func getTruncatedLine(line string, width int) string {
 	} else if lineLen < width {
 		return line + strings.Repeat(" ", width-lineLen)
 	} else {
-		return line[:width-3] + "..."
+		truncatedRunes := []rune(line)[:width-3]
+		return string(truncatedRunes) + "..."
 	}
 }
