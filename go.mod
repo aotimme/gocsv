@@ -3,8 +3,14 @@ module github.com/aotimme/gocsv
 go 1.14
 
 require (
-	github.com/Masterminds/sprig/v3 v3.1.0
-	github.com/alphagov/router v0.0.0-20161125164013-5d98b0d9fc19
-	github.com/mattn/go-sqlite3 v1.10.0
-	github.com/tealeg/xlsx v1.0.5
+	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/alphagov/router v0.0.0-20221221092104-2672e1cfdb5e
+	github.com/huandu/xstrings v1.4.0 // indirect
+	github.com/imdario/mergo v0.3.13 // indirect
+	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/mitchellh/copystructure v1.2.0 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
+	github.com/spf13/cast v1.5.0 // indirect
+	github.com/xuri/excelize/v2 v2.6.1
+	golang.org/x/crypto v0.4.0 // indirect
 )

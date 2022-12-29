@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tealeg/xlsx"
+	"github.com/xuri/excelize/v2"
 )
 
 type XlsxSubcommand struct {
@@ -56,7 +56,7 @@ func (sub *XlsxSubcommand) Run(args []string) {
 }
 
 func ConvertXlsxFull(filename, dirname string) {
-	xlsxFile, err := xlsx.OpenFile(filename)
+	f, err := excelize.OpenFile(filename)
 	if err != nil {
 		ExitWithError(err)
 	}
@@ -64,13 +64,13 @@ func ConvertXlsxFull(filename, dirname string) {
 	if err != nil {
 		ExitWithError(err)
 	}
-	for _, sheet := range xlsxFile.Sheets {
-		ConvertXlsxSheetToDirectory(dirname, sheet)
+	for _, sheetName := range f.GetSheetList() {
+		ConvertXlsxSheetToDirectory(f, dirname, sheetName)
 	}
 }
 
-func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
-	filename := fmt.Sprintf("%s/%s.csv", dirname, sheet.Name)
+func ConvertXlsxSheetToDirectory(f *excelize.File, dirname string, sheetName string) {
+	filename := fmt.Sprintf("%s/%s.csv", dirname, sheetName)
 
 	file, err := os.Create(filename)
 	if err != nil {
@@ -78,49 +78,52 @@ func ConvertXlsxSheetToDirectory(dirname string, sheet *xlsx.Sheet) {
 	}
 	defer file.Close()
 	outputCsv := NewOutputCsvFromFile(file)
-	WriteSheetToOutputCsv(sheet, outputCsv)
+	writeRowsToOutputCsv(outputCsv, f, sheetName)
 }
 
 func ConvertXlsxSheet(filename, sheetName string) {
-	xlsxFile, err := xlsx.OpenFile(filename)
+	f, err := excelize.OpenFile(filename)
 	if err != nil {
 		ExitWithError(err)
 	}
-
-	sheetNames := make([]string, len(xlsxFile.Sheets))
-	for i, sheet := range xlsxFile.Sheets {
-		sheetNames[i] = sheet.Name
-	}
+	sheetNames := f.GetSheetList()
+	// Use `GetIndexForColumn` so the sheet can be specified
+	// by name or by index.
 	sheetIndex := GetIndexForColumn(sheetNames, sheetName)
 	if sheetIndex == -1 {
-		ExitWithError(errors.New("Could not find sheet from sheet name"))
+		if sheetIndex == -1 {
+			ExitWithError(errors.New("Could not find sheet from sheet name"))
+		}
 	}
-
-	sheet := xlsxFile.Sheets[sheetIndex]
+	trueSheetName := sheetNames[sheetIndex]
 	outputCsv := NewOutputCsv()
-	WriteSheetToOutputCsv(sheet, outputCsv)
+	writeRowsToOutputCsv(outputCsv, f, trueSheetName)
 }
 
-func WriteSheetToOutputCsv(sheet *xlsx.Sheet, outputCsv *OutputCsv) {
-	for _, row := range sheet.Rows {
-		csvRow := make([]string, 0)
-		for _, cell := range row.Cells {
-			// We only care about the string value of the cell,
-			// so just ignore any error.
-			cellValue, _ := cell.FormattedValue()
-			csvRow = append(csvRow, cellValue)
+func writeRowsToOutputCsv(outputCsv *OutputCsv, f *excelize.File, sheetName string) {
+	rows, err := f.Rows(sheetName)
+	if err != nil {
+		ExitWithError(err)
+	}
+	for rows.Next() {
+		row, err := rows.Columns()
+		if err != nil {
+			ExitWithError(err)
 		}
-		outputCsv.Write(csvRow)
+		outputCsv.Write(row)
+	}
+	if err = rows.Close(); err != nil {
+		ExitWithError(err)
 	}
 }
 
 func ListXlxsSheets(filename string) {
-	xlsxFile, err := xlsx.OpenFile(filename)
+	f, err := excelize.OpenFile(filename)
 	if err != nil {
 		ExitWithError(err)
 	}
 
-	for i, sheet := range xlsxFile.Sheets {
-		fmt.Printf("%d: %s\n", i+1, sheet.Name)
+	for i, sheetName := range f.GetSheetList() {
+		fmt.Printf("%d: %s\n", i+1, sheetName)
 	}
 }
