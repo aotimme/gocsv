@@ -10,6 +10,7 @@ import (
 type SelectSubcommand struct {
 	columnsString string
 	exclude       bool
+	rawOutput     bool
 }
 
 func (sub *SelectSubcommand) Name() string {
@@ -25,11 +26,14 @@ func (sub *SelectSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.StringVar(&sub.columnsString, "columns", "", "Columns to select")
 	fs.StringVar(&sub.columnsString, "c", "", "Columns to select (shorthand)")
 	fs.BoolVar(&sub.exclude, "exclude", false, "Whether to exclude the specified columns")
+	fs.BoolVar(&sub.rawOutput, "raw-output", false, "Whether to output as raw lines (no CSV formatting) -- only applies if select returns one column")
+	fs.BoolVar(&sub.rawOutput, "r", false, "Whether to output as raw lines (no CSV formatting) -- only applies if select returns one column (shorthand)")
 }
 
 func (sub *SelectSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	outputCsv.SetWriteRaw(sub.rawOutput)
 	sub.RunSelect(inputCsvs[0], outputCsv)
 }
 

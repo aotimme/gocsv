@@ -13,7 +13,9 @@ type OutputCsvWriter interface {
 type OutputCsv struct {
 	writeBom         bool
 	hasWrittenHeader bool
-	writer           *csv.Writer
+	csvWriter        *csv.Writer
+	file             *os.File
+	writeRaw         bool
 }
 
 func NewOutputCsvFromInputCsv(inputCsv *InputCsv) (oc *OutputCsv) {
@@ -46,16 +48,21 @@ func NewOutputCsv() (oc *OutputCsv) {
 
 func NewOutputCsvFromFile(file *os.File) (oc *OutputCsv) {
 	oc = new(OutputCsv)
-	oc.writer = csv.NewWriter(file)
+	oc.file = file
+	oc.csvWriter = csv.NewWriter(file)
 	delimiter := os.Getenv("GOCSV_DELIMITER")
 	if delimiter != "" {
-		oc.writer.Comma = GetDelimiterFromString(delimiter)
+		oc.csvWriter.Comma = GetDelimiterFromString(delimiter)
 	}
 	return
 }
 
 func (oc *OutputCsv) SetDelimiter(delimiter rune) {
-	oc.writer.Comma = delimiter
+	oc.csvWriter.Comma = delimiter
+}
+
+func (oc *OutputCsv) SetWriteRaw(writeRaw bool) {
+	oc.writeRaw = writeRaw
 }
 
 func (oc *OutputCsv) Write(row []string) error {
@@ -72,7 +79,11 @@ func (oc *OutputCsv) Write(row []string) error {
 }
 
 func (oc *OutputCsv) writeRow(row []string) (err error) {
-	err = oc.writer.Write(row)
+	if oc.writeRaw && len(row) == 1 {
+		oc.file.WriteString(row[0] + "\n")
+		return
+	}
+	err = oc.csvWriter.Write(row)
 	if err != nil {
 		return
 	}
@@ -80,6 +91,6 @@ func (oc *OutputCsv) writeRow(row []string) (err error) {
 	// keeps the output flowing. Otherwise it could look "jumpy" or
 	// like it's not working at times when there is no visible output
 	// while working on a large file.
-	oc.writer.Flush()
+	oc.csvWriter.Flush()
 	return
 }
