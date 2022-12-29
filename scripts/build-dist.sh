@@ -18,7 +18,10 @@ cd ${BUILD_DIR}
 # Use `xgo` to truly handle cross-compiling, mainly due to gocsv's dependency
 # on `go-sqlite3`, which is a cgo package.
 # See: https://github.com/mattn/go-sqlite3#cross-compile
-xgo -ldflags "${LD_FLAGS}" github.com/aotimme/gocsv
+xgo \
+  --targets="linux/*,windows/*,darwin/*" \
+  -ldflags "${LD_FLAGS}" \
+  github.com/aotimme/gocsv
 
 # Move files to `dist` and zip them.
 for file in $(ls);
