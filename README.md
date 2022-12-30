@@ -759,7 +759,7 @@ To enable debugging mode when running a `gocsv` command, specify the `--debug` c
 
 ## Installation
 
-For the latest pre-built binaries, cross-compiled using [xgo](https://github.com/karalabe/xgo), see the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page.
+For the latest pre-built binaries, cross-compiled using [xgo](https://github.com/crazy-max/xgo), see the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page.
 
 ### Apple OS X
 

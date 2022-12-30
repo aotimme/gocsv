@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BINARY_DIRNAME="gocsv-darwin-10.6-amd64"
+BINARY_DIRNAME="gocsv-darwin-amd64"
 ZIP_FILENAME="${BINARY_DIRNAME}.zip"
 ZIP_URL="https://github.com/aotimme/gocsv/releases/latest/download/${ZIP_FILENAME}"
 TMP_DIR=$(mktemp -d)
