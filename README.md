@@ -775,13 +775,13 @@ This will install `gocsv` at `/usr/local/bin/gocsv`.
 
 #### Detailed Version
 
-To install the pre-built binary for Apple OS X, download the `gocsv-darwin-10.6-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
+To install the pre-built binary for Apple OS X, download the `gocsv-darwin-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
 
 ```shell
 cd ~/Downloads
-unzip gocsv-darwin-10.6-amd64.zip
-mv gocsv-darwin-10.6-amd64/gocsv /usr/local/bin
-rmdir gocsv-darwin-10.6-amd64
+unzip gocsv-darwin-amd64.zip
+mv gocsv-darwin-amd64/gocsv /usr/local/bin
+rmdir gocsv-darwin-amd64
 ```
 
 To verify that it has installed, open a _new_ Terminal window and run
@@ -813,4 +813,4 @@ You should see the `gocsv` help message.
 
 ### Windows
 
-Download `gocsv-windows-4.0-amd64.zip`. Unzip the file and you should see a file `gocsv.exe`. Put that executable in the appropriate location and it should work.
+Download `gocsv-windows-amd64.zip`. Unzip the file and you should see a file `gocsv.exe`. Put that executable in the appropriate location and it should work.
