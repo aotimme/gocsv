@@ -35,7 +35,14 @@ func (sub *CapSubcommand) Run(args []string) {
 }
 
 func (sub *CapSubcommand) RunCap(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
-	names := GetArrayFromCsvString(sub.namesString)
+	if sub.namesString == "" && sub.defaultName == "" {
+		fmt.Fprintf(os.Stderr, "Must specify at least one of --names or --default-name")
+		os.Exit(1)
+	}
+	var names []string
+	if sub.namesString != "" {
+		names = GetArrayFromCsvString(sub.namesString)
+	}
 	Cap(inputCsv, outputCsvWriter, names, sub.truncateNames, sub.defaultName)
 }
 
