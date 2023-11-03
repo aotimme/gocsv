@@ -32,7 +32,7 @@ func (sub *StackSubcommand) Run(args []string) {
 
 	hasSpecifiedGroups := sub.groupsString != ""
 	if hasSpecifiedGroups && sub.useFilenames {
-		ExitWithError(errors.New("Cannot specify both --filename and --groups"))
+		ExitWithError(errors.New("cannot specify both --filename and --groups"))
 	}
 
 	shouldAppendGroup := hasSpecifiedGroups || sub.useFilenames
@@ -45,7 +45,7 @@ func (sub *StackSubcommand) Run(args []string) {
 	}
 
 	if shouldAppendGroup && len(filenames) != len(groups) {
-		ExitWithError(errors.New("Number of files and groups are not equal"))
+		ExitWithError(errors.New("number of files and groups are not equal"))
 	}
 
 	var groupColumnName string
@@ -82,11 +82,11 @@ func StackFiles(inputCsvs []*InputCsv, groupName string, groups []string) {
 			continue
 		}
 		if len(firstHeader) != len(header) {
-			ExitWithError(errors.New("Headers do not match"))
+			ExitWithError(errors.New("headers do not match"))
 		}
 		for j, elem := range firstHeader {
 			if elem != header[j] {
-				ExitWithError(errors.New("Headers do not match"))
+				ExitWithError(errors.New("headers do not match"))
 			}
 		}
 	}

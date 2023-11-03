@@ -34,7 +34,7 @@ func (sub *TailSubcommand) Run(args []string) {
 }
 
 func (sub *TailSubcommand) RunTail(inputCsv *InputCsv, outputCsvWriter OutputCsvWriter) {
-	numRowsRegex := regexp.MustCompile("^\\+?\\d+$")
+	numRowsRegex := regexp.MustCompile(`^\\+?\\d+$`)
 	if !numRowsRegex.MatchString(sub.numRowsStr) {
 		fmt.Fprintln(os.Stderr, "Invalid argument to -n")
 		os.Exit(1)

@@ -57,7 +57,7 @@ func ZipFiles(inputCsvs []*InputCsv) {
 	isInputCsvComplete := make([]bool, numCsvs)
 	numCsvsComplete := 0
 	// Go through the files
-	for true {
+	for {
 		for i, inputCsv := range inputCsvs {
 			if isInputCsvComplete[i] {
 				continue

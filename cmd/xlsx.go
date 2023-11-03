@@ -92,7 +92,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 	sheetIndex := GetIndexForColumn(sheetNames, sheetName)
 	if sheetIndex == -1 {
 		if sheetIndex == -1 {
-			ExitWithError(errors.New("Could not find sheet from sheet name"))
+			ExitWithError(errors.New("could not find sheet from sheet name"))
 		}
 	}
 	trueSheetName := sheetNames[sheetIndex]

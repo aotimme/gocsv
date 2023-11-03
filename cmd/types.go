@@ -137,7 +137,7 @@ func ParseDatetime(elem string) (time.Time, error) {
 			return t, nil
 		}
 	}
-	return time.Time{}, errors.New("Invalid Date string")
+	return time.Time{}, errors.New("invalid Date string")
 }
 
 func ParseDateOrPanic(elem string) time.Time {
@@ -161,7 +161,7 @@ func ParseDate(elem string) (time.Time, error) {
 			return t, nil
 		}
 	}
-	return time.Time{}, errors.New("Invalid Date string")
+	return time.Time{}, errors.New("invalid Date string")
 }
 
 func ParseFloat64OrPanic(strVal string) float64 {
