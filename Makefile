@@ -11,8 +11,8 @@ dist:
 	bash scripts/build-dist.sh
 
 test:
-	cd $(CMD_DIR) && GO111MODULE=on go test -cover
-	cd $(CSV_DIR) && GO111MODULE=on go test -cover
+	cd $(CMD_DIR) && go test -cover
+	cd $(CSV_DIR) && go test -cover
 
 bin:
 	bash scripts/build-bin.sh

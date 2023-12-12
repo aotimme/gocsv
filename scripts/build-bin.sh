@@ -9,4 +9,4 @@ LD_FLAGS="-X github.com/aotimme/gocsv/cmd.VERSION=${VERSION} -X github.com/aotim
 
 rm -rf ${BIN_DIR}
 mkdir -p ${BIN_DIR}
-GO111MODULE=on go build -ldflags "${LD_FLAGS}" -o ${BIN_DIR}/${EXECUTABLE}
+go build -ldflags "${LD_FLAGS}" -o ${BIN_DIR}/${EXECUTABLE}

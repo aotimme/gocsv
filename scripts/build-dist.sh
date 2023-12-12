@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-BUILD_DIR=$(pwd)/build
 DIST_DIR=$(pwd)/dist
 EXECUTABLE=gocsv
 
@@ -8,37 +7,41 @@ GIT_HASH=$(git rev-parse HEAD)
 VERSION=$(git describe --tags HEAD)
 LD_FLAGS="-X github.com/aotimme/gocsv/cmd.VERSION=${VERSION} -X github.com/aotimme/gocsv/cmd.GIT_HASH=${GIT_HASH}"
 
-rm -rf ${BUILD_DIR}
-mkdir ${BUILD_DIR}
+# Create an array of goos:goarch pairs
+options=(
+  "darwin:amd64"
+  "darwin:arm64"
+  "freebsd:amd64"
+  "freebsd:arm64"
+  "linux:386"
+  "linux:amd64"
+  "linux:arm"
+  "linux:arm64"
+  "linux:ppc64le"
+  "linux:riscv64"
+  "windows:amd64"
+  "windows:arm64"
+)
 
+echo "Building into ${DIST_DIR}/..."
 rm -rf ${DIST_DIR}
 mkdir ${DIST_DIR}
 
-cd ${BUILD_DIR}
-# Use `xgo` to truly handle cross-compiling, mainly due to gocsv's dependency
-# on `go-sqlite3`, which is a cgo package.
-# See: https://github.com/mattn/go-sqlite3#cross-compile
-xgo \
-  --targets="linux/*,windows/*,darwin/*" \
-  -ldflags "${LD_FLAGS}" \
-  github.com/aotimme/gocsv
+for option in "${options[@]}"; do
+  IFS=':' read -r goos goarch <<< "$option"
 
-# Move files to `dist` and zip them.
-for file in $(ls);
-do
-  folder=${file}
+  folder="${EXECUTABLE}-${goos}-${goarch}"
+  echo "Building: ${folder}..."
+  BIN_DIR=${DIST_DIR}/${folder}
+  rm -rf ${BIN_DIR}
+  mkdir -p ${BIN_DIR}
   binary=${EXECUTABLE}
-  if [ ${file: -4} == ".exe" ];
-  then
+  if [ "$goos" == "windows" ]; then
     binary="${EXECUTABLE}.exe"
-    folder=$(echo ${folder} | sed -E 's/.exe$//g')
   fi
-  mkdir ${DIST_DIR}/${folder}
-  mv ${file} ${DIST_DIR}/${folder}/${binary}
+  GOOS=${goos} GOARCH=${goarch} go build -ldflags "${LD_FLAGS}" -o ${BIN_DIR}/${binary}
   cd ${DIST_DIR}
   zip -rq ${folder}.zip ${folder}
-  rm -r ${folder}
-  cd ${BUILD_DIR}
+  rm -rf ${folder}
+  cd - >/dev/null 2>&1
 done
-
-rm -r ${BUILD_DIR}

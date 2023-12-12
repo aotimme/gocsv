@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type SqlSubcommand struct {
@@ -37,7 +37,7 @@ func (sub *SqlSubcommand) RunSql(inputCsvs []*InputCsv, outputCsvWriter OutputCs
 	query := sub.queryString
 
 	// 1. Create the SQLite DB
-	db, err := sql.Open("sqlite3", ":memory:")
+	db, err := sql.Open("sqlite", ":memory:")
 	if err != nil {
 		ExitWithError(err)
 	}
