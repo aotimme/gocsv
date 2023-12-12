@@ -84,11 +84,13 @@ Arguments:
 Note that the `--template` argument for this subcommand is a string providing a template for the new column. Templates are parsed using the [html/template](https://golang.org/pkg/html/template/) package provided by Go and can reference any column by the _name_ of the column, along with a special variable `index` that represents the row number (starting at `1`).
 
 For example, if your CSV has a column named `Name`, you can do
+
 ```shell
 gocsv add -t "Hello, {{.Name}}! You are number {{.index}} in line."
 ```
 
 For multi-word columns there is a slightly different syntax. Say you have a column called `Full Name`. Then the following template would work:
+
 ```shell
 gocsv add -t 'Hello {{index . "Full Name"}}! You are number {{.index} in line.'
 ```
@@ -149,14 +151,35 @@ gocsv cap --names NAMES [--truncate-names] [--default-name DEFAULT_NAME] FILE
 
 Arguments:
 
-- `--names` A comma-separated list of names to add as headers to each column.
+- `--names` [optional] A comma-separated list of names to add as headers to each column.
 - `--truncate-names` [optional] If there are fewer columns than the number of names provided by `--names`, drop the extra column names.
-- `--default-name` [optional] If there are more columns than the number of names provided by `--names`, use this as the base of the default names for any additional column. If the default name is `DEFAULT_NAME`, then the first additional column will be named DEFAULT_NAME, the second "{DEFAULT_NAME} 1", the third "{DEFAULT_NAME} 2", etc.
+- `--default-name` [optional] Fill out the balance of columns not specified by `--names` by using this as the base of the default names for the additional columns. If the default name is `Extra Col`, then the first additional column will be named "Extra Col", the second "Extra Col 1", the third "Extra Col 2", etc.
 
 The subcommand will error if:
-* The number of names provided by `--names` is greater than the number of columns and `--truncate-names` is not specified, or
-* the number of names provided by `--names` is less than the number of columns and `--default-name` is not specified.
 
+- Both `--names` and `--default-name` are not specified, or
+- The number of names provided by `--names` is greater than the number of columns and `--truncate-names` is not specified, or
+- the number of names provided by `--names` is less than the number of columns and `--default-name` is not specified.
+
+For example:
+
+```shell
+echo Jamie,52,Purple | gocsv cap --names 'Name,Age,Favorite color'
+Name,Age,Favorite color
+Jamie,52,Purple
+```
+
+```shell
+echo Jamie,52,Purple | gocsv cap --names 'Name' --default-name 'Col'
+Name,Col,Col 1
+Jamie,52,Purple
+```
+
+```shell
+echo Jamie,52,Purple | gocsv cap --default-name 'Col'
+Col,Col 1,Col 2
+Jamie,52,Purple
+```
 
 ### clean
 
@@ -418,6 +441,7 @@ Arguments:
 Run SQL queries on CSVs.
 
 Usage:
+
 ```shell
 gocsv sql --query QUERY FILE [FILES]
 ```
@@ -583,15 +607,18 @@ When specifying the name of a column, it will match all columns that are exact c
 When referencing a column name that has whitespace, either escape the whitespace with `\` or use quotes (`"`) around the column name.
 
 For example, if you have a column named `Hello World`,
+
 ```shell
 gocsv select -c "Hello World" test.csv
 ```
+
 or
+
 ```shell
 gocsv select -c Hello\ World test.csv
 ```
 
-When referencing multiple columns, specify column names as a comma-delimited list with no spaces between the columns. If any of the column names have whitespace, enclose the entire list in a single set of quotes. 
+When referencing multiple columns, specify column names as a comma-delimited list with no spaces between the columns. If any of the column names have whitespace, enclose the entire list in a single set of quotes.
 
 ```shell
 gocsv select -c "Hello World,Foo Bar" test.csv
@@ -721,6 +748,7 @@ gocsv filter --columns ABC --regex "-1$" test-files/left-table.csv
 ```shell
 gocsv filter --columns Stringer --regex "^$" test-files/stats.csv
 ```
+
 If you also want to match on cells that have only whitespace, you can use a regular expression like `"^s*$"`.
 
 ##### Replace Content in Cells By Regular Expression

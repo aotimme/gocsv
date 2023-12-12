@@ -12,6 +12,14 @@ func TestRunCap(t *testing.T) {
 		defaultName   string
 		rows          [][]string
 	}{
+		{"", false, "Col", [][]string{
+			{"Col", "Col 1"},
+			{"Number", "String"},
+			{"1", "One"},
+			{"2", "Two"},
+			{"-1", "Minus One"},
+			{"2", "Another Two"},
+		}},
 		{"Numero,Cadena", false, "", [][]string{
 			{"Numero", "Cadena"},
 			{"Number", "String"},
