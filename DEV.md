@@ -21,10 +21,9 @@ To release an update to `gocsv`, make sure you have committed and pushed the mos
    ```
 
 
-2. Create cross-compiled binaries for distribution. Cross-compilation uses [xgo](https://github.com/karalabe/xgo) to handle issues with CGO packages in other platforms and architectures. Because `xgo` requires `docker`, you will need `docker` installed.
+2. Create cross-compiled binaries for distribution.
 
    ```shell
-   go get -u github.com/karalabe/xgo
    make dist
    ```
 
