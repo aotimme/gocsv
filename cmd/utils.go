@@ -53,9 +53,7 @@ func GetIndicesForColumns(headers []string, columns []string) (indices []int, er
 		if err != nil {
 			return nil, err
 		}
-		for _, columnIndex := range columnIndices {
-			indices = append(indices, columnIndex)
-		}
+		indices = append(indices, columnIndices...)
 	}
 	return
 }
@@ -97,7 +95,7 @@ func GetIndicesForColumn(headers []string, column string) (indices []int, err er
 	}
 	indices = GetIndicesOfString(headers, column)
 	if len(indices) == 0 {
-		err = fmt.Errorf("Could not find header \"%s\"", column)
+		err = fmt.Errorf("could not find header \"%s\"", column)
 		return
 	}
 	return
@@ -126,7 +124,7 @@ func GetIndicesOfString(haystack []string, needle string) (indices []int) {
 func GetIndexForColumnOrPanic(headers []string, column string) int {
 	index := GetIndexForColumn(headers, column)
 	if index == -1 {
-		ExitWithError(fmt.Errorf("Unable to find column specified: %s", column))
+		ExitWithError(fmt.Errorf("unable to find column specified: %s", column))
 	}
 	return index
 }

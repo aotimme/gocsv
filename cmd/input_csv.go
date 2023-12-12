@@ -125,7 +125,7 @@ func GetInputCsvs(filenames []string, numInputCsvs int) (csvs []*InputCsv, err e
 	} else {
 		csvs = make([]*InputCsv, numInputCsvs)
 		if len(filenames) > numInputCsvs {
-			err = errors.New("Too many files for command")
+			err = errors.New("too many files for command")
 			return
 		}
 		if len(filenames) == numInputCsvs {
@@ -139,7 +139,7 @@ func GetInputCsvs(filenames []string, numInputCsvs int) (csvs []*InputCsv, err e
 		}
 		if len(filenames) == numInputCsvs-1 {
 			if hasDash {
-				err = errors.New("Too few inputs specified")
+				err = errors.New("too few inputs specified")
 				return
 			}
 			csvs[0], err = NewInputCsv("-")
@@ -154,7 +154,7 @@ func GetInputCsvs(filenames []string, numInputCsvs int) (csvs []*InputCsv, err e
 			}
 			return
 		}
-		err = errors.New("Too few inputs specified")
+		err = errors.New("too few inputs specified")
 		return
 	}
 }

@@ -189,5 +189,5 @@ func PrintCleanCheck(rowIndex, columnIndex int, message string) {
 	} else {
 		prelude = ""
 	}
-	fmt.Fprintf(os.Stderr, fmt.Sprintf("%s%s\n", prelude, message))
+	fmt.Fprintf(os.Stderr, "%s%s\n", prelude, message)
 }

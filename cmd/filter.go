@@ -102,7 +102,7 @@ func (sub *FilterSubcommand) RunFilter(inputCsv *InputCsv, outputCsvWriter Outpu
 				return elemDate.After(gt)
 			}
 		} else {
-			ExitWithError(errors.New("Invalid argument for -gt"))
+			ExitWithError(errors.New("invalid argument for -gt"))
 		}
 	} else if sub.gteStr != "" {
 		if IsFloatType(sub.gteStr) {
@@ -130,7 +130,7 @@ func (sub *FilterSubcommand) RunFilter(inputCsv *InputCsv, outputCsvWriter Outpu
 				return elemDate.Equal(gte) || elemDate.After(gte)
 			}
 		} else {
-			ExitWithError(errors.New("Invalid argument for -gte"))
+			ExitWithError(errors.New("invalid argument for -gte"))
 		}
 	} else if sub.ltStr != "" {
 		if IsFloatType(sub.ltStr) {
@@ -158,7 +158,7 @@ func (sub *FilterSubcommand) RunFilter(inputCsv *InputCsv, outputCsvWriter Outpu
 				return elemDate.Before(lt)
 			}
 		} else {
-			ExitWithError(errors.New("Invalid argument for -lt"))
+			ExitWithError(errors.New("invalid argument for -lt"))
 		}
 	} else if sub.lteStr != "" {
 		if IsFloatType(sub.lteStr) {
@@ -186,10 +186,10 @@ func (sub *FilterSubcommand) RunFilter(inputCsv *InputCsv, outputCsvWriter Outpu
 				return elemDate.Equal(lte) || elemDate.Before(lte)
 			}
 		} else {
-			ExitWithError(errors.New("Invalid argument for -lte"))
+			ExitWithError(errors.New("invalid argument for -lte"))
 		}
 	} else {
-		ExitWithError(errors.New("Missing filter function"))
+		ExitWithError(errors.New("missing filter function"))
 	}
 	FilterMatchFunc(inputCsv, outputCsvWriter, columns, sub.exclude, matchFunc)
 }
