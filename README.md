@@ -699,11 +699,11 @@ export GOCSV_DELIMITER="\t"
 gocsv select -c 1 tab-delimited.tsv
 ```
 
-Or, for more exotic delimiters like `\x01` (#54):
+Or, for more exotic delimiters you can use hexadecimal or unicode (e.g. `\x01` or `\u0001` for the SOH delimiter):
 
 ```shell
 export GOCSV_DELIMITER="\x01"
-gocsv select -c 1 x01-delimited.tsv
+gocsv select -c 1 soh-delimited.tsv
 ```
 
 ## Examples
