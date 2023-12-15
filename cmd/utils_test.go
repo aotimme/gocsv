@@ -58,7 +58,7 @@ func TestGetBaseFilenameWithoutExtension(t *testing.T) {
 	}
 }
 
-func TestGetDelimiterFromString(t *testing.T) {
+func TestValidGetDelimiterFromString(t *testing.T) {
 	testCases := []struct {
 		delimiter string
 		comma     rune
@@ -66,15 +66,34 @@ func TestGetDelimiterFromString(t *testing.T) {
 		{",", ','},
 		{";", ';'},
 		{"\\t", '\t'},
-		{"", rune(0)},
 		{"|", '|'},
-		{"lolcats", 'l'},
+		{"\\x01", '\x01'},
 	}
 	for _, tt := range testCases {
 		t.Run(tt.delimiter, func(t *testing.T) {
-			delimiterRune := GetDelimiterFromString(tt.delimiter)
+			delimiterRune, err := GetDelimiterFromString(tt.delimiter)
+			if err != nil {
+				t.Errorf("Expected \"%#U\" but instead got an error: %v", tt.comma, err)
+			}
 			if delimiterRune != tt.comma {
 				t.Errorf("Expected \"%#U\" but got \"%#U\"", tt.comma, delimiterRune)
+			}
+		})
+	}
+}
+
+func TestInvalidGetDelimiterFromString(t *testing.T) {
+	testCases := []struct {
+		delimiter string
+	}{
+		{""},
+		{"lolcats"},
+	}
+	for _, tt := range testCases {
+		t.Run(tt.delimiter, func(t *testing.T) {
+			delimiterRune, err := GetDelimiterFromString(tt.delimiter)
+			if err == nil {
+				t.Errorf("Expected an error for delimiter \"%s\" but instead got rune \"%#U\"", tt.delimiter, delimiterRune)
 			}
 		})
 	}

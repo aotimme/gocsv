@@ -18,14 +18,28 @@ const (
 	NUM_BOM_BYTES = 3
 )
 
-func GetDelimiterFromString(delimiter string) rune {
-	if delimiter == "\\t" {
-		return '\t'
-	} else if len(delimiter) > 0 {
-		delimiterRune, _ := utf8.DecodeRuneInString(delimiter)
-		return delimiterRune
+func GetDelimiterFromString(delimiter string) (rune, error) {
+	unquoted, err := strconv.Unquote(`"` + delimiter + `"`)
+	if err != nil {
+		return utf8.RuneError, err
 	}
-	return rune(0)
+	runeCount := utf8.RuneCountInString(unquoted)
+	if runeCount != 1 {
+		return utf8.RuneError, fmt.Errorf("delimiter \"%s\" must contain exactly 1 rune, but contains %d", delimiter, runeCount)
+	}
+	r, _ := utf8.DecodeRuneInString(unquoted)
+	if r == utf8.RuneError {
+		return utf8.RuneError, fmt.Errorf("invalid delimiter \"%s\"", delimiter)
+	}
+	return r, nil
+}
+
+func GetDelimiterFromStringOrPanic(delimiter string) rune {
+	r, err := GetDelimiterFromString(delimiter)
+	if err != nil {
+		ExitWithError(err)
+	}
+	return r
 }
 
 // GetIndicesForColumnsOrPanic is a simple wrapper around GetIndicesForColumns

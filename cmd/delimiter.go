@@ -32,7 +32,7 @@ func (sub *DelimiterSubcommand) Run(args []string) {
 }
 
 func ChangeDelimiter(inputCsv *InputCsv, inputDelimiter, outputDelimiter string) {
-	inputDelimiterRune := GetDelimiterFromString(inputDelimiter)
+	inputDelimiterRune := GetDelimiterFromStringOrPanic(inputDelimiter)
 	if inputDelimiterRune != rune(0) {
 		inputCsv.SetDelimiter(inputDelimiterRune)
 	}
@@ -41,7 +41,7 @@ func ChangeDelimiter(inputCsv *InputCsv, inputDelimiter, outputDelimiter string)
 	inputCsv.SetLazyQuotes(true)
 
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
-	outputDelimiterRune := GetDelimiterFromString(outputDelimiter)
+	outputDelimiterRune := GetDelimiterFromStringOrPanic(outputDelimiter)
 	if outputDelimiterRune != rune(0) {
 		outputCsv.SetDelimiter(outputDelimiterRune)
 	}
