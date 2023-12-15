@@ -68,6 +68,7 @@ func TestValidGetDelimiterFromString(t *testing.T) {
 		{"\\t", '\t'},
 		{"|", '|'},
 		{"\\x01", '\x01'},
+		{"\\u0001", '\x01'},
 	}
 	for _, tt := range testCases {
 		t.Run(tt.delimiter, func(t *testing.T) {
