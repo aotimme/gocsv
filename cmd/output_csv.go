@@ -52,7 +52,7 @@ func NewOutputCsvFromFile(file *os.File) (oc *OutputCsv) {
 	oc.csvWriter = csv.NewWriter(file)
 	delimiter := os.Getenv("GOCSV_DELIMITER")
 	if delimiter != "" {
-		oc.csvWriter.Comma = GetDelimiterFromString(delimiter)
+		oc.csvWriter.Comma = GetDelimiterFromStringOrPanic(delimiter)
 	}
 	return
 }

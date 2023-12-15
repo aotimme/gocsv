@@ -683,7 +683,7 @@ cat test-files/left-table.csv \
 
 ## Changing the Default Delimiter
 
-While `gocsv` generally assumes standard CSVs (per [RFC 4180](https://tools.ietf.org/html/rfc4180)), you can specify a default delimiter other than `,` using the `GOCSV_DELIMITER` environment variable.
+While `gocsv` generally assumes standard CSVs (per [RFC 4180](https://tools.ietf.org/html/rfc4180)), you can specify a default delimiter other than `,` using the `GOCSV_DELIMITER` environment variable. The delimiter _must_ evaluate to exactly 1 ["rune"](https://go.dev/doc/go1#rune). If it does not, `gocsv` will error.
 
 For example, to use semicolon-delimited files:
 
@@ -697,6 +697,13 @@ Or, to use tab-delimited files (TSVs):
 ```shell
 export GOCSV_DELIMITER="\t"
 gocsv select -c 1 tab-delimited.tsv
+```
+
+Or, for more exotic delimiters you can use hexadecimal or unicode (e.g. `\x01` or `\u0001` for the SOH delimiter):
+
+```shell
+export GOCSV_DELIMITER="\x01"
+gocsv select -c 1 soh-delimited.tsv
 ```
 
 ## Examples
