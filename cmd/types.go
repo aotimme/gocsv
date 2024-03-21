@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -16,7 +17,7 @@ const (
 	FLOAT_TYPE
 	BOOLEAN_TYPE
 	DATETIME_TYPE
-	DATE_TYPE
+	DATE_TYPE // TODO: remove since time.Time values have both date and time, no true date-only type for use in comparisons
 	STRING_TYPE
 )
 
@@ -119,18 +120,34 @@ func ParseDatetimeOrPanic(elem string) time.Time {
 	return t
 }
 
-func ParseDatetime(elem string) (time.Time, error) {
-	patterns := []string{
-		time.ANSIC,
-		time.UnixDate,
-		time.RubyDate,
-		time.RFC822,
-		time.RFC822Z,
-		time.RFC850,
-		time.RFC1123,
-		time.RFC1123Z,
-		time.RFC3339,
+var patterns = []string{
+	// GOCSV_TIMELAYOUT goes here
+	"2006-01-02",
+	"2006-1-2",
+	"1/2/2006",
+	"01/02/2006",
+	time.ANSIC,
+	time.UnixDate,
+	time.RubyDate,
+	time.RFC822,
+	time.RFC822Z,
+	time.RFC850,
+	time.RFC1123,
+	time.RFC1123Z,
+	time.RFC3339,
+}
+
+// useTimeLayoutEnvVar looks for the GOCSV_TIMELAYOUT env var and
+// inserts it at the front of patterns, if not already there.
+func useTimeLayoutEnvVar() {
+	if x := os.Getenv("GOCSV_TIMELAYOUT"); x != "" {
+		if patterns[0] != x {
+			patterns = append([]string{x}, patterns...)
+		}
 	}
+}
+
+func ParseDatetime(elem string) (time.Time, error) {
 	for _, pattern := range patterns {
 		t, err := time.Parse(pattern, elem)
 		if err == nil {
@@ -149,12 +166,6 @@ func ParseDateOrPanic(elem string) time.Time {
 }
 
 func ParseDate(elem string) (time.Time, error) {
-	patterns := []string{
-		"2006-01-02",
-		"2006-1-2",
-		"1/2/2006",
-		"01/02/2006",
-	}
 	for _, pattern := range patterns {
 		t, err := time.Parse(pattern, elem)
 		if err == nil {
