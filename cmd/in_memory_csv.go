@@ -205,6 +205,8 @@ func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
 		imc.PrintStatsForColumnAsBoolean(columnIndex)
 	} else if columnType == DATE_TYPE {
 		imc.PrintStatsForColumnAsDate(columnIndex)
+	} else if columnType == DATETIME_TYPE {
+		imc.PrintStatsForColumnAsDate(columnIndex)
 	} else if columnType == STRING_TYPE {
 		imc.PrintStatsForColumnAsString(columnIndex)
 	}
