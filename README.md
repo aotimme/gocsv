@@ -562,7 +562,9 @@ If the length of a cell exceeds `--max-width` it will be truncated with an ellip
 
 ### xlsx
 
-Convert sheets of a XLSX file to CSV.
+Convert sheets of a XLSX file to CSV and save the CSVs in a new directory.
+
+By default, all sheets will be converted, and the directory will be named after FILE.  Use the `--sheet` and  `--dirname` options to control which sheets are converted, and where they are saved.
 
 Usage:
 
