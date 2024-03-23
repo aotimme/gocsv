@@ -26,9 +26,9 @@ func (sub *XlsxSubcommand) Description() string {
 	return "Convert sheets of a XLSX file to CSV."
 }
 func (sub *XlsxSubcommand) SetFlags(fs *flag.FlagSet) {
-	fs.BoolVar(&sub.listSheets, "list-sheets", false, "List sheets in file")
-	fs.StringVar(&sub.dirname, "dirname", "", "Name of folder to output sheets to")
-	fs.StringVar(&sub.sheet, "sheet", "", "Name of sheet to convert")
+	fs.BoolVar(&sub.listSheets, "list-sheets", false, "List sheets in file by index and name")
+	fs.StringVar(&sub.dirname, "dirname", "", "Name of folder to write converted sheets to (defaults to file name minus \".xlsx\" extension)")
+	fs.StringVar(&sub.sheet, "sheet", "", "Index or name of sheet to write to stdout")
 }
 
 func (sub *XlsxSubcommand) Run(args []string) {
@@ -39,14 +39,26 @@ func (sub *XlsxSubcommand) Run(args []string) {
 		fmt.Fprintln(os.Stderr, "Cannot convert file from stdin")
 		os.Exit(1)
 	}
+
+	n := 0
+	if sub.listSheets {
+		n++
+	}
+	if sub.dirname != "" {
+		n++
+	}
+	if sub.sheet != "" {
+		n++
+	}
+	if n > 1 {
+		fmt.Fprintln(os.Stderr, "Cannot combine options")
+		os.Exit(1)
+	}
+
 	filename := args[0]
 	if sub.listSheets {
 		ListXlxsSheets(filename)
 	} else {
-		if sub.sheet != "" && sub.dirname != "" {
-			fmt.Fprintln(os.Stderr, "Cannot use --sheet and --dirname together")
-			os.Exit(1)
-		}
 		if sub.sheet == "" {
 			if sub.dirname == "" {
 				fileParts := strings.Split(filename, ".")

@@ -562,19 +562,23 @@ If the length of a cell exceeds `--max-width` it will be truncated with an ellip
 
 ### xlsx
 
-Convert sheets of a XLSX file to CSVs, either saving all sheets to a directory or writing a single sheet to stdout.  Use the `--sheet` option to write a single sheet to stdout.  Use the `--dirname` option to set the directory where all sheets will be saved.
+Convert sheets of an XLSX file to CSVs.
+
+The command defaults to writing all converted sheets to a directory with the same name as the XLSX file (without the ".xlsx" extension).
 
 Usage:
 
-```shell
-gocsv xlsx [--list-sheets] [--dirname DIRNAME] [--sheet SHEET] FILE
+```none
+gocsv xlsx [--list-sheets | --dirname DIRNAME | --sheet SHEET] FILE
 ```
 
 Arguments:
 
-- `--list-sheets` (optional) List the sheets in the XLSX file.
-- `--sheet` (optional) Specify a single sheet (by index or name) to convert and write to stdout.
-- `--dirname` (optional) Name of directory for the output CSVs.  The command defaults to a directory name with the same name as `FILE` (without the `.xlsx` extension).
+- `--list-sheets` (optional) List the sheets, by index and name, in the XLSX file.
+- `--sheet` (optional) Specify a single sheet, by index or name, to convert and write to stdout.
+- `--dirname` (optional) Specify the name of the directory for the converted sheets.  The command defaults to the same name as `FILE`, minus the extension.
+
+Only one option can be used; multiple options cannot be combined.
 
 ### zip
 
