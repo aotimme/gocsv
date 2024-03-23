@@ -576,8 +576,6 @@ Arguments:
 - `--sheet` (optional) Specify the sheet (by index or name) of the sheet to convert.  The command defaults to saving all sheets.
 - `--dirname` (optional) Name of directory for the output CSVs.  The command defaults to a directory name with the same name as `FILE` (without the `.xlsx` extension).
 
-By default the `xlsx` subcommand will convert all the sheets in `FILE` to CSVs to a directory with the same name as `FILE`.
-
 ### zip
 
 Zip multiple CSVs into one CSV.
