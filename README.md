@@ -562,9 +562,7 @@ If the length of a cell exceeds `--max-width` it will be truncated with an ellip
 
 ### xlsx
 
-Convert sheets of a XLSX file to CSV and save the CSVs in a new directory.
-
-By default, all sheets will be converted, and the directory will be named after FILE.  Use the `--sheet` and  `--dirname` options to control which sheets are converted, and where they are saved.
+Convert sheets of a XLSX file to CSV and save the CSVs in a new directory.  See the `--sheet` and  `--dirname` options learn about the defaults, or to control which sheets are converted and where they are saved.
 
 Usage:
 
@@ -575,8 +573,8 @@ gocsv xlsx [--list-sheets] [--dirname DIRNAME] [--sheet SHEET] FILE
 Arguments:
 
 - `--list-sheets` (optional) List the sheets in the XLSX file.
-- `--sheet` (optional) Specify the sheet (by index or name) of the sheet to convert.
-- `--dirname` (optional) Name of directory to output CSV conversions of sheets from `FILE`. If this is not specified, the command will output the CSV files to a directory with the same name as `FILE` (without the `.xlsx` extension).
+- `--sheet` (optional) Specify the sheet (by index or name) of the sheet to convert.  The command defaults to saving all sheets.
+- `--dirname` (optional) Name of directory for the output CSVs.  The command defaults to a directory name with the same name as `FILE` (without the `.xlsx` extension).
 
 By default the `xlsx` subcommand will convert all the sheets in `FILE` to CSVs to a directory with the same name as `FILE`.
 
