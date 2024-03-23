@@ -43,6 +43,10 @@ func (sub *XlsxSubcommand) Run(args []string) {
 	if sub.listSheets {
 		ListXlxsSheets(filename)
 	} else {
+		if sub.sheet != "" && sub.dirname != "" {
+			fmt.Fprintln(os.Stderr, "Cannot use --sheet and --dirname together")
+			os.Exit(1)
+		}
 		if sub.sheet == "" {
 			if sub.dirname == "" {
 				fileParts := strings.Split(filename, ".")
