@@ -32,6 +32,7 @@ func (sub *XlsxSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *XlsxSubcommand) Run(args []string) {
+	// Check args
 	if len(args) > 1 {
 		fmt.Fprintln(os.Stderr, "Can only convert one file")
 		os.Exit(1)
@@ -39,7 +40,7 @@ func (sub *XlsxSubcommand) Run(args []string) {
 		fmt.Fprintln(os.Stderr, "Cannot convert file from stdin")
 		os.Exit(1)
 	}
-
+	// Check flags
 	n := 0
 	if sub.listSheets {
 		n++
@@ -55,6 +56,7 @@ func (sub *XlsxSubcommand) Run(args []string) {
 		os.Exit(1)
 	}
 
+	// Run
 	filename := args[0]
 	if sub.listSheets {
 		ListXlxsSheets(filename)
