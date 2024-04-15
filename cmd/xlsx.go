@@ -42,13 +42,14 @@ func (sub *XlsxSubcommand) Run(args []string) {
 	}
 	// Check flags
 	n := 0
-	if sub.listSheets {
+	switch {
+	case sub.listSheets:
 		n++
-	}
-	if sub.dirname != "" {
+		fallthrough
+	case sub.dirname != "":
 		n++
-	}
-	if sub.sheet != "" {
+		fallthrough
+	case sub.sheet != "":
 		n++
 	}
 	if n > 1 {
