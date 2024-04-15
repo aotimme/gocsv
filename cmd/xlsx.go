@@ -41,19 +41,18 @@ func (sub *XlsxSubcommand) Run(args []string) {
 		os.Exit(1)
 	}
 	// Check flags
-	n := 0
-	switch {
-	case sub.listSheets:
-		n++
-		fallthrough
-	case sub.dirname != "":
-		n++
-		fallthrough
-	case sub.sheet != "":
-		n++
+	flags := []string{}
+	if sub.listSheets {
+		flags = append(flags, "list-sheets")
 	}
-	if n > 1 {
-		fmt.Fprintln(os.Stderr, "Cannot combine options")
+	if sub.dirname != "" {
+		flags = append(flags, "dirname")
+	}
+	if sub.sheet != "" {
+		flags = append(flags, "sheet")
+	}
+	if len(flags) > 1 {
+		fmt.Fprintf(os.Stderr, "Cannot combine flags %s\n", strings.Join(flags, ", "))
 		os.Exit(1)
 	}
 
