@@ -721,7 +721,7 @@ GoCSV can infer values (in increasing order of precedence) for int, float, boole
 
   A datetime column can have values with different layouts that match any of the previously mentioned layouts.
 
-  A custom layout can be supplied with the environment variable `GOCSV_TIMELAYOUT` (like in the GOCSV_DELIMITER examples above). Using the env var puts that layout of the "front of the line" of the precviously mentioned layouts to be tried, so the other layouts can still match values in any of the input columns.
+  A custom layout can be supplied with the environment variable `GOCSV_TIMELAYOUT` (like in the GOCSV_DELIMITER examples above). Using the env var puts that layout of the "front of the line" of the previously mentioned layouts to be tried, so the other layouts can still match values in any of the input columns.
 
 ## Examples
 
