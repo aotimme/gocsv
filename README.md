@@ -568,7 +568,7 @@ The command defaults to writing all converted sheets to a directory with the sam
 
 Usage:
 
-```none
+```shell
 gocsv xlsx [--list-sheets | --dirname DIRNAME | --sheet SHEET] FILE
 ```
 
@@ -576,7 +576,7 @@ Arguments:
 
 - `--list-sheets` (optional) List the sheets, by index and name, in the XLSX file.
 - `--sheet` (optional) Specify a single sheet, by index or name, to convert and write to stdout.
-- `--dirname` (optional) Specify the name of the directory for the converted sheets.  The command defaults to the same name as `FILE`, minus the extension.
+- `--dirname` (optional) Specify the name of the directory for the converted sheets. The command defaults to the same name as `FILE`, minus the extension.
 
 Only one option can be used; multiple options cannot be combined.
 
@@ -646,36 +646,36 @@ cat test-files/left-table.csv \
 
 ### Pipelining Support
 
-| Subcommand    |    Input            |  Output  |
-| ------------- | :-----------------: | :------: |
-| add           |  &#x2714;           | &#x2714; |
-| autoincrement |  &#x2714;           | &#x2714; |
-| behead        |  &#x2714;           | &#x2714; |
-| clean         |  &#x2714;           | &#x2714; |
-| delimiter     |  &#x2714;           | &#x2714; |
-| describe      |  &#x2714;           |   N/A    |
-| dimensions    |  &#x2714;           | &#x2714;<sup>*</sup> |
-| filter        |  &#x2714;           | &#x2714; |
-| head          |  &#x2714;           | &#x2714; |
-| headers       |  &#x2714;           | &#x2714;<sup>*</sup> |
-| join          |  &#x2714;           | &#x2714; |
-| ncol          |  &#x2714;           |   N/A    |
-| nrow          |  &#x2714;           |   N/A    |
-| rename        |  &#x2714;           | &#x2714; |
-| replace       |  &#x2714;           | &#x2714; |
-| sample        |  &#x2714;           | &#x2714; |
-| select        |  &#x2714;           | &#x2714; |
-| sort          |  &#x2714;           | &#x2714; |
-| split         |  &#x2714;           |   N/A    |
-| sql           |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
-| stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
-| stats         |  &#x2714;           |   N/A    |
-| tail          |  &#x2714;           | &#x2714; |
-| transpose     |  &#x2714;           | &#x2714; |
-| tsv           |  &#x2714;           | &#x2714; |
-| unique        |  &#x2714;           | &#x2714; |
-| view          |  &#x2714;           |   N/A    |
-| xlsx          |     N/A             | &#x2021; |
+| Subcommand    |            Input            |        Output         |
+| ------------- | :-------------------------: | :-------------------: |
+| add           |          &#x2714;           |       &#x2714;        |
+| autoincrement |          &#x2714;           |       &#x2714;        |
+| behead        |          &#x2714;           |       &#x2714;        |
+| clean         |          &#x2714;           |       &#x2714;        |
+| delimiter     |          &#x2714;           |       &#x2714;        |
+| describe      |          &#x2714;           |          N/A          |
+| dimensions    |          &#x2714;           | &#x2714;<sup>\*</sup> |
+| filter        |          &#x2714;           |       &#x2714;        |
+| head          |          &#x2714;           |       &#x2714;        |
+| headers       |          &#x2714;           | &#x2714;<sup>\*</sup> |
+| join          |          &#x2714;           |       &#x2714;        |
+| ncol          |          &#x2714;           |          N/A          |
+| nrow          |          &#x2714;           |          N/A          |
+| rename        |          &#x2714;           |       &#x2714;        |
+| replace       |          &#x2714;           |       &#x2714;        |
+| sample        |          &#x2714;           |       &#x2714;        |
+| select        |          &#x2714;           |       &#x2714;        |
+| sort          |          &#x2714;           |       &#x2714;        |
+| split         |          &#x2714;           |          N/A          |
+| sql           | &#x2714;<sup>&#x2020;</sup> |       &#x2714;        |
+| stack         | &#x2714;<sup>&#x2020;</sup> |       &#x2714;        |
+| stats         |          &#x2714;           |          N/A          |
+| tail          |          &#x2714;           |       &#x2714;        |
+| transpose     |          &#x2714;           |       &#x2714;        |
+| tsv           |          &#x2714;           |       &#x2714;        |
+| unique        |          &#x2714;           |       &#x2714;        |
+| view          |          &#x2714;           |          N/A          |
+| xlsx          |             N/A             |       &#x2021;        |
 
 \* `dimensions` and `headers` write to CSV format when using the `--csv` argument.
 
