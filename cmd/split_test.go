@@ -39,7 +39,11 @@ func TestSplit(t *testing.T) {
 
 	// iterate remaining files, breaking them up into groups of
 	// a single test file and some number of subsequent want files
-	const testPrefix = "test: "
+	const (
+		testPrefix = "test: "
+		wantPrefix = "want: "
+	)
+
 	files = files[1:]
 	for i := 0; i < len(files); {
 		if !strings.HasPrefix(files[i].Name, testPrefix) {
@@ -50,7 +54,7 @@ func TestSplit(t *testing.T) {
 
 		wantFiles := make([]txtar.File, 0)
 		for i < len(files) &&
-			strings.HasPrefix(files[i].Name, "want/") {
+			strings.HasPrefix(files[i].Name, wantPrefix) {
 			wantFiles = append(wantFiles, files[i])
 			i++
 		}
@@ -72,7 +76,7 @@ func TestSplit(t *testing.T) {
 			sc.Run(fs.Args())
 
 			for _, file := range wantFiles {
-				name := strings.TrimPrefix(file.Name, "want/")
+				name := strings.TrimPrefix(file.Name, wantPrefix)
 				want := file.Data
 
 				got, err := os.ReadFile(name)
