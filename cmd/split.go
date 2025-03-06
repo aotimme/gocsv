@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 )
 
 type SplitSubcommand struct {
 	maxRows      int
 	filenameBase string
+	width        int
 }
 
 func (sub *SplitSubcommand) Name() string {
@@ -25,7 +25,8 @@ func (sub *SplitSubcommand) Description() string {
 }
 func (sub *SplitSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.IntVar(&sub.maxRows, "max-rows", 0, "Maximum number of rows per CSV.")
-	fs.StringVar(&sub.filenameBase, "filename-base", "", "Base of filenames for output.")
+	fs.StringVar(&sub.filenameBase, "filename-base", "", "(optional) Base of filenames for output.")
+	fs.IntVar(&sub.width, "width", 0, "(optional) Minimum width of the numeric suffix, zero-padded if necessary. For example, --width 3 results in filenames like file-001.csv, file-002.csv, etc.")
 }
 
 func (sub *SplitSubcommand) Run(args []string) {
@@ -35,10 +36,10 @@ func (sub *SplitSubcommand) Run(args []string) {
 	}
 
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
-	Split(inputCsvs[0], sub.maxRows, sub.filenameBase)
+	Split(inputCsvs[0], sub.maxRows, sub.filenameBase, sub.width)
 }
 
-func Split(inputCsv *InputCsv, maxRows int, filenameBase string) {
+func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 	if filenameBase == "" {
 		inputFilename := inputCsv.Filename()
 		if inputFilename == "-" {
@@ -57,7 +58,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string) {
 
 	fileNumber := 1
 	numRowsWritten := 0
-	curFilename := filenameBase + "-" + strconv.Itoa(fileNumber) + ".csv"
+	curFilename := fmt.Sprintf("%s-%0*d.csv", filenameBase, width, fileNumber)
 	curFile, err := os.Create(curFilename)
 	if err != nil {
 		ExitWithError(err)
@@ -80,7 +81,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string) {
 		if numRowsWritten == maxRows {
 			fileNumber++
 			numRowsWritten = 0
-			curFilename = filenameBase + "-" + strconv.Itoa(fileNumber) + ".csv"
+			curFilename = fmt.Sprintf("%s-%0*d.csv", filenameBase, width, fileNumber)
 			curFile, err = os.Create(curFilename)
 			if err != nil {
 				ExitWithError(err)

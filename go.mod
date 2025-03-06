@@ -12,5 +12,6 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/xuri/excelize/v2 v2.6.1
 	golang.org/x/crypto v0.4.0 // indirect
+	golang.org/x/tools v0.4.0
 	modernc.org/sqlite v1.21.1
 )

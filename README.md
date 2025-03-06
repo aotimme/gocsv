@@ -428,13 +428,14 @@ Split a CSV into multiple files.
 Usage:
 
 ```shell
-gocsv split --max-rows N [--filename-base FILENAME] FILE
+gocsv split --max-rows N [--filename-base FILENAME] [--width N] FILE
 ```
 
 Arguments:
 
 - `--max-rows` Maximum number of rows per final CSV.
 - `--filename-base` (optional) Prefix of the resulting files. The file outputs will be appended with `"-1.csv"`,`"-2.csv"`, etc. If not specified, the base filename will be the same as the base of the input filename, unless the input is specified by standard input. If so, then the base filename will be `out`.
+- `--width` (optional) Minimum width of the numeric suffix, zero-padded if necessary. For example, `--width 3` results in filenames like `"file-001.csv"`, `"file-002.csv"`, etc.
 
 ### sql
 
