@@ -20,6 +20,8 @@ func (sub *DescribeSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *DescribeSubcommand) Run(args []string) {
+	useTimeLayoutEnvVar()
+
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	DescribeCsv(inputCsvs[0])
 }

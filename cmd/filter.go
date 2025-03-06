@@ -45,6 +45,8 @@ func (sub *FilterSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *FilterSubcommand) Run(args []string) {
+	useTimeLayoutEnvVar()
+
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
 	sub.RunFilter(inputCsvs[0], outputCsv)
