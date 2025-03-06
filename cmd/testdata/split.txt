@@ -1,0 +1,91 @@
+Test files for the split subcommand.
+-- input.csv --
+A
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+-- test: maxrows --
+-max-rows=1
+-- want/input-1.csv --
+A
+1
+-- want/input-2.csv --
+A
+2
+-- want/input-3.csv --
+A
+3
+-- want/input-4.csv --
+A
+4
+-- want/input-5.csv --
+A
+5
+-- want/input-6.csv --
+A
+6
+-- want/input-7.csv --
+A
+7
+-- want/input-8.csv --
+A
+8
+-- want/input-9.csv --
+A
+9
+-- want/input-10.csv --
+A
+0
+-- test: width --
+-max-rows=1 -width=4
+-- want/input-0001.csv --
+A
+1
+-- want/input-0002.csv --
+A
+2
+-- want/input-0003.csv --
+A
+3
+-- want/input-0004.csv --
+A
+4
+-- want/input-0005.csv --
+A
+5
+-- want/input-0006.csv --
+A
+6
+-- want/input-0007.csv --
+A
+7
+-- want/input-0008.csv --
+A
+8
+-- want/input-0009.csv --
+A
+9
+-- want/input-0010.csv --
+A
+0
+-- test: basename --
+-filename-base=foo -max-rows=10
+-- want/foo-1.csv --
+A
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
