@@ -26,12 +26,13 @@ func (sub *XlsxSubcommand) Description() string {
 	return "Convert sheets of a XLSX file to CSV."
 }
 func (sub *XlsxSubcommand) SetFlags(fs *flag.FlagSet) {
-	fs.BoolVar(&sub.listSheets, "list-sheets", false, "List sheets in file")
-	fs.StringVar(&sub.dirname, "dirname", "", "Name of folder to output sheets to")
-	fs.StringVar(&sub.sheet, "sheet", "", "Name of sheet to convert")
+	fs.BoolVar(&sub.listSheets, "list-sheets", false, "List sheets in file by index and name")
+	fs.StringVar(&sub.dirname, "dirname", "", "Name of folder to write converted sheets to (defaults to file name minus \".xlsx\" extension)")
+	fs.StringVar(&sub.sheet, "sheet", "", "Index or name of sheet to write to stdout")
 }
 
 func (sub *XlsxSubcommand) Run(args []string) {
+	// Check args
 	if len(args) > 1 {
 		fmt.Fprintln(os.Stderr, "Can only convert one file")
 		os.Exit(1)
@@ -39,6 +40,23 @@ func (sub *XlsxSubcommand) Run(args []string) {
 		fmt.Fprintln(os.Stderr, "Cannot convert file from stdin")
 		os.Exit(1)
 	}
+	// Check flags
+	flags := []string{}
+	if sub.listSheets {
+		flags = append(flags, "list-sheets")
+	}
+	if sub.dirname != "" {
+		flags = append(flags, "dirname")
+	}
+	if sub.sheet != "" {
+		flags = append(flags, "sheet")
+	}
+	if len(flags) > 1 {
+		fmt.Fprintf(os.Stderr, "Cannot combine flags %s\n", strings.Join(flags, ", "))
+		os.Exit(1)
+	}
+
+	// Run
 	filename := args[0]
 	if sub.listSheets {
 		ListXlxsSheets(filename)
