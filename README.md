@@ -18,6 +18,7 @@ For other platforms, see the [Installation](#installation) section.
 - [Regular Expression Syntax](#regular-expression-syntax)
 - [Pipelining](#pipelining)
 - [Changing the Default Delimiter](#changing-the-default-delimiter)
+- [Inference](#inference)
 - [Examples](#examples)
 - [Debugging](#debugging)
 - [Installation](#installation)
@@ -225,7 +226,7 @@ Arguments:
 
 ### describe
 
-Get basic information about a CSV. This will output the number of rows and columns in the CSV, the column headers in the CSV, and the inferred type of each column.
+Get basic information about a CSV. This will output the number of rows and columns in the CSV, the column headers in the CSV, and the [inferred](#inference) type of each column.
 
 Usage
 
@@ -265,7 +266,7 @@ Arguments:
 - `--equals` (optional, shorthand `-eq`) String to match against.
 - `--regex` (optional) Regular expression to use to match against. See [Regular Expression Syntax](#regular-expression-syntax) for the syntax.
 - `--case-insensitive` (optional, shorthand `-i`) When using the `--regex` flag, use this flag to specify a case insensitive match rather than the default case sensitive match.
-- `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against a number.
+- `--gt` , `--gte`, `--lt`, `--lte` (optional) Compare against the [inferred types int, float, datetime](#inference); booleans and strings cannot be compared.
 - `--exclude` (optional) Exclude rows that match. Default is to include.
 
 Note that one of `--regex`, `--equals` (`-eq`), `--gt` , `--gte`, `--lt`, or `--lte` must be specified.
@@ -404,7 +405,7 @@ Arguments:
 
 ### sort
 
-Sort a CSV by multiple columns, with or without type inference. The currently supported types are float, int, date, and string.
+Sort a CSV by multiple columns, with or without type [inference](#inference). The currently supported types are float, int, datetime, and string.
 
 Usage:
 
@@ -483,7 +484,7 @@ Specifying a file by name `-` will read a CSV from standard input.
 
 ### stats
 
-Get some basic statistics on a CSV.
+Get some basic statistics on a CSV, uses [inference](#inference).
 
 Usage:
 
@@ -708,6 +709,22 @@ Or, for more exotic delimiters you can use hexadecimal or unicode (e.g. `\x01` o
 export GOCSV_DELIMITER="\x01"
 gocsv select -c 1 soh-delimited.tsv
 ```
+
+## Inference
+
+GoCSV can infer values (in increasing order of precedence) for int, float, boolean, and datetime.
+
+- Ints and floats are any number that can be parsed by strconv's ParseInt and ParseFloat functions.
+
+  A column with ints and floats will be inferred as floats by the [describe](#describe) and [stats](#stats) subcommands—floats have greater precedence than ints.
+
+- Booleans are any of "T", "True", "F", or "False" (case invariant).
+
+- Datetimes are values that match any of [pkg time's](https://pkg.go.dev/time@go1.14#pkg-constants) predefined layouts, ANSIC, UnixDate, RubyDate, RFC822, RFC822Z, RFC850, RFC1123, RFC1123Z, and RFC3339 , as well as the date-only layouts, "2006-01-02", "2006-1-2", "1/2/2006", "01/02/2006".
+
+  A datetime column can have values with different layouts that match any of the previously mentioned layouts.
+
+  A custom layout can be supplied with the environment variable `GOCSV_TIMELAYOUT` (like in the GOCSV_DELIMITER examples above). Using the env var puts that layout of the "front of the line" of the previously mentioned layouts to be tried, so the other layouts can still match values in any of the input columns.
 
 ## Examples
 

@@ -19,6 +19,8 @@ func (sub *StatsSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *StatsSubcommand) Run(args []string) {
+	useTimeLayoutEnvVar()
+
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	Stats(inputCsvs[0])
 }
