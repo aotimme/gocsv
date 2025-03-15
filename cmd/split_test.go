@@ -25,6 +25,12 @@ func TestSplit(t *testing.T) {
 	if input.Name != "input.csv" {
 		t.Fatalf("got first file %s; want input.csv", input.Name)
 	}
+	currentDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Chdir(currentDir)
+	defer os.RemoveAll(tempdir)
 	// need to change dir to test that calling split without
 	// a basename works
 	os.Chdir(tempdir)
