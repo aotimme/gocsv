@@ -71,18 +71,31 @@ func (imc *InMemoryCsv) GetRowsMatchingIndexedColumn(value string) [][]string {
 	return rows
 }
 
-func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
-	curType := NULL_TYPE
-	for _, row := range imc.rows {
-		thisType := InferTypeWithHint(row[columnIndex], curType)
-		if thisType > curType {
-			curType = thisType
-		}
-		if curType == STRING_TYPE {
-			return curType
-		}
+type ColumnValueIterator struct {
+	imc         *InMemoryCsv
+	columnIndex int
+	rowIndex    int
+}
+
+func NewColumnValueIterator(imc *InMemoryCsv, columnIndex int) *ColumnValueIterator {
+	return &ColumnValueIterator{
+		imc:         imc,
+		columnIndex: columnIndex,
+		rowIndex:    0,
 	}
-	return curType
+}
+func (cvi *ColumnValueIterator) Next() (string, bool) {
+	if cvi.rowIndex >= len(cvi.imc.rows) {
+		return "", false
+	}
+	retval := cvi.imc.rows[cvi.rowIndex][cvi.columnIndex]
+	cvi.rowIndex++
+	return retval, true
+}
+
+func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
+	cvi := NewColumnValueIterator(imc, columnIndex)
+	return InferTypeFromStringIterator(cvi)
 }
 
 func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, stable bool, reverse bool) {
@@ -204,7 +217,9 @@ func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
 	} else if columnType == BOOLEAN_TYPE {
 		imc.PrintStatsForColumnAsBoolean(columnIndex)
 	} else if columnType == DATE_TYPE {
-		imc.PrintStatsForColumnAsDate(columnIndex)
+		imc.PrintStatsForColumnAsDatetimeWithFormat(columnIndex, time.DateOnly)
+	} else if columnType == DATETIME_TYPE {
+		imc.PrintStatsForColumnAsDatetimeWithFormat(columnIndex, time.RFC3339)
 	} else if columnType == STRING_TYPE {
 		imc.PrintStatsForColumnAsString(columnIndex)
 	}
@@ -499,35 +514,42 @@ func (a FloatValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a FloatValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
+	numNulls := imc.CountNullsInColumn(columnIndex)
+
 	numTrue := 0
 	numFalse := 0
 	for _, row := range imc.rows {
-		strLower := strings.ToLower(strings.Trim(row[columnIndex], " "))
-		if strLower == "t" || strLower == "true" {
-			numTrue++
-		} else if strLower == "f" || strLower == "false" {
-			numFalse++
+		value := strings.Trim(row[columnIndex], " ")
+		if !IsNullType(value) {
+			bval := ParseBooleanOrPanic(value)
+			if bval {
+				numTrue++
+			} else {
+				numFalse++
+			}
 		}
 	}
+	fmt.Printf("  Number NULL: %d\n", numNulls)
 	fmt.Printf("  Number TRUE: %d\n", numTrue)
 	fmt.Printf("  Number FALSE: %d\n", numFalse)
 }
 
-func (imc *InMemoryCsv) PrintStatsForColumnAsDate(columnIndex int) {
+func (imc *InMemoryCsv) PrintStatsForColumnAsDatetimeWithFormat(columnIndex int, format string) {
 	numNulls := imc.CountNullsInColumn(columnIndex)
 	dateArray := make([]time.Time, imc.NumRows()-numNulls)
 	i := 0
 	for _, row := range imc.rows {
 		if !IsNullType(row[columnIndex]) {
-			dateArray[i] = ParseDateOrPanic(row[columnIndex])
+			dateArray[i] = ParseDatetimeOrPanic(row[columnIndex])
 			i++
 		}
 	}
-	dcs := NewDateColumnsStats(dateArray)
+	dcs := NewDateColumnsStats(dateArray, format)
 	dcs.CalculateAllStats()
 
-	fmt.Printf("  Min: %s\n", dcs.min.Format("2006-01-02"))
-	fmt.Printf("  Max: %s\n", dcs.max.Format("2006-01-02"))
+	fmt.Printf("  Number NULL: %d\n", numNulls)
+	fmt.Printf("  Min: %s\n", dcs.min.Format(format))
+	fmt.Printf("  Max: %s\n", dcs.max.Format(format))
 	fmt.Printf("  Unique values: %d\n", len(dcs.valueCounts))
 	numFrequent := 5
 	if numFrequent > len(dcs.valueCounts) {
@@ -543,11 +565,13 @@ type DateColumnStats struct {
 	array       []time.Time
 	min, max    time.Time
 	valueCounts []StringValueCount
+	format      string
 }
 
-func NewDateColumnsStats(dateArray []time.Time) *DateColumnStats {
+func NewDateColumnsStats(dateArray []time.Time, format string) *DateColumnStats {
 	dcs := new(DateColumnStats)
 	dcs.array = dateArray
+	dcs.format = format
 	return dcs
 }
 
@@ -576,7 +600,7 @@ func (dcs *DateColumnStats) CalculateMax() {
 func (dcs *DateColumnStats) CalculateValueCounts() {
 	valueCountsMap := make(map[string]int)
 	for _, dateVal := range dcs.array {
-		dateStr := dateVal.Format("2006-01-02")
+		dateStr := dateVal.Format(dcs.format)
 		count, ok := valueCountsMap[dateStr]
 		if ok {
 			valueCountsMap[dateStr] = count + 1
@@ -606,6 +630,7 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {
 	scs := NewStringColumnsStats(stringArray)
 	scs.CalculateAllStats()
 
+	fmt.Printf("  Number NULL: %d\n", numNulls)
 	fmt.Printf("  Unique values: %d\n", len(scs.valueCounts))
 	fmt.Printf("  Max length: %d\n", scs.maxLength)
 	numFrequent := 5
