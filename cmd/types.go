@@ -121,7 +121,7 @@ func InferTypeFromStringIterator(valuesIter StringIterator) ColumnType {
 		if !ok {
 			break
 		}
-		thisType := InferTypeWithHint(value, curType)
+		thisType := InferTypeWithRunningType(value, curType)
 		if thisType > curType {
 			curType = thisType
 		}
@@ -157,9 +157,9 @@ func GetType(value string) ColumnType {
 	return STRING_TYPE
 }
 
-func InferTypeWithHint(elem string, hint ColumnType) ColumnType {
+func InferTypeWithRunningType(elem string, runningType ColumnType) ColumnType {
 	elemType := GetType(elem)
-	return getCommonType(elemType, hint)
+	return getCommonType(elemType, runningType)
 }
 
 func IsNullType(elem string) bool {
