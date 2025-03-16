@@ -31,6 +31,8 @@ func (sub *SortSubcommand) SetFlags(fs *flag.FlagSet) {
 }
 
 func (sub *SortSubcommand) Run(args []string) {
+	useTimeLayoutEnvVar()
+
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
 	sub.SortCsv(inputCsvs[0], outputCsv)
