@@ -529,7 +529,6 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
 			}
 		}
 	}
-	fmt.Printf("  Number NULL: %d\n", numNulls)
 	fmt.Printf("  Number TRUE: %d\n", numTrue)
 	fmt.Printf("  Number FALSE: %d\n", numFalse)
 }
@@ -547,7 +546,6 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsDatetimeWithFormat(columnIndex int,
 	dcs := NewDateColumnsStats(dateArray, format)
 	dcs.CalculateAllStats()
 
-	fmt.Printf("  Number NULL: %d\n", numNulls)
 	fmt.Printf("  Min: %s\n", dcs.min.Format(format))
 	fmt.Printf("  Max: %s\n", dcs.max.Format(format))
 	fmt.Printf("  Unique values: %d\n", len(dcs.valueCounts))
@@ -630,7 +628,6 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {
 	scs := NewStringColumnsStats(stringArray)
 	scs.CalculateAllStats()
 
-	fmt.Printf("  Number NULL: %d\n", numNulls)
 	fmt.Printf("  Unique values: %d\n", len(scs.valueCounts))
 	fmt.Printf("  Max length: %d\n", scs.maxLength)
 	numFrequent := 5
