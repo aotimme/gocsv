@@ -58,11 +58,11 @@ func getCommonType(a, b ColumnType) ColumnType {
 		}
 	case FLOAT_TYPE:
 	case BOOLEAN_TYPE:
-	case DATETIME_TYPE:
 	case DATE_TYPE:
 		if b == DATETIME_TYPE {
 			return DATETIME_TYPE
 		}
+	case DATETIME_TYPE:
 	case STRING_TYPE:
 	}
 	return STRING_TYPE
