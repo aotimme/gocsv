@@ -514,8 +514,6 @@ func (a FloatValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a FloatValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
 
 func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
-	numNulls := imc.CountNullsInColumn(columnIndex)
-
 	numTrue := 0
 	numFalse := 0
 	for _, row := range imc.rows {

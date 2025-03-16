@@ -96,6 +96,8 @@ func TestIsDatetimeType(t *testing.T) {
 		{"2023-01-01 12:00:00", true},
 		{"2023-01-01T12:00:00Z", true},
 		{"2023-01-01 12:00:00.123456", true},
+		// dates are also datetimes
+		{"2023-01-01", true},
 	}
 	for i, tt := range testCases {
 		t.Run(fmt.Sprintf("Test %d", i), func(t *testing.T) {
