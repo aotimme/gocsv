@@ -80,7 +80,7 @@ func usageForSubcommand(subcommand Subcommand) string {
 // Keep this in sync with the README.
 func usage() string {
 	usage := "GoCSV is a command line CSV processing tool.\n"
-	usage += version()
+	usage += version() + "\n"
 	usage += "Subcommands:\n"
 	for _, subcommand := range subcommands {
 		usage += usageForSubcommand(subcommand)
@@ -91,7 +91,7 @@ func usage() string {
 
 func version() string {
 	if VERSION != "" && GIT_HASH != "" {
-		return fmt.Sprintf("Version: %s (%s)\n", VERSION, GIT_HASH)
+		return fmt.Sprintf("Version: %s (%s)", VERSION, GIT_HASH)
 	}
 
 	s := ""
@@ -112,9 +112,9 @@ func version() string {
 			}
 		}
 	}
-	s += "local-build:  " + time.Now().Format(time.RFC3339) + "\n"
+	s += "local-build:  " + time.Now().Format(time.RFC3339)
 
-	return strings.TrimSpace(s)
+	return s
 }
 
 func Main() {
