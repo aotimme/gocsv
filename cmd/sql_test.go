@@ -82,10 +82,27 @@ func TestTxtar(t *testing.T) {
 		testPrefix = "test: "
 		wantPrefix = "want: "
 	)
+	var (
+		join     func(name string) (tempPath string)
+		chTmpDir func()
+	)
+	{
+		tmpPath := t.TempDir()
+		join = func(name string) (tempPath string) {
+			return filepath.Join(tmpPath, name)
+		}
+		chTmpDir = func() { os.Chdir(tmpPath) }
 
-	tmpPath := t.TempDir()
-	join := func(name string) (tempPath string) {
-		return filepath.Join(tmpPath, name)
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatalf("could not get working dir: %v", err)
+		}
+		t.Cleanup(func() {
+			err := os.Chdir(cwd)
+			if err != nil {
+				t.Fatalf("could not change back to orignal working dir %s: %v", cwd, err)
+			}
+		})
 	}
 
 	a, err := txtar.ParseFile("./testdata/sql.txt")
@@ -111,6 +128,8 @@ func TestTxtar(t *testing.T) {
 			}
 		}
 	}
+
+	chTmpDir()
 
 	for i := 0; i < len(testPairs); i += 2 {
 		testFile := testPairs[i]
@@ -143,8 +162,6 @@ func TestTxtar(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not parse args: %v", err)
 			}
-
-			os.Chdir(tmpPath)
 
 			buf := bytes.Buffer{}
 
