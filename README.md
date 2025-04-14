@@ -369,7 +369,7 @@ Arguments:
 - `--case-insensitive` (optional, shorthand `-i`) Use this flag to specify a case insensitive match for replacement rather than the default case sensitive match.
 - `--repl` String to use for replacement.
 
-Note that if you have a capture group in the `--regex` argument you can reference that in the replacement argument using `"\$1"` for the first capture group, `"\$2"` for the second capture group, etc.
+Note that if you have a capture group in the `--regex` argument you can reference that in the replacement argument using `"\$1"` for the first capture group, `"\$2"` for the second capture group, etc. In Windows cmd, the `\` escape is unnecessary, and the capture group references should be specifed as `"$1"` and `"$2"`.
 
 ### sample
 
@@ -428,13 +428,14 @@ Split a CSV into multiple files.
 Usage:
 
 ```shell
-gocsv split --max-rows N [--filename-base FILENAME] FILE
+gocsv split --max-rows N [--filename-base FILENAME] [--width N] FILE
 ```
 
 Arguments:
 
 - `--max-rows` Maximum number of rows per final CSV.
 - `--filename-base` (optional) Prefix of the resulting files. The file outputs will be appended with `"-1.csv"`,`"-2.csv"`, etc. If not specified, the base filename will be the same as the base of the input filename, unless the input is specified by standard input. If so, then the base filename will be `out`.
+- `--width` (optional) Minimum width of the numeric suffix, zero-padded if necessary. For example, `--width 3` results in filenames like `"file-001.csv"`, `"file-002.csv"`, etc.
 
 ### sql
 
@@ -568,7 +569,7 @@ The command defaults to writing all converted sheets to a directory with the sam
 
 Usage:
 
-```none
+```shell
 gocsv xlsx [--list-sheets | --dirname DIRNAME | --sheet SHEET] FILE
 ```
 
@@ -576,7 +577,7 @@ Arguments:
 
 - `--list-sheets` (optional) List the sheets, by index and name, in the XLSX file.
 - `--sheet` (optional) Specify a single sheet, by index or name, to convert and write to stdout.
-- `--dirname` (optional) Specify the name of the directory for the converted sheets.  The command defaults to the same name as `FILE`, minus the extension.
+- `--dirname` (optional) Specify the name of the directory for the converted sheets. The command defaults to the same name as `FILE`, minus the extension.
 
 Only one option can be used; multiple options cannot be combined.
 

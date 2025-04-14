@@ -20,10 +20,10 @@ func (sub *DelimiterSubcommand) Description() string {
 	return "Change the delimiter being used for a CSV."
 }
 func (sub *DelimiterSubcommand) SetFlags(fs *flag.FlagSet) {
-	fs.StringVar(&sub.inputDelimiter, "input", "", "Input delimiter")
-	fs.StringVar(&sub.inputDelimiter, "i", "", "Input delimiter (shorthand)")
-	fs.StringVar(&sub.outputDelimiter, "output", "", "Output delimiter")
-	fs.StringVar(&sub.outputDelimiter, "o", "", "Output delimiter (shorthand)")
+	fs.StringVar(&sub.inputDelimiter, "input", ",", "Input delimiter")
+	fs.StringVar(&sub.inputDelimiter, "i", ",", "Input delimiter (shorthand)")
+	fs.StringVar(&sub.outputDelimiter, "output", ",", "Output delimiter")
+	fs.StringVar(&sub.outputDelimiter, "o", ",", "Output delimiter (shorthand)")
 }
 
 func (sub *DelimiterSubcommand) Run(args []string) {

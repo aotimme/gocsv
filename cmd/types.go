@@ -9,16 +9,64 @@ import (
 
 type ColumnType int
 
-// NOTE: Order matters here. Ordered by strictness descending
 const (
 	NULL_TYPE ColumnType = iota
 	INT_TYPE
 	FLOAT_TYPE
 	BOOLEAN_TYPE
-	DATETIME_TYPE
 	DATE_TYPE
+	DATETIME_TYPE
 	STRING_TYPE
 )
+
+var datetimeFormats = []string{
+	time.ANSIC,
+	time.UnixDate,
+	time.RubyDate,
+	time.RFC822,
+	time.RFC822Z,
+	time.RFC850,
+	time.RFC1123,
+	time.RFC1123Z,
+	time.RFC3339,
+	time.DateTime,
+}
+
+var dateFormats = []string{
+	"2006-01-02",
+	"2006-1-2",
+	"1/2/2006",
+	"01/02/2006",
+}
+
+func getCommonType(a, b ColumnType) ColumnType {
+	// swap a and b so a <= b (because this function is symmetrical):
+	if a > b {
+		a, b = b, a
+	}
+	if a == b {
+		return a
+	}
+	// At this point, b > a, so we don't need to consider any
+	// case where b <= a below.
+	switch a {
+	case NULL_TYPE:
+		return b
+	case INT_TYPE:
+		if b == FLOAT_TYPE {
+			return FLOAT_TYPE
+		}
+	case FLOAT_TYPE:
+	case BOOLEAN_TYPE:
+	case DATE_TYPE:
+		if b == DATETIME_TYPE {
+			return DATETIME_TYPE
+		}
+	case DATETIME_TYPE:
+	case STRING_TYPE:
+	}
+	return STRING_TYPE
+}
 
 func ColumnTypeToString(columnType ColumnType) string {
 	if columnType == NULL_TYPE {
@@ -60,26 +108,58 @@ func ColumnTypeToSqliteType(columnType ColumnType) string {
 	}
 }
 
-func InferTypeWithHint(elem string, hint ColumnType) ColumnType {
-	if IsNullType(elem) {
+type StringIterator interface {
+	// Next returns the next string and whether more values are available
+	Next() (string, bool)
+}
+
+func InferTypeFromStringIterator(valuesIter StringIterator) ColumnType {
+	curType := NULL_TYPE
+
+	for {
+		value, ok := valuesIter.Next()
+		if !ok {
+			break
+		}
+		thisType := InferTypeWithRunningType(value, curType)
+		if thisType > curType {
+			curType = thisType
+		}
+
+		// Early termination if we already know it's a string
+		if curType == STRING_TYPE {
+			return curType
+		}
+	}
+
+	return curType
+}
+
+func GetType(value string) ColumnType {
+	if IsNullType(value) {
 		return NULL_TYPE
 	}
-	if INT_TYPE >= hint && IsIntType(elem) {
+	if IsIntType(value) {
 		return INT_TYPE
 	}
-	if FLOAT_TYPE >= hint && IsFloatType(elem) {
+	if IsFloatType(value) {
 		return FLOAT_TYPE
 	}
-	if BOOLEAN_TYPE >= hint && IsBooleanType(elem) {
+	if IsBooleanType(value) {
 		return BOOLEAN_TYPE
 	}
-	if DATETIME_TYPE >= hint && IsDatetimeType(elem) {
-		return DATETIME_TYPE
-	}
-	if DATE_TYPE >= hint && IsDateType(elem) {
+	if IsDateType(value) {
 		return DATE_TYPE
 	}
+	if IsDatetimeType(value) {
+		return DATETIME_TYPE
+	}
 	return STRING_TYPE
+}
+
+func InferTypeWithRunningType(elem string, runningType ColumnType) ColumnType {
+	elemType := GetType(elem)
+	return getCommonType(elemType, runningType)
 }
 
 func IsNullType(elem string) bool {
@@ -97,8 +177,26 @@ func IsFloatType(elem string) bool {
 }
 
 func IsBooleanType(elem string) bool {
+	_, err := ParseBoolean(elem)
+	return err == nil
+}
+
+func ParseBoolean(elem string) (bool, error) {
 	strLower := strings.ToLower(elem)
-	return strLower == "t" || strLower == "true" || strLower == "f" || strLower == "false"
+	if strLower == "t" || strLower == "true" {
+		return true, nil
+	} else if strLower == "f" || strLower == "false" {
+		return false, nil
+	}
+	return false, errors.New("invalid boolean string")
+}
+
+func ParseBooleanOrPanic(elem string) bool {
+	b, err := ParseBoolean(elem)
+	if err != nil {
+		ExitWithError(err)
+	}
+	return b
 }
 
 func IsDatetimeType(elem string) bool {
@@ -120,24 +218,14 @@ func ParseDatetimeOrPanic(elem string) time.Time {
 }
 
 func ParseDatetime(elem string) (time.Time, error) {
-	patterns := []string{
-		time.ANSIC,
-		time.UnixDate,
-		time.RubyDate,
-		time.RFC822,
-		time.RFC822Z,
-		time.RFC850,
-		time.RFC1123,
-		time.RFC1123Z,
-		time.RFC3339,
-	}
-	for _, pattern := range patterns {
-		t, err := time.Parse(pattern, elem)
+	for _, format := range datetimeFormats {
+		t, err := time.Parse(format, elem)
 		if err == nil {
 			return t, nil
 		}
 	}
-	return time.Time{}, errors.New("invalid Date string")
+	// Fall back to parsing as Date (Date is a subset of Datetime)
+	return ParseDate(elem)
 }
 
 func ParseDateOrPanic(elem string) time.Time {
@@ -149,14 +237,8 @@ func ParseDateOrPanic(elem string) time.Time {
 }
 
 func ParseDate(elem string) (time.Time, error) {
-	patterns := []string{
-		"2006-01-02",
-		"2006-1-2",
-		"1/2/2006",
-		"01/02/2006",
-	}
-	for _, pattern := range patterns {
-		t, err := time.Parse(pattern, elem)
+	for _, format := range dateFormats {
+		t, err := time.Parse(format, elem)
 		if err == nil {
 			return t, nil
 		}

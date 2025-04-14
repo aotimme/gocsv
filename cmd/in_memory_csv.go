@@ -1,11 +1,15 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
+	"io"
 	"math"
 	"math/rand"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -71,18 +75,31 @@ func (imc *InMemoryCsv) GetRowsMatchingIndexedColumn(value string) [][]string {
 	return rows
 }
 
-func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
-	curType := NULL_TYPE
-	for _, row := range imc.rows {
-		thisType := InferTypeWithHint(row[columnIndex], curType)
-		if thisType > curType {
-			curType = thisType
-		}
-		if curType == STRING_TYPE {
-			return curType
-		}
+type ColumnValueIterator struct {
+	imc         *InMemoryCsv
+	columnIndex int
+	rowIndex    int
+}
+
+func NewColumnValueIterator(imc *InMemoryCsv, columnIndex int) *ColumnValueIterator {
+	return &ColumnValueIterator{
+		imc:         imc,
+		columnIndex: columnIndex,
+		rowIndex:    0,
 	}
-	return curType
+}
+func (cvi *ColumnValueIterator) Next() (string, bool) {
+	if cvi.rowIndex >= len(cvi.imc.rows) {
+		return "", false
+	}
+	retval := cvi.imc.rows[cvi.rowIndex][cvi.columnIndex]
+	cvi.rowIndex++
+	return retval, true
+}
+
+func (imc *InMemoryCsv) InferType(columnIndex int) ColumnType {
+	cvi := NewColumnValueIterator(imc, columnIndex)
+	return InferTypeFromStringIterator(cvi)
 }
 
 func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, stable bool, reverse bool) {
@@ -184,35 +201,67 @@ func (imc *InMemoryCsv) SampleRowIndices(numRows int, replace bool, seed int) []
 }
 
 func (imc *InMemoryCsv) PrintStats() {
-	for i := 0; i < imc.NumColumns(); i++ {
-		imc.PrintStatsForColumn(i)
+	numColumns := imc.NumColumns()
+	buffers := make([]bytes.Buffer, numColumns)
+
+	// Use a WaitGroup to wait for all goroutines to complete
+	var wg sync.WaitGroup
+	wg.Add(numColumns)
+
+	// Process each column concurrently
+	for i := 0; i < numColumns; i++ {
+		go func(columnIndex int) {
+			defer wg.Done()
+			bufferedWriter := bufio.NewWriter(&buffers[columnIndex])
+			imc.FprintStatsForColumn(bufferedWriter, columnIndex)
+			bufferedWriter.Flush()
+		}(i)
 	}
+
+	// Wait for all goroutines to complete
+	wg.Wait()
+
+	// Print all column stats in order
+	for i := 0; i < numColumns; i++ {
+		fmt.Print(buffers[i].String())
+	}
+
 	fmt.Printf("Number of rows: %d\n", imc.NumRows())
 }
 
-func (imc *InMemoryCsv) PrintStatsForColumn(columnIndex int) {
-	fmt.Printf("%d. %s\n", columnIndex+1, imc.header[columnIndex])
+func (imc *InMemoryCsv) GetPrintStatsForColumn(columnIndex int) bytes.Buffer {
+	var buf bytes.Buffer
+	bufferedWriter := bufio.NewWriter(&buf)
+	imc.FprintStatsForColumn(bufferedWriter, columnIndex)
+	bufferedWriter.Flush()
+	return buf
+}
+
+func (imc *InMemoryCsv) FprintStatsForColumn(w io.Writer, columnIndex int) {
+	fmt.Fprintf(w, "%d. %s\n", columnIndex+1, imc.header[columnIndex])
 	columnType := imc.InferType(columnIndex)
-	fmt.Printf("  Type: %s\n", ColumnTypeToString(columnType))
-	imc.PrintColumnNumberNulls(columnIndex)
+	fmt.Fprintf(w, "  Type: %s\n", ColumnTypeToString(columnType))
+	imc.FprintColumnNumberNulls(w, columnIndex)
 	if columnType == NULL_TYPE {
 		// continue
 	} else if columnType == INT_TYPE {
-		imc.PrintStatsForColumnAsInt(columnIndex)
+		imc.FprintStatsForColumnAsInt(w, columnIndex)
 	} else if columnType == FLOAT_TYPE {
-		imc.PrintStatsForColumnAsFloat(columnIndex)
+		imc.FprintStatsForColumnAsFloat(w, columnIndex)
 	} else if columnType == BOOLEAN_TYPE {
-		imc.PrintStatsForColumnAsBoolean(columnIndex)
+		imc.FprintStatsForColumnAsBoolean(w, columnIndex)
 	} else if columnType == DATE_TYPE {
-		imc.PrintStatsForColumnAsDate(columnIndex)
+		imc.FprintStatsForColumnAsDatetimeWithFormat(w, columnIndex, time.DateOnly)
+	} else if columnType == DATETIME_TYPE {
+		imc.FprintStatsForColumnAsDatetimeWithFormat(w, columnIndex, time.RFC3339)
 	} else if columnType == STRING_TYPE {
-		imc.PrintStatsForColumnAsString(columnIndex)
+		imc.FprintStatsForColumnAsString(w, columnIndex)
 	}
 }
 
-func (imc *InMemoryCsv) PrintColumnNumberNulls(columnIndex int) {
+func (imc *InMemoryCsv) FprintColumnNumberNulls(w io.Writer, columnIndex int) {
 	numNulls := imc.CountNullsInColumn(columnIndex)
-	fmt.Printf("  Number NULL: %d\n", numNulls)
+	fmt.Fprintf(w, "  Number NULL: %d\n", numNulls)
 }
 
 func (imc *InMemoryCsv) CountNullsInColumn(columnIndex int) int {
@@ -226,7 +275,7 @@ func (imc *InMemoryCsv) CountNullsInColumn(columnIndex int) int {
 	return numNulls
 }
 
-func (imc *InMemoryCsv) PrintStatsForColumnAsInt(columnIndex int) {
+func (imc *InMemoryCsv) FprintStatsForColumnAsInt(w io.Writer, columnIndex int) {
 	numNulls := imc.CountNullsInColumn(columnIndex)
 	intArray := make([]int64, imc.NumRows()-numNulls)
 	i := 0
@@ -239,20 +288,20 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsInt(columnIndex int) {
 	ics := NewIntColumnsStats(intArray)
 	ics.CalculateAllStats()
 
-	fmt.Printf("  Min: %d\n", ics.min)
-	fmt.Printf("  Max: %d\n", ics.max)
-	fmt.Printf("  Sum: %d\n", ics.sum)
-	fmt.Printf("  Mean: %f\n", ics.mean)
-	fmt.Printf("  Median: %f\n", ics.median)
-	fmt.Printf("  Standard Deviation: %f\n", ics.stdev)
-	fmt.Printf("  Unique values: %d\n", len(ics.valueCounts))
+	fmt.Fprintf(w, "  Min: %d\n", ics.min)
+	fmt.Fprintf(w, "  Max: %d\n", ics.max)
+	fmt.Fprintf(w, "  Sum: %d\n", ics.sum)
+	fmt.Fprintf(w, "  Mean: %f\n", ics.mean)
+	fmt.Fprintf(w, "  Median: %f\n", ics.median)
+	fmt.Fprintf(w, "  Standard Deviation: %f\n", ics.stdev)
+	fmt.Fprintf(w, "  Unique values: %d\n", len(ics.valueCounts))
 	numFrequent := 5
 	if numFrequent > len(ics.valueCounts) {
 		numFrequent = len(ics.valueCounts)
 	}
-	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	fmt.Fprintf(w, "  %d most frequent values:\n", numFrequent)
 	for i := 0; i < numFrequent; i++ {
-		fmt.Printf("      %d: %d\n", ics.valueCounts[i].value, ics.valueCounts[i].count)
+		fmt.Fprintf(w, "      %d: %d\n", ics.valueCounts[i].value, ics.valueCounts[i].count)
 	}
 }
 
@@ -365,7 +414,7 @@ func (a IntValueCountByCount) Len() int           { return len(a) }
 func (a IntValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a IntValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
 
-func (imc *InMemoryCsv) PrintStatsForColumnAsFloat(columnIndex int) {
+func (imc *InMemoryCsv) FprintStatsForColumnAsFloat(w io.Writer, columnIndex int) {
 	numNulls := imc.CountNullsInColumn(columnIndex)
 	floatArray := make([]float64, imc.NumRows()-numNulls)
 	i := 0
@@ -378,20 +427,20 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsFloat(columnIndex int) {
 	fcs := NewFloatColumnsStats(floatArray)
 	fcs.CalculateAllStats()
 
-	fmt.Printf("  Min: %f\n", fcs.min)
-	fmt.Printf("  Max: %f\n", fcs.max)
-	fmt.Printf("  Sum: %f\n", fcs.sum)
-	fmt.Printf("  Mean: %f\n", fcs.mean)
-	fmt.Printf("  Median: %f\n", fcs.median)
-	fmt.Printf("  Standard Deviation: %f\n", fcs.stdev)
-	fmt.Printf("  Unique values: %d\n", len(fcs.valueCounts))
+	fmt.Fprintf(w, "  Min: %f\n", fcs.min)
+	fmt.Fprintf(w, "  Max: %f\n", fcs.max)
+	fmt.Fprintf(w, "  Sum: %f\n", fcs.sum)
+	fmt.Fprintf(w, "  Mean: %f\n", fcs.mean)
+	fmt.Fprintf(w, "  Median: %f\n", fcs.median)
+	fmt.Fprintf(w, "  Standard Deviation: %f\n", fcs.stdev)
+	fmt.Fprintf(w, "  Unique values: %d\n", len(fcs.valueCounts))
 	numFrequent := 5
 	if numFrequent > len(fcs.valueCounts) {
 		numFrequent = len(fcs.valueCounts)
 	}
-	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	fmt.Fprintf(w, "  %d most frequent values:\n", numFrequent)
 	for i := 0; i < numFrequent; i++ {
-		fmt.Printf("      %f: %d\n", fcs.valueCounts[i].value, fcs.valueCounts[i].count)
+		fmt.Fprintf(w, "      %f: %d\n", fcs.valueCounts[i].value, fcs.valueCounts[i].count)
 	}
 }
 
@@ -498,44 +547,47 @@ func (a FloatValueCountByCount) Len() int           { return len(a) }
 func (a FloatValueCountByCount) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a FloatValueCountByCount) Less(i, j int) bool { return a[i].count < a[j].count }
 
-func (imc *InMemoryCsv) PrintStatsForColumnAsBoolean(columnIndex int) {
+func (imc *InMemoryCsv) FprintStatsForColumnAsBoolean(w io.Writer, columnIndex int) {
 	numTrue := 0
 	numFalse := 0
 	for _, row := range imc.rows {
-		strLower := strings.ToLower(strings.Trim(row[columnIndex], " "))
-		if strLower == "t" || strLower == "true" {
-			numTrue++
-		} else if strLower == "f" || strLower == "false" {
-			numFalse++
+		value := strings.Trim(row[columnIndex], " ")
+		if !IsNullType(value) {
+			bval := ParseBooleanOrPanic(value)
+			if bval {
+				numTrue++
+			} else {
+				numFalse++
+			}
 		}
 	}
-	fmt.Printf("  Number TRUE: %d\n", numTrue)
-	fmt.Printf("  Number FALSE: %d\n", numFalse)
+	fmt.Fprintf(w, "  Number TRUE: %d\n", numTrue)
+	fmt.Fprintf(w, "  Number FALSE: %d\n", numFalse)
 }
 
-func (imc *InMemoryCsv) PrintStatsForColumnAsDate(columnIndex int) {
+func (imc *InMemoryCsv) FprintStatsForColumnAsDatetimeWithFormat(w io.Writer, columnIndex int, format string) {
 	numNulls := imc.CountNullsInColumn(columnIndex)
 	dateArray := make([]time.Time, imc.NumRows()-numNulls)
 	i := 0
 	for _, row := range imc.rows {
 		if !IsNullType(row[columnIndex]) {
-			dateArray[i] = ParseDateOrPanic(row[columnIndex])
+			dateArray[i] = ParseDatetimeOrPanic(row[columnIndex])
 			i++
 		}
 	}
-	dcs := NewDateColumnsStats(dateArray)
+	dcs := NewDateColumnsStats(dateArray, format)
 	dcs.CalculateAllStats()
 
-	fmt.Printf("  Min: %s\n", dcs.min.Format("2006-01-02"))
-	fmt.Printf("  Max: %s\n", dcs.max.Format("2006-01-02"))
-	fmt.Printf("  Unique values: %d\n", len(dcs.valueCounts))
+	fmt.Fprintf(w, "  Min: %s\n", dcs.min.Format(format))
+	fmt.Fprintf(w, "  Max: %s\n", dcs.max.Format(format))
+	fmt.Fprintf(w, "  Unique values: %d\n", len(dcs.valueCounts))
 	numFrequent := 5
 	if numFrequent > len(dcs.valueCounts) {
 		numFrequent = len(dcs.valueCounts)
 	}
-	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	fmt.Fprintf(w, "  %d most frequent values:\n", numFrequent)
 	for i := 0; i < numFrequent; i++ {
-		fmt.Printf("      %s: %d\n", dcs.valueCounts[i].value, dcs.valueCounts[i].count)
+		fmt.Fprintf(w, "      %s: %d\n", dcs.valueCounts[i].value, dcs.valueCounts[i].count)
 	}
 }
 
@@ -543,11 +595,13 @@ type DateColumnStats struct {
 	array       []time.Time
 	min, max    time.Time
 	valueCounts []StringValueCount
+	format      string
 }
 
-func NewDateColumnsStats(dateArray []time.Time) *DateColumnStats {
+func NewDateColumnsStats(dateArray []time.Time, format string) *DateColumnStats {
 	dcs := new(DateColumnStats)
 	dcs.array = dateArray
+	dcs.format = format
 	return dcs
 }
 
@@ -576,7 +630,7 @@ func (dcs *DateColumnStats) CalculateMax() {
 func (dcs *DateColumnStats) CalculateValueCounts() {
 	valueCountsMap := make(map[string]int)
 	for _, dateVal := range dcs.array {
-		dateStr := dateVal.Format("2006-01-02")
+		dateStr := dateVal.Format(dcs.format)
 		count, ok := valueCountsMap[dateStr]
 		if ok {
 			valueCountsMap[dateStr] = count + 1
@@ -593,7 +647,7 @@ func (dcs *DateColumnStats) CalculateValueCounts() {
 	sort.Sort(sort.Reverse(StringValueCountByCount(dcs.valueCounts)))
 }
 
-func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {
+func (imc *InMemoryCsv) FprintStatsForColumnAsString(w io.Writer, columnIndex int) {
 	numNulls := imc.CountNullsInColumn(columnIndex)
 	stringArray := make([]string, imc.NumRows()-numNulls)
 	i := 0
@@ -606,15 +660,15 @@ func (imc *InMemoryCsv) PrintStatsForColumnAsString(columnIndex int) {
 	scs := NewStringColumnsStats(stringArray)
 	scs.CalculateAllStats()
 
-	fmt.Printf("  Unique values: %d\n", len(scs.valueCounts))
-	fmt.Printf("  Max length: %d\n", scs.maxLength)
+	fmt.Fprintf(w, "  Unique values: %d\n", len(scs.valueCounts))
+	fmt.Fprintf(w, "  Max length: %d\n", scs.maxLength)
 	numFrequent := 5
 	if numFrequent > len(scs.valueCounts) {
 		numFrequent = len(scs.valueCounts)
 	}
-	fmt.Printf("  %d most frequent values:\n", numFrequent)
+	fmt.Fprintf(w, "  %d most frequent values:\n", numFrequent)
 	for i := 0; i < numFrequent; i++ {
-		fmt.Printf("      %s: %d\n", scs.valueCounts[i].value, scs.valueCounts[i].count)
+		fmt.Fprintf(w, "      %s: %d\n", scs.valueCounts[i].value, scs.valueCounts[i].count)
 	}
 }
 
