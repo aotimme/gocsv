@@ -1,0 +1,43 @@
+Test files for the SQL subcommand.
+-- in: employee.csv --
+ID, Name,    Age, Salary,  Dept_ID
+ 1, Abiola,   29, 70000.0,       2
+ 2, Bolade,   25, 68000.0,       3
+ 3, Chima,    23, 66000.0,       2
+ 4, Dinya,    25, 80000.0,       1
+ 5, Ekon,     27, 85000.0,       1
+ 6, Feranmi,  22, 65000.0,       2
+ 7, Ifama,    24, 65000.0,       2
+
+-- in: department.csv --
+ID, Dept
+ 1, DevOps
+ 2, Engineering
+ 3, Finance
+
+-- in: join.sql --
+SELECT
+    Name,Dept
+FROM
+    employee
+    INNER JOIN department ON employee.DEPT_ID = department.ID
+
+-- test: query --
+["-q=SELECT SUM(Salary) AS Total FROM employee", "employee.csv"]
+
+-- want: query --
+Total
+499000
+
+-- test: file --
+["-f=join.sql", "department.csv", "employee.csv"]
+
+-- want: file --
+Name,    Dept
+Abiola,  Engineering
+Bolade,  Finance
+Chima,   Engineering
+Dinya,   DevOps
+Ekon,    DevOps
+Feranmi, Engineering
+Ifama,   Engineering
