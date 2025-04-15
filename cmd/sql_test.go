@@ -249,10 +249,3 @@ func postProcessCSV(data []byte) ([]byte, error) {
 
 	return buf.Bytes(), nil
 }
-
-func max(a, b int) int {
-	if b > a {
-		return b
-	}
-	return a
-}
