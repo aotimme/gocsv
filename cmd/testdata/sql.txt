@@ -1,43 +1,85 @@
 Test files for the SQL subcommand.
--- in: employee.csv --
-ID, Name,    Age, Salary,  Dept_ID
- 1, Abiola,   29, 70000.0,       2
- 2, Bolade,   25, 68000.0,       3
- 3, Chima,    23, 66000.0,       2
- 4, Dinya,    25, 80000.0,       1
- 5, Ekon,     27, 85000.0,       1
- 6, Feranmi,  22, 65000.0,       2
- 7, Ifama,    24, 65000.0,       2
 
--- in: department.csv --
+ - files prefixed with "fs: " will be written to a tempdir
+ - a test/want pair consists of a test file (interpreted as
+   a JSON array of strings) and a want file
+
+The want files can have any number of blank lines at the
+bottom, as they should be normalized; the convention is two
+blank lines to denote the end of a test.
+
+-- fs: employee.csv --
+ID, Name,    Salary, Dept_ID
+ 1, Alice,    70000,       2
+ 2, Bolade,   68000,       3
+ 3, Charly,   66000,       2
+ 4, Dinya,    80000,       1
+ 5, Eiko,     85000,       1
+ 6, Frida,    65000,       2
+ 7, Gunter,   65000,       2
+
+-- fs: department.csv --
 ID, Dept
  1, DevOps
  2, Engineering
  3, Finance
 
--- in: join.sql --
+
+-- query_sum --
+["-q=SELECT SUM(Salary) AS Total FROM employee", "employee.csv"]
+
+-- want --
+Total
+499000
+
+
+-- query_where --
+["-q=SELECT ID,Name,Salary FROM employee WHERE Salary >= 80000", "employee.csv"]
+
+-- want --
+ID, Name,  Salary
+ 4, Dinya,  80000
+ 5, Eiko,   85000
+
+
+-- file_join --
+["-f=join.sql", "department.csv", "employee.csv"]
+
+-- fs: join.sql --
 SELECT
     Name,Dept
 FROM
     employee
     INNER JOIN department ON employee.DEPT_ID = department.ID
 
--- test: query --
-["-q=SELECT SUM(Salary) AS Total FROM employee", "employee.csv"]
-
--- want: query --
-Total
-499000
-
--- test: file --
-["-f=join.sql", "department.csv", "employee.csv"]
-
--- want: file --
+-- want --
 Name,    Dept
-Abiola,  Engineering
+Alice,   Engineering
 Bolade,  Finance
-Chima,   Engineering
+Charly,  Engineering
 Dinya,   DevOps
-Ekon,    DevOps
-Feranmi, Engineering
-Ifama,   Engineering
+Eiko,    DevOps
+Frida,   Engineering
+Gunter,  Engineering
+
+
+-- file_count --
+["-f=count.sql", "department.csv", "employee.csv"]
+
+-- fs: count.sql --
+SELECT
+    Dept AS DeptName,
+    COUNT(*) AS EmployeeCount
+FROM
+    employee
+    INNER JOIN department on employee.DEPT_ID = department.ID
+GROUP BY
+    DeptName
+ORDER BY
+    DeptName ASC
+
+-- want --
+DeptName,    EmployeeCount
+DevOps,                  2
+Engineering,             4
+Finance,                 1

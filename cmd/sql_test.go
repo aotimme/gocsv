@@ -7,54 +7,69 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
 	"golang.org/x/tools/txtar"
 )
 
-func TestRunSql(t *testing.T) {
-	testCases := []struct {
-		queryString string
-		rows        [][]string
-	}{
-		{"SELECT * FROM [simple-sort] WHERE [Number] > 0", [][]string{
-			{"Number", "String"},
-			{"1", "One"},
-			{"2", "Two"},
-			{"2", "Another Two"},
-		}},
-		{"SELECT SUM([Number]) AS Total FROM [simple-sort]", [][]string{
-			{"Total"},
-			{"4"},
-		}},
-		{"SELECT [Number], COUNT(*) AS Count FROM [simple-sort] GROUP BY [Number] ORDER BY [Number] ASC", [][]string{
-			{"Number", "Count"},
-			{"-1", "1"},
-			{"1", "1"},
-			{"2", "2"},
-		}},
+func TestSql_RunSql(t *testing.T) {
+	a := must(txtar.ParseFile("./testdata/sql.txt"))
+
+	// create tempdir to read input CSVs and SQL scripts
+	t.Chdir(t.TempDir())
+
+	// save fs files (normalizing CSVs); separate
+	// non-fs files (should be test/want files)
+	const fsPrefix = "fs: "
+	otherFiles := []txtar.File{}
+	for _, f := range a.Files {
+		if !strings.HasPrefix(f.Name, fsPrefix) {
+			otherFiles = append(otherFiles, f)
+			continue
+		}
+
+		if strings.HasSuffix(f.Name, ".csv") {
+			f.Data = normalize(f.Data)
+		}
+
+		_must(os.WriteFile(
+			strings.TrimPrefix(f.Name, fsPrefix), f.Data, 0444))
 	}
-	for i, tt := range testCases {
-		t.Run(fmt.Sprintf("Test %d", i), func(t *testing.T) {
-			ic, err := NewInputCsv("../test-files/simple-sort.csv")
-			if err != nil {
-				t.Error("Unexpected error", err)
-			}
-			toc := new(testOutputCsv)
-			sub := new(SqlSubcommand)
-			sub.queryString = tt.queryString
-			sub.RunSql([]*InputCsv{ic}, toc)
-			err = assertRowsEqual(tt.rows, toc.rows)
-			if err != nil {
-				t.Error(err)
+
+	// iterate test/want pairs
+	for i := 0; i < len(otherFiles); i += 2 {
+		a, b := otherFiles[i], otherFiles[i+1]
+		if b.Name != "want" {
+			t.Fatalf("after test file %s got want file %q; want \"want\"",
+				a.Name, b.Name)
+		}
+		ftest, fwant := a, b
+
+		t.Run(ftest.Name, func(t *testing.T) {
+			subcmd := SqlSubcommand{}
+			fs := flag.NewFlagSet("", 0)
+			subcmd.SetFlags(fs)
+			_must(fs.Parse(getArgs(ftest.Data)))
+
+			inputCsvs := GetInputCsvsOrPanic(fs.Args(), -1)
+			outputBuf := bytes.Buffer{}
+			outputCsv := &OutputCsv{csvWriter: csv.NewWriter(&outputBuf)}
+
+			subcmd.RunSql(inputCsvs, outputCsv)
+
+			got := prettify(outputBuf.Bytes())
+			want := prettify(fwant.Data)
+			if !slices.Equal(got, want) {
+				t.Errorf("\ngot: \n%s\n\nwant: \n%s", got, want)
 			}
 		})
 	}
 }
 
-func TestEscapeSqlName(t *testing.T) {
+func TestSql_escapeSqlName(t *testing.T) {
 	testCases := []struct {
 		inputName  string
 		outputName string
@@ -76,176 +91,87 @@ func TestEscapeSqlName(t *testing.T) {
 	}
 }
 
-func TestTxtar(t *testing.T) {
-	const (
-		inPrefix   = "in: "
-		testPrefix = "test: "
-		wantPrefix = "want: "
-	)
-	var (
-		join     func(name string) (tempPath string)
-		chTmpDir func()
-	)
-	{
-		tmpPath := t.TempDir()
-		join = func(name string) (tempPath string) {
-			return filepath.Join(tmpPath, name)
-		}
-		chTmpDir = func() { os.Chdir(tmpPath) }
-
-		cwd, err := os.Getwd()
-		if err != nil {
-			t.Fatalf("could not get working dir: %v", err)
-		}
-		t.Cleanup(func() {
-			err := os.Chdir(cwd)
-			if err != nil {
-				t.Fatalf("could not change back to orignal working dir %s: %v", cwd, err)
-			}
-		})
-	}
-
-	a, err := txtar.ParseFile("./testdata/sql.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	testPairs := []txtar.File{}
-	for _, aFile := range a.Files {
-		name := aFile.Name
-		if !strings.HasPrefix(name, inPrefix) {
-			testPairs = append(testPairs, aFile)
-			continue
-		}
-		name = strings.TrimPrefix(name, inPrefix)
-		path := join(name)
-		if err := os.WriteFile(path, aFile.Data, 0644); err != nil {
-			t.Fatal(err)
-		}
-		if strings.HasSuffix(name, ".csv") {
-			if err := preProcessCSV(path); err != nil {
-				t.Fatalf("got non-nil error for preProcessCSV(%s); %v", name, err)
-			}
-		}
-	}
-
-	chTmpDir()
-
-	for i := 0; i < len(testPairs); i += 2 {
-		testFile := testPairs[i]
-		wantFile := testPairs[i+1]
-		if !strings.HasPrefix(testFile.Name, testPrefix) ||
-			!strings.HasPrefix(wantFile.Name, wantPrefix) {
-			t.Fatalf("got test-file=%q want-file=%q; want \"test: ...\", \"want: ...\"",
-				testFile.Name, wantFile.Name)
-		}
-		testName := strings.TrimPrefix(testFile.Name, testPrefix)
-		wantName := strings.TrimPrefix(wantFile.Name, wantPrefix)
-		if testName != wantName {
-			t.Fatalf("got test-name=%s want-name=%s; want test-name==want-name", testName, wantName)
-		}
-
-		t.Run(testName, func(t *testing.T) {
-			var (
-				args   []string
-				subcmd SqlSubcommand
-			)
-
-			err := json.Unmarshal(testFile.Data, &args)
-			if err != nil {
-				t.Fatalf("expected test data to be an array of string values: %v", err)
-			}
-
-			fs := flag.NewFlagSet(subcmd.Name(), flag.ExitOnError)
-			subcmd.SetFlags(fs)
-			err = fs.Parse(args)
-			if err != nil {
-				t.Fatalf("could not parse args: %v", err)
-			}
-
-			buf := bytes.Buffer{}
-
-			inputCsvs := GetInputCsvsOrPanic(fs.Args(), -1)
-			outputCsv := &OutputCsv{
-				csvWriter: csv.NewWriter(&buf),
-			}
-			subcmd.RunSql(inputCsvs, outputCsv)
-
-			b, err := postProcessCSV(buf.Bytes())
-			if err != nil {
-				t.Fatalf("could post-process CSV: %v", err)
-			}
-			got := strings.TrimSpace(string(b))
-			want := strings.TrimSpace(string(wantFile.Data))
-			if got != want {
-				t.Errorf("\n got: \n%q\nwant: \n%q", got, want)
-			}
-		})
-	}
-}
-
-// preProcessCSV modifies and overwrites path
-// to de-prettify the CSV.
-func preProcessCSV(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	reader := csv.NewReader(f)
+// normalize parses csvData with [csv.Reader]'s
+// TrimLeadingSpace option.
+func normalize(csvData []byte) []byte {
+	reader := csv.NewReader(bytes.NewReader(csvData))
 	reader.TrimLeadingSpace = true
-	records, err := reader.ReadAll()
-	if err != nil {
-		return err
-	}
+	records := must(reader.ReadAll())
 
-	f, err = os.Create(path)
-	if err != nil {
-		return err
-	}
-	writer := csv.NewWriter(f)
-	err = writer.WriteAll(records)
-	if err != nil {
-		return err
-	}
+	buf := &bytes.Buffer{}
+	writer := csv.NewWriter(buf)
+	_must(writer.WriteAll(records))
 	writer.Flush()
-	if err = writer.Error(); err != nil {
-		return err
-	}
+	_must(writer.Error())
 
-	return nil
+	return buf.Bytes()
 }
 
-// postProcessCSV prettifies data.
-func postProcessCSV(data []byte) ([]byte, error) {
-	reader := csv.NewReader(bytes.NewReader(data))
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, err
-	}
+// prettify justifies columns (right-justifies numbers)
+// in a way which [normalize] can still parse.
+func prettify(csvData []byte) []byte {
+	csvData = normalize(csvData)
 
-	var widths []int
-	for _, record := range records[0] {
-		widths = append(widths, len(record))
-	}
-	for _, record := range records[1:] {
+	reader := csv.NewReader(bytes.NewReader(csvData))
+	records := must(reader.ReadAll())
+
+	// get max width (field length) of each column
+	widths := make([]int, len(records[0]))
+	for _, record := range records {
 		for i, field := range record {
 			widths[i] = max(len(field), widths[i])
 		}
 	}
 
-	buf := &bytes.Buffer{}
+	const (
+		sep = ", "
+	)
+	var (
+		buf   = &bytes.Buffer{}
+		write = func(s string) { must(buf.WriteString(s)) }
+
+		lastField = len(records[0]) - 1
+	)
 	for _, record := range records {
-		line := record[0]
-		sep := ", "
-		for i := 1; i < len(record); i++ {
-			field := record[i]
-			field = strings.Repeat(" ", widths[i-1]-len(record[i-1])) + field
-			line += sep + field
+		for i, field := range record {
+			pad := strings.Repeat(" ", widths[i]-len(field))
+			switch isNum(field) {
+			case true:
+				// pad num [, ]
+				write(pad + field)
+				if i != lastField {
+					write(sep)
+				}
+			default:
+				// text [, pad]
+				write(field)
+				if i != lastField {
+					write(sep + pad)
+				}
+			}
 		}
-		if _, err := buf.WriteString(line + "\n"); err != nil {
-			return nil, err
-		}
+		write("\n")
 	}
 
-	return buf.Bytes(), nil
+	return bytes.TrimSpace(buf.Bytes())
+}
+
+// getArgs tries to interpret data as a JSON array of strings.
+func getArgs(data []byte) []string {
+	var args []string
+	_must(json.Unmarshal(data, &args))
+	return args
+}
+
+// isNum checks if s represents a number.
+func isNum(s string) bool { _, err := strconv.ParseFloat(s, 64); return err == nil }
+
+// must returns obj if err==nil.
+func must[T any](obj T, err error) T { _must(err); return obj }
+
+// _must panics if err!=nil.
+func _must(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
