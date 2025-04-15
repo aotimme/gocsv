@@ -109,6 +109,9 @@ func normalize(csvData []byte) []byte {
 
 // prettify justifies columns (right-justifies numbers)
 // in a way which [normalize] can still parse.
+//
+// Only fit for simple, toy CSV data; does not properly
+// encode chars that require quoting.
 func prettify(csvData []byte) []byte {
 	csvData = normalize(csvData)
 
@@ -116,21 +119,21 @@ func prettify(csvData []byte) []byte {
 	records := must(reader.ReadAll())
 
 	// get max width (field length) of each column
-	widths := make([]int, len(records[0]))
+	nFields := len(records[0])
+	widths := make([]int, nFields)
 	for _, record := range records {
 		for i, field := range record {
 			widths[i] = max(len(field), widths[i])
 		}
 	}
 
-	const (
-		sep = ", "
-	)
+	// write CSV-like output
+	const sep = ", "
 	var (
 		buf   = &bytes.Buffer{}
 		write = func(s string) { must(buf.WriteString(s)) }
 
-		lastField = len(records[0]) - 1
+		lastField = nFields - 1
 	)
 	for _, record := range records {
 		for i, field := range record {
