@@ -1,10 +1,14 @@
 package cmd
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
+	"text/tabwriter"
+	"time"
 )
 
 var (
@@ -78,13 +82,46 @@ func usageForSubcommand(subcommand Subcommand) string {
 // Keep this in sync with the README.
 func usage() string {
 	usage := "GoCSV is a command line CSV processing tool.\n"
-	usage += fmt.Sprintf("Version: %s (%s)\n", VERSION, GIT_HASH)
+	usage += version() + "\n"
 	usage += "Subcommands:\n"
 	for _, subcommand := range subcommands {
 		usage += usageForSubcommand(subcommand)
 	}
 	usage += "See https://github.com/aotimme/gocsv for more documentation."
 	return usage
+}
+
+func version() string {
+	if VERSION != "" && GIT_HASH != "" {
+		return fmt.Sprintf("Version: %s (%s)", VERSION, GIT_HASH)
+	}
+
+	s := ""
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		s += "go:\t" + bi.GoVersion + "\n"
+		for _, x := range bi.Settings {
+			if x.Key == "vcs.revision" {
+				// short hash
+				s += "vcs.revision:\t" + x.Value[:7] + "\n"
+			}
+			if x.Key == "vcs.time" {
+				t, _ := time.Parse(time.RFC3339, x.Value)
+				t = t.Local()
+				s += "vcs.time:\t" + t.Format(time.RFC3339) + "\n"
+			}
+			if x.Key == "vcs.modified" {
+				s += "vcs.modified:\t" + x.Value + "\n"
+			}
+		}
+	}
+	s += "local-build:\t" + time.Now().Format(time.RFC3339)
+
+	buf := &bytes.Buffer{}
+	w := tabwriter.NewWriter(buf, 0, 0, 1, ' ', 0)
+	fmt.Fprint(w, s)
+	w.Flush()
+
+	return buf.String()
 }
 
 func Main() {
@@ -97,7 +134,7 @@ func Main() {
 	}
 	subcommandName := args[1]
 	if subcommandName == "version" {
-		fmt.Printf("%s (%s)\n", VERSION, GIT_HASH)
+		fmt.Println(version())
 		return
 	}
 	if subcommandName == "help" {
