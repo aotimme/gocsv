@@ -679,7 +679,6 @@ cat test-files/left-table.csv \
 | view          |  &#x2714;           |   N/A    |
 | xlsx          |     N/A             | &#x2021; |
 
-
 \* `dimensions` and `headers` write to CSV format when using the `--csv` argument.
 
 &#x2020; `stack` and `sql` read from standard input when specifying the filename as `-`.
