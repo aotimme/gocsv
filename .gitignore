@@ -27,6 +27,3 @@ _testmain.go
 .DS_Store
 bin
 dist
-
-# Issue 79
-db
