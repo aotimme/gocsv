@@ -444,14 +444,15 @@ Run SQL queries on CSVs.
 Usage:
 
 ```shell
-gocsv sql --query QUERY FILE [FILES]
+gocsv sql (--query QUERY | --file SQL_SCRIPT ) FILE [FILES]
 ```
 
 Arguments:
 
 - `--query` (shorthand `-q`) The SQL query to run.
+- `--file` (shorthand `-f`) The path to the SQL script to run.
 
-When passing in files, you may read from standard input by specifying the filename `-`.
+When passing in files, you may read one file from standard input by specifying the filename `-`.
 
 Table names are derived from the CSV filenames by taking the base filename without the file extension. For example, `test-files/stats.csv` is referenced as a table with the name `stats`. The table from standard input `-` should be referenced as the table `stdin`.
 
