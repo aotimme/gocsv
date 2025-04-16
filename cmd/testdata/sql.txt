@@ -1,6 +1,8 @@
 Test files for the SQL subcommand.
 
- - files prefixed with "fs: " will be written to a tempdir
+ - files prefixed with "fs: " will be written to a tempdir;
+   they will be stripped out of test/want pairs (but preserved
+   in tempdir)
  - a test/want pair consists of a test file (interpreted as
    a JSON array of strings) and a want file
 

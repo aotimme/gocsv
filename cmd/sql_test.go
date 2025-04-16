@@ -16,27 +16,26 @@ import (
 )
 
 func TestSql_RunSql(t *testing.T) {
-	a := must(txtar.ParseFile("./testdata/sql.txt"))
+	archive := must(txtar.ParseFile("./testdata/sql.txt"))
 
 	// create tempdir to read input CSVs and SQL scripts
 	t.Chdir(t.TempDir())
 
 	// save fs files (normalizing CSVs); separate
-	// non-fs files (should be test/want files)
+	// non-fs files (should be test or want file)
 	const fsPrefix = "fs: "
 	otherFiles := []txtar.File{}
-	for _, f := range a.Files {
+	for _, f := range archive.Files {
 		if !strings.HasPrefix(f.Name, fsPrefix) {
 			otherFiles = append(otherFiles, f)
 			continue
 		}
-
 		if strings.HasSuffix(f.Name, ".csv") {
 			f.Data = normalize(f.Data)
 		}
+		f.Name = strings.TrimPrefix(f.Name, fsPrefix)
 
-		_must(os.WriteFile(
-			strings.TrimPrefix(f.Name, fsPrefix), f.Data, 0444))
+		_must(os.WriteFile(f.Name, f.Data, 0444))
 	}
 
 	// iterate test/want pairs
