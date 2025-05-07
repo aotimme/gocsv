@@ -75,6 +75,12 @@ func usageForSubcommand(subcommand Subcommand) string {
 	return retval
 }
 
+func exitTerseUsage() {
+	fmt.Fprintln(os.Stderr, "usage: gocsv subcommand [flags] [file(s)]")
+	fmt.Fprintln(os.Stderr, "Run 'gocsv help' for a list of subcommands, and 'gocsv <subcommand> -h' for subcommand details.")
+	os.Exit(2)
+}
+
 // Keep this in sync with the README.
 func usage() string {
 	usage := "GoCSV is a command line CSV processing tool.\n"
@@ -90,20 +96,20 @@ func usage() string {
 func Main() {
 	args := os.Args
 	if len(args) == 1 {
-		fmt.Fprintln(os.Stderr, "Must provide a valid subcommand.")
-		fmt.Fprintf(os.Stderr, "%s\n", usage())
-		os.Exit(1)
-		return
+		exitTerseUsage()
 	}
+
 	subcommandName := args[1]
-	if subcommandName == "version" {
+
+	switch subcommandName {
+	case "help":
+		fmt.Println(usage())
+		return
+	case "version":
 		fmt.Printf("%s (%s)\n", VERSION, GIT_HASH)
 		return
 	}
-	if subcommandName == "help" {
-		fmt.Fprintf(os.Stderr, "%s\n", usage())
-		return
-	}
+
 	for _, subcommand := range subcommands {
 		if MatchesSubcommand(subcommand, subcommandName) {
 			fs := flag.NewFlagSet(subcommand.Name(), flag.ExitOnError)
@@ -117,9 +123,9 @@ func Main() {
 			return
 		}
 	}
-	fmt.Fprintf(os.Stderr, "Invalid subcommand \"%s\"\n", subcommandName)
-	fmt.Fprintf(os.Stderr, "%s\n", usage())
-	os.Exit(1)
+
+	fmt.Fprintf(os.Stderr, "error: invalid subcommand \"%s\"\n\n", subcommandName)
+	exitTerseUsage()
 }
 
 func MatchesSubcommand(sub Subcommand, name string) bool {
