@@ -80,7 +80,7 @@ func usageForSubcommand(subcommand Subcommand) string {
 }
 
 func exitTerseUsage() {
-	fmt.Fprintln(os.Stderr, "usage: gocsv subcommand [flags] [file(s)]")
+	fmt.Fprintln(os.Stderr, "usage: gocsv help|version|<subcommand>")
 	fmt.Fprintln(os.Stderr, "Run 'gocsv help' for a list of subcommands, and 'gocsv <subcommand> -h' for subcommand details.")
 	os.Exit(2)
 }
