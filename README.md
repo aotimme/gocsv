@@ -797,7 +797,37 @@ To enable debugging mode when running a `gocsv` command, specify the `--debug` c
 
 ## Installation
 
-For the latest pre-built binaries, cross-compiled using [xgo](https://github.com/crazy-max/xgo), see the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page.
+For the latest pre-built binaries, see the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page.
+
+To install from source,
+
+1. If you've never installed/built with Go before, welcome! 🤓
+
+   1. Follow the instructions for your OS/platform at Go's [_Download and install_](https://go.dev/doc/install) page, starting with the Download (1.x.x) button.
+
+      Ensure that `go version` works.
+
+   2. Go installs binaries to `$GOBIN`, which defaults to being not set and falls back to`$GOPATH/bin`. You'll need to either set `$GOBIN` and ensure that path is in your `$PATH`, or add `$GOPATH/bin` to your `$PATH`.
+
+      Run `go env` to see what values `$GOBIN` and `$GOPATH` have.
+
+      If you want to learn more about the path-related decisions the go command makes, check out the [GOPATH wiki](https://go.dev/wiki/GOPATH#gopath-variable).
+
+2. Either, run `go install`...
+
+   ```shell
+   go install github.com/aotimme/gocsv@latest
+   ```
+
+   Verify the install with `gocsv version`. You may need to restart your shell.
+
+3. Or, clone/download the repository and build directly:
+
+   ```shell
+   cd <GOCSV-DIR>
+   go build -o gocsv .
+   ./gocsv version
+   ```
 
 ### Apple OS X
 
