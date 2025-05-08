@@ -647,36 +647,36 @@ cat test-files/left-table.csv \
 
 ### Pipelining Support
 
-| Subcommand    |    Input            |  Output  |
-| ------------- | :-----------------: | :------: |
-| add           |  &#x2714;           | &#x2714; |
-| autoincrement |  &#x2714;           | &#x2714; |
-| behead        |  &#x2714;           | &#x2714; |
-| clean         |  &#x2714;           | &#x2714; |
-| delimiter     |  &#x2714;           | &#x2714; |
-| describe      |  &#x2714;           |   N/A    |
-| dimensions    |  &#x2714;           | &#x2714;<sup>*</sup> |
-| filter        |  &#x2714;           | &#x2714; |
-| head          |  &#x2714;           | &#x2714; |
-| headers       |  &#x2714;           | &#x2714;<sup>*</sup> |
-| join          |  &#x2714;           | &#x2714; |
-| ncol          |  &#x2714;           |   N/A    |
-| nrow          |  &#x2714;           |   N/A    |
-| rename        |  &#x2714;           | &#x2714; |
-| replace       |  &#x2714;           | &#x2714; |
-| sample        |  &#x2714;           | &#x2714; |
-| select        |  &#x2714;           | &#x2714; |
-| sort          |  &#x2714;           | &#x2714; |
-| split         |  &#x2714;           |   N/A    |
-| sql           |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
-| stack         |  &#x2714;<sup>&#x2020;</sup>   | &#x2714; |
-| stats         |  &#x2714;           |   N/A    |
-| tail          |  &#x2714;           | &#x2714; |
-| transpose     |  &#x2714;           | &#x2714; |
-| tsv           |  &#x2714;           | &#x2714; |
-| unique        |  &#x2714;           | &#x2714; |
-| view          |  &#x2714;           |   N/A    |
-| xlsx          |     N/A             | &#x2021; |
+| Subcommand    |            Input            |        Output         |
+| ------------- | :-------------------------: | :-------------------: |
+| add           |          &#x2714;           |       &#x2714;        |
+| autoincrement |          &#x2714;           |       &#x2714;        |
+| behead        |          &#x2714;           |       &#x2714;        |
+| clean         |          &#x2714;           |       &#x2714;        |
+| delimiter     |          &#x2714;           |       &#x2714;        |
+| describe      |          &#x2714;           |          N/A          |
+| dimensions    |          &#x2714;           | &#x2714;<sup>\*</sup> |
+| filter        |          &#x2714;           |       &#x2714;        |
+| head          |          &#x2714;           |       &#x2714;        |
+| headers       |          &#x2714;           | &#x2714;<sup>\*</sup> |
+| join          |          &#x2714;           |       &#x2714;        |
+| ncol          |          &#x2714;           |          N/A          |
+| nrow          |          &#x2714;           |          N/A          |
+| rename        |          &#x2714;           |       &#x2714;        |
+| replace       |          &#x2714;           |       &#x2714;        |
+| sample        |          &#x2714;           |       &#x2714;        |
+| select        |          &#x2714;           |       &#x2714;        |
+| sort          |          &#x2714;           |       &#x2714;        |
+| split         |          &#x2714;           |          N/A          |
+| sql           | &#x2714;<sup>&#x2020;</sup> |       &#x2714;        |
+| stack         | &#x2714;<sup>&#x2020;</sup> |       &#x2714;        |
+| stats         |          &#x2714;           |          N/A          |
+| tail          |          &#x2714;           |       &#x2714;        |
+| transpose     |          &#x2714;           |       &#x2714;        |
+| tsv           |          &#x2714;           |       &#x2714;        |
+| unique        |          &#x2714;           |       &#x2714;        |
+| view          |          &#x2714;           |          N/A          |
+| xlsx          |             N/A             |       &#x2021;        |
 
 \* `dimensions` and `headers` write to CSV format when using the `--csv` argument.
 
@@ -804,7 +804,7 @@ To install from source,
 1. If you've never installed/built with Go before, welcome! 🤓
 
    1. Follow the instructions for your OS/platform at Go's [_Download and install_](https://go.dev/doc/install) page, starting with the Download (1.x.x) button.
-   
+
       Ensure that `go version` works.
 
    2. Go installs binaries to `$GOBIN`, which defaults to being not set and falls back to`$GOPATH/bin`. You'll need to either set `$GOBIN` and ensure that path is in your `$PATH`, or add `$GOPATH/bin` to your `$PATH`.
@@ -813,13 +813,21 @@ To install from source,
 
       If you want to learn more about the path-related decisions the go command makes, check out the [GOPATH wiki](https://go.dev/wiki/GOPATH#gopath-variable).
 
-2. Run `go install`:
+2. Either, run `go install`...
 
    ```shell
    go install github.com/aotimme/gocsv@latest
    ```
 
-3. Verify the install with `gocsv version`. You may need to restart your shell.
+   Verify the install with `gocsv version`. You may need to restart your shell.
+
+3. Or, clone/download the repository and build directly:
+
+   ```shell
+   cd <GOCSV-DIR>
+   go build -o gocsv .
+   ./gocsv version
+   ```
 
 ### Apple OS X
 
