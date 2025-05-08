@@ -646,6 +646,7 @@ cat test-files/left-table.csv \
 ```
 
 ### Pipelining Support
+
 | Subcommand    |    Input            |  Output  |
 | ------------- | :-----------------: | :------: |
 | add           |  &#x2714;           | &#x2714; |
