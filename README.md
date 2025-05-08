@@ -803,13 +803,15 @@ To install from source,
 
 1. If you've never installed/built with Go before, welcome! 🤓
 
-   - Follow the instructions for your OS/platform at Go's [_Download and install_](https://go.dev/doc/install) page, starting with the Download (1.x.x) button. Ensure that `go version` works.
+   - Follow the instructions for your OS/platform at Go's [_Download and install_](https://go.dev/doc/install) page, starting with the Download (1.x.x) button.
+   
+     Ensure that `go version` works.
 
    - Go installs binaries to `$GOBIN`, which defaults to being not set and falls back to`$GOPATH/bin`. You'll need to either set `$GOBIN` and ensure that path is in your `$PATH`, or add `$GOPATH/bin` to your `$PATH`.
 
      Run `go env` to see what values `$GOBIN` and `$GOPATH` have.
 
-     Check out the [GOPATH wiki](https://go.dev/wiki/GOPATH#gopath-variable) to learn more about the path-related decisions the go command makes.
+     If you want to learn more about the path-related decisions the go command makes, check out the [GOPATH wiki](https://go.dev/wiki/GOPATH#gopath-variable).
 
 2. Run `go install`:
 
