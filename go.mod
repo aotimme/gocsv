@@ -1,12 +1,12 @@
 module github.com/aotimme/gocsv
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/alphagov/router v0.0.0-20221221092104-2672e1cfdb5e
 	github.com/xuri/excelize/v2 v2.6.1
-	golang.org/x/tools v0.32.0
+	golang.org/x/tools v0.38.0
 	modernc.org/sqlite v1.21.1
 )
 
@@ -29,12 +29,12 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
-	golang.org/x/crypto v0.37.0 // indirect
-	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/crypto v0.45.0 // indirect
+	golang.org/x/mod v0.29.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	lukechampine.com/uint128 v1.2.0 // indirect
 	modernc.org/cc/v3 v3.40.0 // indirect
 	modernc.org/ccgo/v3 v3.16.13 // indirect
