@@ -369,7 +369,7 @@ func (ics *IntColumnStats) CalculateMedian() {
 	copy(sortedArray, ics.array)
 	sort.Sort(Int64Array(sortedArray))
 	if len(sortedArray)%2 == 0 {
-		ics.median = (float64(sortedArray[arrayLen/2-1]) + float64(sortedArray[arrayLen/2-1])) / 2.0
+		ics.median = (float64(sortedArray[arrayLen/2-1]) + float64(sortedArray[arrayLen/2])) / 2.0
 	} else {
 		ics.median = float64(sortedArray[arrayLen/2])
 	}
@@ -502,7 +502,7 @@ func (fcs *FloatColumnStats) CalculateMedian() {
 	copy(sortedArray, fcs.array)
 	sort.Float64s(sortedArray)
 	if len(sortedArray)%2 == 0 {
-		fcs.median = (float64(sortedArray[arrayLen/2-1]) + float64(sortedArray[arrayLen/2-1])) / 2.0
+		fcs.median = (float64(sortedArray[arrayLen/2-1]) + float64(sortedArray[arrayLen/2])) / 2.0
 	} else {
 		fcs.median = float64(sortedArray[arrayLen/2])
 	}
