@@ -5,6 +5,7 @@ EXECUTABLE=gocsv
 .DEFAULT_GOAL := bin
 .PHONY: cleanall dist bin
 
+# See DEV.md for release steps
 dist:
 	bash scripts/build-dist.sh
 
