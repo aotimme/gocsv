@@ -70,7 +70,7 @@ func TestGetInputCsvs(t *testing.T) {
 				t.Error("Unexpected error", err)
 			}
 			if len(inputCsvs) != tt.numCsvs {
-				t.Errorf("Expected %q CSVs but got %q", tt.numCsvs, len(inputCsvs))
+				t.Errorf("Expected %d CSVs but got %d", tt.numCsvs, len(inputCsvs))
 			}
 		})
 	}
