@@ -12,13 +12,14 @@ When developing, you can build a local version of the `gocsv` binary via running
 
 ## Releasing
 
-To release an update to `gocsv`, make sure you have committed and pushed the most recent commit on master. Then:
+To release an update to `gocsv`, make sure you have committed and pushed the most recent commit on main. Then:
 
 1. Tag the latest commit following [semantic versioning](https://semver.org) and push the tag.
 
    ```shell
-   git tag -a v1.2.3 -m "Release v1.2.3"
-   git push origin v1.2.3
+   tagName=v9.8.7
+   git tag -a $tagName -m "Release $tagName"
+   git push origin $tagName
    ```
 
 2. Create cross-compiled binaries for distribution.
