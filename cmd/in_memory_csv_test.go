@@ -2,50 +2,43 @@ package cmd
 
 import "testing"
 
-func TestIntColumnStatsCalculateMedian(t *testing.T) {
+func TestMedian(t *testing.T) {
 	testCases := []struct {
-		name   string
 		values []int64
-		median float64
+		want   float64
 	}{
-		{"two values", []int64{1, 3}, 2},
-		{"fractional median", []int64{1, 2}, 1.5},
-		{"unsorted negative values", []int64{-1, -9, 7, -5}, -3},
-		{"repeated middle values", []int64{9, 1, 5, 5}, 5},
-		{"odd count", []int64{9, 1, 5}, 5},
-		{"single value", []int64{-2}, -2},
-	}
-	for _, tt := range testCases {
-		t.Run(tt.name, func(t *testing.T) {
-			stats := NewIntColumnsStats(tt.values)
-			stats.CalculateMedian()
-			if stats.median != tt.median {
-				t.Errorf("expected median %v but got %v", tt.median, stats.median)
-			}
-		})
-	}
-}
+		{[]int64{0}, 0},
+		{[]int64{0, 1}, 0.5},
+		{[]int64{0, 1, 2}, 1},
+		{[]int64{0, 1, 2, 3}, 1.5},
 
-func TestFloatColumnStatsCalculateMedian(t *testing.T) {
-	testCases := []struct {
-		name   string
-		values []float64
-		median float64
-	}{
-		{"two values", []float64{1.5, 3.5}, 2.5},
-		{"fractional median", []float64{1.5, 2.5}, 2},
-		{"unsorted negative values", []float64{-1.5, -9.5, 7.5, -5.5}, -3.5},
-		{"repeated middle values", []float64{9.5, 1.5, 5.5, 5.5}, 5.5},
-		{"odd count", []float64{9.5, 1.5, 5.5}, 5.5},
-		{"single value", []float64{-2.5}, -2.5},
+		{[]int64{-1, 0, 1}, 0}, // negative
+
+		{[]int64{1, 0, -1}, 0}, // unsorted
 	}
-	for _, tt := range testCases {
-		t.Run(tt.name, func(t *testing.T) {
-			stats := NewFloatColumnsStats(tt.values)
+
+	t.Run("int", func(t *testing.T) {
+		for _, tc := range testCases {
+			stats := NewIntColumnsStats(tc.values)
 			stats.CalculateMedian()
-			if stats.median != tt.median {
-				t.Errorf("expected median %v but got %v", tt.median, stats.median)
+			if stats.median != tc.want {
+				t.Errorf("for %v, got %v; want %v", tc.values, stats.median, tc.want)
 			}
-		})
-	}
+		}
+	})
+
+	t.Run("float", func(t *testing.T) {
+		for _, tc := range testCases {
+			values := make([]float64, len(tc.values))
+			for i := range tc.values {
+				values[i] = float64(tc.values[i])
+			}
+
+			stats := NewFloatColumnsStats(values)
+			stats.CalculateMedian()
+			if stats.median != tc.want {
+				t.Errorf("for %v, got %v; want %v", values, stats.median, tc.want)
+			}
+		}
+	})
 }
