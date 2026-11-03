@@ -49,6 +49,7 @@ func Sample(inputCsv *InputCsv, numRows int, replace bool, seed int) {
 	rowIndices := imc.SampleRowIndices(numRows, replace, seed)
 
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	defer outputCsv.FlushOrPanic()
 
 	// Write header.
 	outputCsv.Write(imc.header)

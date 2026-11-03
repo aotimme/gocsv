@@ -96,6 +96,7 @@ func ConvertXlsxSheetToDirectory(f *excelize.File, dirname string, sheetName str
 	}
 	defer file.Close()
 	outputCsv := NewOutputCsvFromFile(file)
+	defer outputCsv.FlushOrPanic()
 	writeRowsToOutputCsv(outputCsv, f, sheetName)
 }
 
@@ -115,6 +116,7 @@ func ConvertXlsxSheet(filename, sheetName string) {
 	}
 	trueSheetName := sheetNames[sheetIndex]
 	outputCsv := NewOutputCsv()
+	defer outputCsv.FlushOrPanic()
 	writeRowsToOutputCsv(outputCsv, f, trueSheetName)
 }
 

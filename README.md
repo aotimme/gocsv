@@ -710,6 +710,16 @@ export GOCSV_DELIMITER="\x01"
 gocsv select -c 1 soh-delimited.tsv
 ```
 
+## Output Buffering
+
+By default, `gocsv` buffers CSV output for better performance and flushes any remaining output when the command finishes. To flush after every row for more immediate output, set `GOCSV_FLUSH_EVERY_ROW`:
+
+```shell
+GOCSV_FLUSH_EVERY_ROW=true gocsv select -c 1 input.csv
+```
+
+Accepted true values are `1`, `t`, `T`, `true`, `TRUE`, and `True`. Accepted false values are `0`, `f`, `F`, `false`, `FALSE`, and `False`. Unset, empty, or false values keep the default buffering behavior. Any other nonempty value causes `gocsv` to exit with an error.
+
 ## Examples
 
 ##### Copy Values

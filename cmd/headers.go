@@ -35,6 +35,7 @@ func ShowHeaders(inputCsv *InputCsv, asCsv bool) {
 	}
 	if asCsv {
 		outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+		defer outputCsv.FlushOrPanic()
 		outputCsv.Write([]string{"Column", "Name"})
 		for i, name := range header {
 			outputCsv.Write([]string{strconv.Itoa(i + 1), name})

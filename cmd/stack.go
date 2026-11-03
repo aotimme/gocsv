@@ -66,6 +66,7 @@ func (sub *StackSubcommand) Run(args []string) {
 func StackFiles(inputCsvs []*InputCsv, groupName string, groups []string) {
 	shouldAppendGroup := groupName != ""
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	defer outputCsv.FlushOrPanic()
 
 	// Check that the headers match
 	headers := make([][]string, len(inputCsvs))

@@ -34,6 +34,7 @@ func (sub *ReplaceSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *ReplaceSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	defer outputCsv.FlushOrPanic()
 	sub.RunReplace(inputCsvs[0], outputCsv)
 }
 

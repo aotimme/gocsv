@@ -63,9 +63,26 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 	if err != nil {
 		ExitWithError(err)
 	}
-	defer curFile.Close()
+	var outputCsv *OutputCsv
+	finishOutput := func() {
+		file, output := curFile, outputCsv
+		curFile, outputCsv = nil, nil
+		if file == nil {
+			return
+		}
+		defer func() {
+			if err := file.Close(); err != nil {
+				ExitWithError(err)
+			}
+		}()
+		if output != nil {
+			output.FlushOrPanic()
+		}
+	}
+	// Capture only the current output, flushing it before closing its file.
+	defer finishOutput()
 
-	outputCsv := NewFileOutputCsvFromInputCsv(inputCsv, curFile)
+	outputCsv = NewFileOutputCsvFromInputCsv(inputCsv, curFile)
 	outputCsv.Write(header)
 
 	for {
@@ -79,6 +96,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 		}
 		// Switch to the next file.
 		if numRowsWritten == maxRows {
+			finishOutput()
 			fileNumber++
 			numRowsWritten = 0
 			curFilename = fmt.Sprintf("%s-%0*d.csv", filenameBase, width, fileNumber)
@@ -86,7 +104,6 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 			if err != nil {
 				ExitWithError(err)
 			}
-			defer curFile.Close()
 			outputCsv = NewFileOutputCsvFromInputCsv(inputCsv, curFile)
 			outputCsv.Write(header)
 		}

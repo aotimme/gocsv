@@ -33,6 +33,7 @@ func (sub *UniqueSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *UniqueSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	defer outputCsv.FlushOrPanic()
 	sub.RunUnique(inputCsvs[0], outputCsv)
 }
 

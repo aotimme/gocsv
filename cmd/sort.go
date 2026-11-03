@@ -33,6 +33,7 @@ func (sub *SortSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *SortSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	defer outputCsv.FlushOrPanic()
 	sub.SortCsv(inputCsvs[0], outputCsv)
 }
 
