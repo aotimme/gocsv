@@ -58,6 +58,7 @@ func TestSql_RunSql(t *testing.T) {
 			outputCsv := &OutputCsv{csvWriter: csv.NewWriter(&outputBuf)}
 
 			subcmd.RunSql(inputCsvs, outputCsv)
+			_must(outputCsv.Flush())
 
 			got := prettify(outputBuf.Bytes())
 			want := prettify(fwant.Data)

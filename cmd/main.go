@@ -131,6 +131,27 @@ func version() string {
 }
 
 func Main() {
+	if err := runMain(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		os.Exit(1)
+	}
+}
+
+// runMain converts deliberate commandError panics from ExitWithError into errors.
+// Existing command functions do not return errors, so this lets their deferred
+// flushes and file cleanup run before Main calls os.Exit, which skips defers.
+// Debug-mode errors and unexpected panics are rethrown to preserve stack traces.
+func runMain() (err error) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			if failure, ok := recovered.(commandError); ok {
+				err = failure.err
+			} else {
+				panic(recovered)
+			}
+		}
+	}()
+
 	args := os.Args
 	if len(args) == 1 {
 		exitTerseUsage()
@@ -152,8 +173,7 @@ func Main() {
 			fs := flag.NewFlagSet(subcommand.Name(), flag.ExitOnError)
 			fs.BoolVar(&DEBUG, "debug", false, "Enable debug mode")
 			subcommand.SetFlags(fs)
-			err := fs.Parse(args[2:])
-			if err != nil {
+			if err := fs.Parse(args[2:]); err != nil {
 				ExitWithError(err)
 			}
 			subcommand.Run(fs.Args())
@@ -163,6 +183,7 @@ func Main() {
 
 	fmt.Fprintf(os.Stderr, "error: invalid subcommand \"%s\"\n\n", subcommandName)
 	exitTerseUsage()
+	return nil
 }
 
 func MatchesSubcommand(sub Subcommand, name string) bool {

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -224,11 +223,15 @@ func concat(outrow, row1, row2 []string) {
 	}
 }
 
+// commandError unwinds command execution so deferred output cleanup runs before
+// Main reports the error and exits. Other panics retain their normal behavior.
+type commandError struct {
+	err error
+}
+
 func ExitWithError(err error) {
 	if DEBUG {
 		panic(err)
-	} else {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
-		os.Exit(1)
 	}
+	panic(commandError{err: err})
 }

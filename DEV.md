@@ -10,6 +10,16 @@ ln -s ../../git-hooks/pre-commit .git/hooks/pre-commit
 
 When developing, you can build a local version of the `gocsv` binary via running `make`. This will create a newly compiled `gocsv` binary in `bin/`.
 
+## Testing
+
+Run `make test` to run the tests with coverage.
+
+If this reports `go: no such tool "covdata"`, you may be hitting a [Go toolchain switching bug](https://github.com/golang/go/issues/75031). Explicitly select the toolchain reported by `go env GOVERSION`:
+
+```shell
+GOTOOLCHAIN="$(go env GOVERSION)+auto" make test
+```
+
 ## Releasing
 
 To release an update to `gocsv`, make sure you have committed and pushed the most recent commit on main. Then:
