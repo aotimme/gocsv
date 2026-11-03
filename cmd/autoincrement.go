@@ -30,6 +30,7 @@ func (sub *AutoincrementSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *AutoincrementSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	defer outputCsv.FlushOrPanic()
 	sub.RunAutoincrement(inputCsvs[0], outputCsv)
 }
 

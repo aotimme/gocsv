@@ -51,6 +51,7 @@ func GetDimensions(inputCsv *InputCsv, asCsv bool) {
 
 	if asCsv {
 		outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+		defer outputCsv.FlushOrPanic()
 		outputCsv.Write([]string{"Dimension", "Size"})
 		outputCsv.Write([]string{"Rows", strconv.Itoa(numRows)})
 		outputCsv.Write([]string{"Columns", strconv.Itoa(numColumns)})

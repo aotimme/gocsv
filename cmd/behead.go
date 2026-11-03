@@ -27,6 +27,7 @@ func (sub *BeheadSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *BeheadSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	defer outputCsv.FlushOrPanic()
 	sub.RunBehead(inputCsvs[0], outputCsv)
 }
 

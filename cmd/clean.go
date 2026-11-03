@@ -50,6 +50,7 @@ func (sub *CleanSubcommand) Run(args []string) {
 
 func (sub *CleanSubcommand) Clean(inputCsv *InputCsv) {
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	defer outputCsv.FlushOrPanic()
 	if sub.stripBom {
 		if sub.verbose {
 			if inputCsv.hasBom {

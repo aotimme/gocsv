@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 type OutputCsvWriter interface {
@@ -16,6 +17,7 @@ type OutputCsv struct {
 	csvWriter        *csv.Writer
 	file             *os.File
 	writeRaw         bool
+	flushEveryRow    bool
 }
 
 func NewOutputCsvFromInputCsv(inputCsv *InputCsv) (oc *OutputCsv) {
@@ -50,11 +52,32 @@ func NewOutputCsvFromFile(file *os.File) (oc *OutputCsv) {
 	oc = new(OutputCsv)
 	oc.file = file
 	oc.csvWriter = csv.NewWriter(file)
+	if value := os.Getenv("GOCSV_FLUSH_EVERY_ROW"); value != "" {
+		var err error
+		oc.flushEveryRow, err = strconv.ParseBool(value)
+		if err != nil {
+			ExitWithError(fmt.Errorf("invalid GOCSV_FLUSH_EVERY_ROW value %q: %w", value, err))
+		}
+	}
 	delimiter := os.Getenv("GOCSV_DELIMITER")
 	if delimiter != "" {
 		oc.csvWriter.Comma = GetDelimiterFromStringOrPanic(delimiter)
 	}
 	return
+}
+
+// Flush writes any buffered CSV data to the output file and returns any write error.
+// Call it when finished writing, before closing the file.
+func (oc *OutputCsv) Flush() error {
+	oc.csvWriter.Flush()
+	return oc.csvWriter.Error()
+}
+
+// FlushOrPanic flushes buffered CSV data and reports any error via ExitWithError.
+func (oc *OutputCsv) FlushOrPanic() {
+	if err := oc.Flush(); err != nil {
+		ExitWithError(err)
+	}
 }
 
 func (oc *OutputCsv) SetDelimiter(delimiter rune) {
@@ -87,10 +110,8 @@ func (oc *OutputCsv) writeRow(row []string) (err error) {
 	if err != nil {
 		return
 	}
-	// It is less efficient to flush after every write, but doing so
-	// keeps the output flowing. Otherwise it could look "jumpy" or
-	// like it's not working at times when there is no visible output
-	// while working on a large file.
-	oc.csvWriter.Flush()
+	if oc.flushEveryRow {
+		return oc.Flush()
+	}
 	return
 }

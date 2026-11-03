@@ -37,6 +37,7 @@ func (sub *SqlSubcommand) Run(args []string) {
 	}
 	inputCsvs := GetInputCsvsOrPanic(args, -1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	defer outputCsv.FlushOrPanic()
 	sub.RunSql(inputCsvs, outputCsv)
 }
 

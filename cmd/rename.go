@@ -30,6 +30,7 @@ func (sub *RenameSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *RenameSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsv(inputCsvs[0])
+	defer outputCsv.FlushOrPanic()
 	sub.RunRename(inputCsvs[0], outputCsv)
 }
 

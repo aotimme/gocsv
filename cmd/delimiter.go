@@ -41,6 +41,7 @@ func ChangeDelimiter(inputCsv *InputCsv, inputDelimiter, outputDelimiter string)
 	inputCsv.SetLazyQuotes(true)
 
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	defer outputCsv.FlushOrPanic()
 	outputDelimiterRune := GetDelimiterFromStringOrPanic(outputDelimiter)
 	if outputDelimiterRune != rune(0) {
 		outputCsv.SetDelimiter(outputDelimiterRune)

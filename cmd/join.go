@@ -88,6 +88,7 @@ func InnerJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname 
 	shellRow := make([]string, numLeftColumns+numRightColumns)
 
 	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
+	defer outputCsv.FlushOrPanic()
 
 	// Write header.
 	concat(shellRow, leftHeader, rightCsv.header)
@@ -130,6 +131,7 @@ func LeftJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname s
 	shellRow := make([]string, numLeftColumns+numRightColumns)
 
 	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
+	defer outputCsv.FlushOrPanic()
 
 	// Write header.
 	concat(shellRow, leftHeader, rightCsv.header)
@@ -175,6 +177,7 @@ func RightJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname 
 	shellRow := make([]string, numLeftColumns+numRightColumns)
 
 	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
+	defer outputCsv.FlushOrPanic()
 
 	// Write header.
 	concat(shellRow, leftCsv.header, rightHeader)
@@ -227,6 +230,7 @@ func OuterJoin(leftInputCsv, rightInputCsv *InputCsv, leftColname, rightColname 
 	rightIncludeStatus := make([]bool, len(rightCsv.rows))
 
 	outputCsv := NewOutputCsvFromInputCsvs([]*InputCsv{leftInputCsv, rightInputCsv})
+	defer outputCsv.FlushOrPanic()
 
 	// Write header.
 	concat(shellRow, leftHeader, rightCsv.header)

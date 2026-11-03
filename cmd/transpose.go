@@ -23,6 +23,7 @@ func (sub *TransposeSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *TransposeSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	defer outputCsv.FlushOrPanic()
 	sub.RunTranspose(inputCsvs[0], outputCsv)
 }
 

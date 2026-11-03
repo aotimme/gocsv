@@ -47,6 +47,7 @@ func (sub *FilterSubcommand) SetFlags(fs *flag.FlagSet) {
 func (sub *FilterSubcommand) Run(args []string) {
 	inputCsvs := GetInputCsvsOrPanic(args, 1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	defer outputCsv.FlushOrPanic()
 	sub.RunFilter(inputCsvs[0], outputCsv)
 }
 

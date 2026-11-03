@@ -26,6 +26,7 @@ func (sub *TsvSubcommand) Run(args []string) {
 
 func Tsv(inputCsv *InputCsv) {
 	outputCsv := NewOutputCsvFromInputCsv(inputCsv)
+	defer outputCsv.FlushOrPanic()
 	outputCsv.SetDelimiter('\t')
 
 	// Write all rows with tabs.

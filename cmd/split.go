@@ -66,6 +66,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 	defer curFile.Close()
 
 	outputCsv := NewFileOutputCsvFromInputCsv(inputCsv, curFile)
+	defer outputCsv.FlushOrPanic()
 	outputCsv.Write(header)
 
 	for {
@@ -79,6 +80,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 		}
 		// Switch to the next file.
 		if numRowsWritten == maxRows {
+			outputCsv.FlushOrPanic()
 			fileNumber++
 			numRowsWritten = 0
 			curFilename = fmt.Sprintf("%s-%0*d.csv", filenameBase, width, fileNumber)
@@ -88,6 +90,7 @@ func Split(inputCsv *InputCsv, maxRows int, filenameBase string, width int) {
 			}
 			defer curFile.Close()
 			outputCsv = NewFileOutputCsvFromInputCsv(inputCsv, curFile)
+			defer outputCsv.FlushOrPanic()
 			outputCsv.Write(header)
 		}
 

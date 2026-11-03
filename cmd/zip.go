@@ -28,6 +28,7 @@ func (sub *ZipSubcommand) Run(args []string) {
 
 func ZipFiles(inputCsvs []*InputCsv) {
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
+	defer outputCsv.FlushOrPanic()
 
 	numCsvs := len(inputCsvs)
 
