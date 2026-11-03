@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 
 	_ "modernc.org/sqlite"
@@ -11,6 +12,7 @@ import (
 
 type SqlSubcommand struct {
 	queryString string
+	filePath    string
 }
 
 func (sub *SqlSubcommand) Name() string {
@@ -25,15 +27,28 @@ func (sub *SqlSubcommand) Description() string {
 func (sub *SqlSubcommand) SetFlags(fs *flag.FlagSet) {
 	fs.StringVar(&sub.queryString, "query", "", "SQL query")
 	fs.StringVar(&sub.queryString, "q", "", "SQL query (shorthand)")
+	fs.StringVar(&sub.filePath, "file", "", "path to a SQL script")
+	fs.StringVar(&sub.filePath, "f", "", "path to a SQL script (shorthand)")
 }
 
 func (sub *SqlSubcommand) Run(args []string) {
+	if sub.queryString != "" && sub.filePath != "" {
+		ExitWithError(fmt.Errorf("got query string and file path; use only one of -q or -f"))
+	}
 	inputCsvs := GetInputCsvsOrPanic(args, -1)
 	outputCsv := NewOutputCsvFromInputCsvs(inputCsvs)
 	sub.RunSql(inputCsvs, outputCsv)
 }
 
 func (sub *SqlSubcommand) RunSql(inputCsvs []*InputCsv, outputCsvWriter OutputCsvWriter) {
+	if sub.filePath != "" {
+		b, err := os.ReadFile(sub.filePath)
+		if err != nil {
+			ExitWithError(fmt.Errorf("could not read SQL file with -f: %v", err))
+		}
+		sub.queryString = string(b)
+	}
+
 	query := sub.queryString
 
 	// 1. Create the SQLite DB
