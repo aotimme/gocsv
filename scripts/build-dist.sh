@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# See DEV.md for release steps
+
 DIST_DIR=$(pwd)/dist
 EXECUTABLE=gocsv
 
