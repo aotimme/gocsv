@@ -167,18 +167,18 @@ func (imc *InMemoryCsv) SortRows(columnIndices []int, columnTypes []ColumnType, 
 	SortRowsBy(isLessFunc).Sort(imc.rows, stable, reverse)
 }
 
-func (imc *InMemoryCsv) SampleRowIndicesWithReplacement(numRows, seed int) []int {
+func (imc *InMemoryCsv) SampleRowIndicesWithReplacement(numRows int, r *rand.Rand) []int {
 	totalRows := imc.NumRows()
 	retval := make([]int, numRows)
 	for i := 0; i < numRows; i++ {
-		retval[i] = rand.Intn(totalRows)
+		retval[i] = r.Intn(totalRows)
 	}
 	return retval
 }
 
-func (imc *InMemoryCsv) SampleRowIndicesWithoutReplacement(numRows, seed int) []int {
+func (imc *InMemoryCsv) SampleRowIndicesWithoutReplacement(numRows int, r *rand.Rand) []int {
 	totalRows := imc.NumRows()
-	permuted := rand.Perm(totalRows)
+	permuted := r.Perm(totalRows)
 	retval := make([]int, numRows)
 	for i := 0; i < numRows; i++ {
 		retval[i] = permuted[i]
@@ -187,16 +187,16 @@ func (imc *InMemoryCsv) SampleRowIndicesWithoutReplacement(numRows, seed int) []
 }
 
 func (imc *InMemoryCsv) SampleRowIndices(numRows int, replace bool, seed int) []int {
-	// NOTE: Updating global `rand` variable for the life of the proces...
+	var r *rand.Rand
 	if seed != 0 {
-		rand.Seed(int64(seed))
+		r = rand.New(rand.NewSource(int64(seed)))
 	} else {
-		rand.Seed(time.Now().UTC().UnixNano())
+		r = rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
 	if replace {
-		return imc.SampleRowIndicesWithReplacement(numRows, seed)
+		return imc.SampleRowIndicesWithReplacement(numRows, r)
 	} else {
-		return imc.SampleRowIndicesWithoutReplacement(numRows, seed)
+		return imc.SampleRowIndicesWithoutReplacement(numRows, r)
 	}
 }
 
