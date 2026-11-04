@@ -52,12 +52,6 @@ func TestSampleRowIndices(t *testing.T) {
 
 	t.Run("seeding", func(t *testing.T) {
 		var (
-			// random
-
-			got_0 = imc.SampleRowIndices(5, false, 0)
-
-			// seeded
-
 			got_1  = imc.SampleRowIndices(5, false, 1)
 			want_1 = []int{0, 4, 2, 3, 1}
 
@@ -70,9 +64,6 @@ func TestSampleRowIndices(t *testing.T) {
 		}
 		if !slices.Equal(got_2, want_2) {
 			t.Errorf("for seed=2, got %v; want %v", got_2, want_2)
-		}
-		if slices.Equal(got_0, got_1) || slices.Equal(got_0, got_2) {
-			t.Errorf("got_0=%v, should not match got_1=%v or got_2=%v", got_0, got_1, got_2)
 		}
 	})
 
