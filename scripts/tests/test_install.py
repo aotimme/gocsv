@@ -26,7 +26,7 @@ class InstallerTests(unittest.TestCase):
                         TEST_ZIP=str(self.root / "release.zip"),
                         TEST_URL=str(self.root / "url"))
         self.env.pop("GOCSV_VERSION", None)
-        for command in ("sh", "unzip", "chmod", "mkdir", "mv", "mktemp", "rm", "dirname"):
+        for command in ("unzip", "chmod", "mkdir", "mv", "mktemp", "rm"):
             (self.bin / command).symlink_to(shutil.which(command))
         self.mock("uname", 'case "$1" in -s) echo "$TEST_OS";; -m) echo "$TEST_ARCH";; esac')
         self.downloader("curl")
@@ -49,9 +49,10 @@ printf '%s' "$2" > "$TEST_URL"
             archive.writestr("unexpected" if missing else f"gocsv-{os_name}-{arch}/gocsv",
                              "#!/bin/sh\necho fixture-version\n")
 
-    def run_installer(self, script="install.sh", piped=False):
-        result = subprocess.run(["/bin/sh"] if piped else ["/bin/sh", str(SCRIPTS / script)],
-                                input=(SCRIPTS / script).read_text() if piped else None,
+    def run_installer(self, piped=False):
+        script = SCRIPTS / "install.sh"
+        result = subprocess.run(["/bin/sh"] if piped else ["/bin/sh", str(script)],
+                                input=script.read_text() if piped else None,
                                 text=True, capture_output=True, env=self.env)
         self.assertEqual(list(self.scratch.iterdir()), [], result.stderr)
         return result
@@ -77,10 +78,10 @@ printf '%s' "$2" > "$TEST_URL"
                 self.assertTrue(os.access(binary, os.X_OK))
                 self.assertEqual(subprocess.check_output([str(binary)], text=True).strip(), "fixture-version")
 
-    def test_default_directory_and_legacy_entrypoint(self):
+    def test_default_directory(self):
         self.env.pop("GOCSV_INSTALL_DIR")
         self.archive()
-        result = self.run_installer("install-latest-darwin-amd64.sh")
+        result = self.run_installer()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue((self.root / ".local/bin/gocsv").is_file())
         self.assertIn("PATH", result.stdout)
