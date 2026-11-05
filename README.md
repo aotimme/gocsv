@@ -2,13 +2,19 @@
 
 Command line CSV processing tool inspired by [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive. And written in Go.
 
-To install on Apple OS X, open a Terminal window and run
+**macOS and Linux**
 
 ```shell
-/bin/bash <(curl -s https://raw.githubusercontent.com/aotimme/gocsv/master/scripts/install-latest-darwin-amd64.sh)
+curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | sh
 ```
 
-For other platforms, see the [Installation](#installation) section.
+**Windows (PowerShell)**
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+```
+
+For installation details and version selection, see [Installation](#installation).
 
 ### Table of Contents
 
@@ -808,7 +814,70 @@ To enable debugging mode when running a `gocsv` command, specify the `--debug` c
 
 ## Installation
 
-For the latest pre-built binaries, see the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page.
+### Linux and macOS
+
+The installer detects your operating system and CPU architecture and downloads the corresponding binary. It requires `unzip` and either `curl` or `wget`.
+
+```shell
+curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | sh
+# Or, without curl:
+wget -qO- https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | sh
+```
+
+From a checkout, you can also run `scripts/install.sh` directly.
+
+By default, this installs `gocsv` in `~/.local/bin` without requiring `sudo`. If that directory is not on your `PATH`, add the following to your shell configuration (e.g. `~/.bashrc` or `~/.zshrc`), then open a new terminal:
+
+```shell
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+To choose a different installation directory, set `GOCSV_INSTALL_DIR` for the installer:
+
+```shell
+curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | GOCSV_INSTALL_DIR=/your/bin sh
+```
+
+The installer supports Intel and Apple Silicon macOS, and Linux amd64, 386, arm (ARMv7 or newer), arm64, ppc64le, and riscv64.
+
+### Windows
+
+Run this command in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+```
+
+The installer detects x64 or ARM64 Windows, installs `gocsv.exe` in `$HOME\.local\bin`, and adds that directory to your user `PATH`. No administrator access is needed. Open a new terminal after installation. To choose another directory, set `$env:GOCSV_INSTALL_DIR` before running the command. From a checkout, run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1`.
+
+### Install a specific version
+
+Both installers use the [latest release](https://github.com/aotimme/gocsv/releases/latest) by default. To install a specific version, set `GOCSV_VERSION` to the exact [release tag](https://github.com/aotimme/gocsv/releases), including the `v` prefix.
+
+On Linux and macOS, set the variable on the `sh` side of the pipe:
+
+```shell
+curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | GOCSV_VERSION=v1.0.7 sh
+```
+
+On Windows, set it in PowerShell before running the installer:
+
+```powershell
+$env:GOCSV_VERSION = 'v1.0.7'
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+Remove-Item Env:GOCSV_VERSION
+```
+
+### Verify or upgrade
+
+Run `gocsv version` or `gocsv help` to verify the installation. Re-run the installer to upgrade to the latest release.
+
+> [!NOTE] 
+> If you installed GoCSV with the previous macOS installer (`scripts/install-latest-darwin-amd64.sh`), it put `gocsv` in `/usr/local/bin`. After upgrading to the new default location, make sure `$HOME/.local/bin` is on your `PATH`, then remove the old copy with `rm /usr/local/bin/gocsv`. Open a new terminal and run `command -v gocsv` to confirm it finds the copy in `~/.local/bin`.
+
+You can inspect the [shell installer](scripts/install.sh) or [PowerShell installer](scripts/install.ps1) before running it. Alternatively, download the archive for your platform from the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page, extract it, and put `gocsv` (or `gocsv.exe`) in a directory on your `PATH`.
+
+### From source
 
 To install from source,
 
@@ -839,57 +908,3 @@ To install from source,
    go build -o gocsv .
    ./gocsv version
    ```
-
-### Apple OS X
-
-#### Simple Version
-
-Open a Terminal window and paste the following command:
-
-```shell
-/bin/bash <(curl -s https://raw.githubusercontent.com/aotimme/gocsv/master/scripts/install-latest-darwin-amd64.sh)
-```
-
-This will install `gocsv` at `/usr/local/bin/gocsv`.
-
-#### Detailed Version
-
-To install the pre-built binary for Apple OS X, download the `gocsv-darwin-amd64.zip` file. It should download into your `~/Downloads` directory. To install it, open a Terminal window and do the following:
-
-```shell
-cd ~/Downloads
-unzip gocsv-darwin-amd64.zip
-mv gocsv-darwin-amd64/gocsv /usr/local/bin
-rmdir gocsv-darwin-amd64
-```
-
-To verify that it has installed, open a _new_ Terminal window and run
-
-```shell
-gocsv help
-```
-
-You should see the `gocsv` help message.
-
-### Linux
-
-Installing the pre-built binary for Linux is very similar to installing the binary for Apple OS X. First, download `gocsv-linux-amd64.zip`. Assuming this downloads to your `~/Downloads` directory, open a Terminal window and run the following commands:
-
-```shell
-cd ~/Downloads
-unzip gocsv-linux-amd64.zip
-mv gocsv-linux-amd64/gocsv /usr/local/bin
-rmdir gocsv-linux-amd64
-```
-
-To verify that it has installed, open a _new_ Terminal window and run
-
-```shell
-gocsv help
-```
-
-You should see the `gocsv` help message.
-
-### Windows
-
-Download `gocsv-windows-amd64.zip`. Unzip the file and you should see a file `gocsv.exe`. Put that executable in the appropriate location and it should work.
