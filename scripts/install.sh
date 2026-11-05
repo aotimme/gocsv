@@ -45,7 +45,8 @@ main() {
     esac
     url="https://github.com/aotimme/gocsv/releases/$release_path/$archive.zip"
     tmp_dir=$(mktemp -d)
-    trap 'rm -rf "$tmp_dir"' EXIT
+    staged_binary=
+    trap 'rm -rf "$tmp_dir"; if [ -n "$staged_binary" ]; then rm -f "$staged_binary"; fi' EXIT
     trap 'exit 1' HUP INT TERM
 
     printf 'Downloading %s (%s)...\n' "$archive" "$version"
@@ -57,11 +58,13 @@ main() {
     unzip -q "$tmp_dir/release.zip" -d "$tmp_dir" || fail 'Could not extract the release archive.'
     binary="$tmp_dir/$archive/gocsv"
     [ -f "$binary" ] || fail 'The release archive does not contain the expected gocsv binary.'
-    chmod 755 "$binary"
     mkdir -p "$install_dir" || fail "Cannot create $install_dir. Set GOCSV_INSTALL_DIR to a writable directory."
     [ ! -d "$install_dir/gocsv" ] || fail "The destination $install_dir/gocsv is a directory."
-    # Do not touch an existing installation until download and extraction succeed.
-    mv -f "$binary" "$install_dir/gocsv" || fail "Cannot install to $install_dir. Set GOCSV_INSTALL_DIR to a writable directory."
+    # Stage on the same filesystem so the final rename replaces the old binary atomically.
+    staged_binary=$(mktemp "$install_dir/.gocsv.XXXXXX") || fail "Cannot create a temporary file in $install_dir."
+    install -m 755 "$binary" "$staged_binary" || fail "Cannot copy the binary to $install_dir."
+    mv -f "$staged_binary" "$install_dir/gocsv" || fail "Cannot install to $install_dir. Set GOCSV_INSTALL_DIR to a writable directory."
+    staged_binary=
 
     printf 'GoCSV installed to %s/gocsv\n' "$install_dir"
     case ":${PATH:-}:" in

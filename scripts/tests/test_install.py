@@ -26,7 +26,7 @@ class InstallerTests(unittest.TestCase):
                         TEST_ZIP=str(self.root / "release.zip"),
                         TEST_URL=str(self.root / "url"))
         self.env.pop("GOCSV_VERSION", None)
-        for command in ("unzip", "chmod", "mkdir", "mv", "mktemp", "rm"):
+        for command in ("unzip", "install", "mkdir", "mv", "mktemp", "rm"):
             (self.bin / command).symlink_to(shutil.which(command))
         self.mock("uname", 'case "$1" in -s) echo "$TEST_OS";; -m) echo "$TEST_ARCH";; esac')
         self.downloader("curl")
@@ -129,6 +129,18 @@ printf '%s' "$2" > "$TEST_URL"
                 self.assertNotEqual(result.returncode, 0)
                 self.assertNotIn("GoCSV installed", result.stdout)
                 self.assertEqual(binary.read_text(), "existing installation")
+
+    def test_failed_copy_preserves_existing_install(self):
+        self.archive()
+        self.install.mkdir()
+        binary = self.install / "gocsv"
+        binary.write_text("existing installation")
+        (self.bin / "install").unlink()
+        self.mock("install", 'printf partial > "$4"; exit 1')
+        result = self.run_installer()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(binary.read_text(), "existing installation")
+        self.assertEqual(list(self.install.iterdir()), [binary])
 
     def test_missing_dependencies(self):
         for command in ("unzip", "curl"):

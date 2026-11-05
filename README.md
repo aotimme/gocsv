@@ -11,7 +11,7 @@ curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.
 **Windows (PowerShell)**
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
 ```
 
 For installation details and version selection, see [Installation](#installation).
@@ -845,7 +845,7 @@ The installer supports Intel and Apple Silicon macOS, and Linux amd64, 386, arm 
 Run this command in PowerShell (Windows PowerShell 5.1 or PowerShell 7):
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
 ```
 
 The installer detects x64 or ARM64 Windows, installs `gocsv.exe` in `$HOME\.local\bin`, and adds that directory to your user `PATH`. No administrator access is needed. Open a new terminal after installation. To choose another directory, set `$env:GOCSV_INSTALL_DIR` before running the command. From a checkout, run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1`.
@@ -864,7 +864,7 @@ On Windows, set it in PowerShell before running the installer:
 
 ```powershell
 $env:GOCSV_VERSION = 'v1.0.7'
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
 Remove-Item Env:GOCSV_VERSION
 ```
 

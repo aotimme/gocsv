@@ -52,10 +52,32 @@
         }
         Copy-Item -LiteralPath $binary -Destination $destination -Force
 
-        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-        if (@($userPath -split ';') -notcontains $installDir) {
-            $newPath = (([string]$userPath).TrimEnd(';') + ';' + $installDir).TrimStart(';')
-            [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+        $environmentKey = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Environment')
+        try {
+            if (@($environmentKey.GetValue('Path', '') -split ';') -notcontains $installDir) {
+                $userPath = $environmentKey.GetValue('Path', $null, 'DoNotExpandEnvironmentNames')
+                $pathKind = if ($null -eq $userPath) { 'String' } else { $environmentKey.GetValueKind('Path') }
+                $separator = if ($userPath -and -not $userPath.EndsWith(';')) { ';' } else { '' }
+
+                # A raw registry write preserves expandable entries but does not notify Explorer.
+                if (-not ('GoCsv.EnvironmentChange' -as [type])) {
+                    Add-Type -Namespace GoCsv -Name EnvironmentChange -MemberDefinition @'
+[System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+private static extern System.IntPtr SendMessageTimeout(System.IntPtr window, uint message,
+    System.IntPtr wParam, string lParam, uint flags, uint timeout, out System.IntPtr result);
+
+public static void Notify() {
+    System.IntPtr result;
+    SendMessageTimeout(new System.IntPtr(0xffff), 0x001a, System.IntPtr.Zero, "Environment", 2, 1000, out result);
+}
+'@
+                }
+                $environmentKey.SetValue('Path', "$userPath$separator$installDir", $pathKind)
+                [GoCsv.EnvironmentChange]::Notify()
+            }
+        }
+        finally {
+            $environmentKey.Dispose()
         }
         if (@($env:Path -split ';') -notcontains $installDir) {
             $env:Path = "$installDir;$env:Path"

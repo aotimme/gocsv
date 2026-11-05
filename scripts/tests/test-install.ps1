@@ -2,7 +2,9 @@
 $ErrorActionPreference = 'Stop'
 $installer = Join-Path $PSScriptRoot '..\install.ps1'
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('gocsv tests ' + [Guid]::NewGuid())
-$originalUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+$testEnvironmentKey = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Environment')
+$originalUserPath = $testEnvironmentKey.GetValue('Path', $null, 'DoNotExpandEnvironmentNames')
+$originalPathKind = if ($null -ne $originalUserPath) { $testEnvironmentKey.GetValueKind('Path') }
 $originalPath = $env:Path
 $originalInstallDir = $env:GOCSV_INSTALL_DIR
 $originalVersion = $env:GOCSV_VERSION
@@ -49,6 +51,8 @@ function Expect-Failure {
 }
 
 try {
+    $pathFixture = '%USERPROFILE%\gocsv-path-fixture'
+    $testEnvironmentKey.SetValue('Path', $pathFixture, 'ExpandString')
     New-Item -ItemType Directory -Path $testRoot | Out-Null
     $env:GOCSV_INSTALL_DIR = Join-Path $testRoot 'install with spaces'
     $installerTestState.Installed = Join-Path $env:GOCSV_INSTALL_DIR 'gocsv.exe'
@@ -68,6 +72,9 @@ try {
         Assert (@($env:Path -split ';') -contains $env:GOCSV_INSTALL_DIR) 'Session PATH was not updated.'
         $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
         Assert (@($userPath -split ';') -contains $env:GOCSV_INSTALL_DIR) 'User PATH was not updated.'
+        $rawPath = $testEnvironmentKey.GetValue('Path', $null, 'DoNotExpandEnvironmentNames')
+        Assert ($rawPath -eq "$pathFixture;$env:GOCSV_INSTALL_DIR") 'Expandable PATH entry was rewritten.'
+        Assert ($testEnvironmentKey.GetValueKind('Path') -eq 'ExpandString') 'User PATH registry type changed.'
         & $installer
         Assert ([Environment]::GetEnvironmentVariable('Path', 'User') -eq $userPath) 'Repeated install changed user PATH.'
     }
@@ -114,7 +121,13 @@ try {
     Write-Host 'All Windows installer tests passed.'
 }
 finally {
-    [Environment]::SetEnvironmentVariable('Path', $originalUserPath, 'User')
+    if ($null -eq $originalUserPath) {
+        $testEnvironmentKey.DeleteValue('Path', $false)
+    } else {
+        $testEnvironmentKey.SetValue('Path', $originalUserPath, $originalPathKind)
+    }
+    $testEnvironmentKey.Dispose()
+    if ('GoCsv.EnvironmentChange' -as [type]) { [GoCsv.EnvironmentChange]::Notify() }
     $env:Path = $originalPath
     $env:GOCSV_INSTALL_DIR = $originalInstallDir
     $env:GOCSV_VERSION = $originalVersion
