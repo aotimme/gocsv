@@ -20,6 +20,18 @@ If this reports `go: no such tool "covdata"`, you may be hitting a [Go toolchain
 GOTOOLCHAIN="$(go env GOVERSION)+auto" make test
 ```
 
+### Installers
+
+Run the offline shell installer tests on Linux or macOS:
+
+```shell
+python3 scripts/tests/test_install.py
+```
+
+On Windows, run `./scripts/tests/test-install.ps1` in Windows PowerShell 5.1 or PowerShell 7. These tests use fixture ZIP files, exercise installation and user PATH updates in a temporary directory, and restore the original PATH afterward.
+
+The `Installers` GitHub Actions workflow runs these tests and installs the latest published release on Linux, Intel and Apple Silicon macOS, and x64 and ARM64 Windows. Windows runs under both PowerShell versions. The smoke tests download actual release assets and run `gocsv version`.
+
 ## Releasing
 
 To release an update to `gocsv`, make sure you have committed and pushed the most recent commit on main. Then:

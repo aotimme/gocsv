@@ -1,0 +1,45 @@
+name: Installers
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  unix:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline installer tests
+        run: python3 scripts/tests/test_install.py
+      - name: Install and run the latest release
+        shell: sh
+        run: |
+          export GOCSV_INSTALL_DIR="$RUNNER_TEMP/gocsv smoke/bin"
+          sh scripts/install.sh
+          "$GOCSV_INSTALL_DIR/gocsv" version
+
+  windows:
+    strategy:
+      matrix:
+        os: [windows-latest, windows-11-arm]
+        shell: [powershell, pwsh]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline installer tests
+        run: ./scripts/tests/test-install.ps1
+      - name: Install and run the latest release
+        run: |
+          $env:GOCSV_INSTALL_DIR = Join-Path $env:RUNNER_TEMP 'gocsv smoke\bin'
+          & ./scripts/install.ps1
+          & (Join-Path $env:GOCSV_INSTALL_DIR 'gocsv.exe') version
+          if ($LASTEXITCODE -ne 0) { throw 'Installed binary failed to run.' }
