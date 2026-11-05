@@ -872,6 +872,8 @@ Remove-Item Env:GOCSV_VERSION
 
 Run `gocsv version` or `gocsv help` to verify the installation. Re-run the installer to upgrade to the latest release.
 
+The previous macOS installer put `gocsv` in `/usr/local/bin`. After upgrading, run `command -v gocsv` to see which copy your shell uses. If it still points to `/usr/local/bin/gocsv`, put `$HOME/.local/bin` before `/usr/local/bin` on your `PATH` and open a new terminal. Once `gocsv` resolves to the new copy, you can remove `/usr/local/bin/gocsv` if it came from the old installer.
+
 You can inspect the [shell installer](scripts/install.sh) or [PowerShell installer](scripts/install.ps1) before running it. Alternatively, download the archive for your platform from the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page, extract it, and put `gocsv` (or `gocsv.exe`) in a directory on your `PATH`.
 
 ### From source
