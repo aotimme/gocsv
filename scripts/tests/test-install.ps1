@@ -9,6 +9,15 @@ $originalVersion = $env:GOCSV_VERSION
 $originalArchitecture = $env:PROCESSOR_ARCHITECTURE
 $originalWowArchitecture = $env:PROCESSOR_ARCHITEW6432
 
+# A file invocation gives the installer a separate script scope. Share state
+# through an object that the mock can read and update in either invocation.
+$installerTestState = @{
+    Fixture = Join-Path $testRoot 'fixture.zip'
+    ExpectedReleasePath = 'latest/download'
+    Mode = 'success'
+    DownloadDir = $null
+}
+
 function Assert($condition, $message) {
     if (-not $condition) { throw $message }
 }
@@ -18,13 +27,14 @@ function Assert($condition, $message) {
 function Invoke-WebRequest {
     param([switch]$UseBasicParsing, $Uri, $OutFile)
     Assert $UseBasicParsing 'UseBasicParsing is required for Windows PowerShell.'
-    Assert ($Uri -eq "https://github.com/aotimme/gocsv/releases/$script:expectedReleasePath/gocsv-windows-$script:expectedArch.zip") 'Incorrect download URL.'
-    $script:downloadDir = Split-Path $OutFile
-    if ($script:mode -eq 'download') { throw 'Simulated download failure' }
-    if ($script:mode -eq 'corrupt') {
+    $expectedUrl = "https://github.com/aotimme/gocsv/releases/$($installerTestState.ExpectedReleasePath)/gocsv-windows-$($installerTestState.ExpectedArch).zip"
+    Assert ($Uri -eq $expectedUrl) "Expected download URL '$expectedUrl', got '$Uri'."
+    $installerTestState.DownloadDir = Split-Path $OutFile
+    if ($installerTestState.Mode -eq 'download') { throw 'Simulated download failure' }
+    if ($installerTestState.Mode -eq 'corrupt') {
         Set-Content -LiteralPath $OutFile -Value 'not a zip'
     } else {
-        Copy-Item -LiteralPath $script:fixture -Destination $OutFile
+        Copy-Item -LiteralPath $installerTestState.Fixture -Destination $OutFile
     }
 }
 
@@ -32,32 +42,29 @@ function Expect-Failure {
     $failed = $false
     try { & $installer } catch { $failed = $true }
     Assert $failed 'The installer should have failed.'
-    Assert ((Get-Content -LiteralPath $script:installed -Raw).Trim() -eq 'existing') 'Existing installation was changed.'
-    if ($script:downloadDir) {
-        Assert (-not (Test-Path -LiteralPath $script:downloadDir)) 'Temporary files were not cleaned up.'
+    Assert ((Get-Content -LiteralPath $installerTestState.Installed -Raw).Trim() -eq 'existing') 'Existing installation was changed.'
+    if ($installerTestState.DownloadDir) {
+        Assert (-not (Test-Path -LiteralPath $installerTestState.DownloadDir)) 'Temporary files were not cleaned up.'
     }
 }
 
 try {
     New-Item -ItemType Directory -Path $testRoot | Out-Null
     $env:GOCSV_INSTALL_DIR = Join-Path $testRoot 'install with spaces'
-    $script:installed = Join-Path $env:GOCSV_INSTALL_DIR 'gocsv.exe'
-    $script:fixture = Join-Path $testRoot 'fixture.zip'
+    $installerTestState.Installed = Join-Path $env:GOCSV_INSTALL_DIR 'gocsv.exe'
     $env:PROCESSOR_ARCHITEW6432 = ''
     $env:GOCSV_VERSION = $null
-    $script:expectedReleasePath = 'latest/download'
-    $script:mode = 'success'
     foreach ($arch in @('amd64', 'arm64')) {
-        $script:expectedArch = $arch
+        $installerTestState.ExpectedArch = $arch
         $env:PROCESSOR_ARCHITECTURE = $arch.ToUpperInvariant()
         $folder = Join-Path $testRoot "gocsv-windows-$arch"
         New-Item -ItemType Directory -Path $folder | Out-Null
         Set-Content -LiteralPath (Join-Path $folder 'gocsv.exe') -Value 'fixture executable'
-        Compress-Archive -LiteralPath $folder -DestinationPath $script:fixture -Force
+        Compress-Archive -LiteralPath $folder -DestinationPath $installerTestState.Fixture -Force
         # Exercise the README's download-and-evaluate execution style too.
         Invoke-Expression (Get-Content -LiteralPath $installer -Raw)
-        Assert ((Get-Content -LiteralPath $script:installed -Raw).Trim() -eq 'fixture executable') 'Binary not installed.'
-        Assert (-not (Test-Path -LiteralPath $script:downloadDir)) 'Temporary files were not cleaned up.'
+        Assert ((Get-Content -LiteralPath $installerTestState.Installed -Raw).Trim() -eq 'fixture executable') 'Binary not installed.'
+        Assert (-not (Test-Path -LiteralPath $installerTestState.DownloadDir)) 'Temporary files were not cleaned up.'
         Assert (@($env:Path -split ';') -contains $env:GOCSV_INSTALL_DIR) 'Session PATH was not updated.'
         $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
         Assert (@($userPath -split ';') -contains $env:GOCSV_INSTALL_DIR) 'User PATH was not updated.'
@@ -65,25 +72,25 @@ try {
         Assert ([Environment]::GetEnvironmentVariable('Path', 'User') -eq $userPath) 'Repeated install changed user PATH.'
     }
     $env:GOCSV_VERSION = 'v1.0.6'
-    $script:expectedReleasePath = 'download/v1.0.6'
+    $installerTestState.ExpectedReleasePath = 'download/v1.0.6'
     & $installer
     $env:GOCSV_VERSION = $null
-    $script:expectedReleasePath = 'latest/download'
+    $installerTestState.ExpectedReleasePath = 'latest/download'
     # A 32-bit PowerShell process on 64-bit Windows must use the native binary.
     $env:PROCESSOR_ARCHITECTURE = 'x86'
     $env:PROCESSOR_ARCHITEW6432 = 'ARM64'
     & $installer
     $env:PROCESSOR_ARCHITEW6432 = ''
-    Set-Content -LiteralPath $script:installed -Value 'existing'
+    Set-Content -LiteralPath $installerTestState.Installed -Value 'existing'
     Expect-Failure # Unsupported 32-bit Windows.
     $env:PROCESSOR_ARCHITECTURE = 'ARM64'
     foreach ($failure in @('download', 'corrupt', 'missing')) {
-        $script:mode = $failure
+        $installerTestState.Mode = $failure
         if ($failure -eq 'missing') {
             $folder = Join-Path $testRoot 'unexpected'
             New-Item -ItemType Directory -Path $folder | Out-Null
             Set-Content -LiteralPath (Join-Path $folder 'other.txt') -Value 'missing executable'
-            Compress-Archive -LiteralPath $folder -DestinationPath $script:fixture -Force
+            Compress-Archive -LiteralPath $folder -DestinationPath $installerTestState.Fixture -Force
         }
         Expect-Failure
     }
