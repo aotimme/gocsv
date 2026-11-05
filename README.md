@@ -2,13 +2,19 @@
 
 Command line CSV processing tool inspired by [csvkit](https://csvkit.readthedocs.io). But faster and less memory intensive. And written in Go.
 
-To install on Linux or macOS, open a terminal and run:
+**macOS and Linux**
 
 ```shell
 curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | sh
 ```
 
-For Windows and other installation options, see [Installation](#installation).
+**Windows (PowerShell)**
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.ps1 | iex"
+```
+
+For installation details and version selection, see [Installation](#installation).
 
 ### Table of Contents
 
