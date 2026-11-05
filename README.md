@@ -838,7 +838,7 @@ To choose a different installation directory, set `GOCSV_INSTALL_DIR` for the in
 curl -fLsS https://raw.githubusercontent.com/aotimme/gocsv/main/scripts/install.sh | GOCSV_INSTALL_DIR=/your/bin sh
 ```
 
-The installer supports Intel and Apple Silicon macOS, and Linux amd64, 386, arm (ARMv7 or newer), arm64, ppc64le, and riscv64. The old `install-latest-darwin-amd64.sh` URL remains a compatibility entry point and now detects the platform too.
+The installer supports Intel and Apple Silicon macOS, and Linux amd64, 386, arm (ARMv7 or newer), arm64, ppc64le, and riscv64.
 
 ### Windows
 
