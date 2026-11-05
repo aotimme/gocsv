@@ -73,7 +73,24 @@ try {
     }
     $env:GOCSV_VERSION = 'v1.0.6'
     $installerTestState.ExpectedReleasePath = 'download/v1.0.6'
-    & $installer
+    # PowerShell's location can differ from the process working directory.
+    $originalWorkingDirectory = [Environment]::CurrentDirectory
+    $absoluteInstallDir = $env:GOCSV_INSTALL_DIR
+    Push-Location -LiteralPath $testRoot
+    try {
+        [Environment]::CurrentDirectory = Join-Path $testRoot 'gocsv-windows-arm64'
+        $env:GOCSV_INSTALL_DIR = 'relative install'
+        $expectedInstallDir = Join-Path $testRoot 'relative install'
+        & $installer
+        Assert (Test-Path -LiteralPath (Join-Path $expectedInstallDir 'gocsv.exe') -PathType Leaf) 'Relative install did not use the PowerShell location.'
+        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+        Assert (@($userPath -split ';') -contains $expectedInstallDir) 'User PATH is missing the resolved install directory.'
+    }
+    finally {
+        [Environment]::CurrentDirectory = $originalWorkingDirectory
+        Pop-Location
+        $env:GOCSV_INSTALL_DIR = $absoluteInstallDir
+    }
     $env:GOCSV_VERSION = $null
     $installerTestState.ExpectedReleasePath = 'latest/download'
     # A 32-bit PowerShell process on 64-bit Windows must use the native binary.

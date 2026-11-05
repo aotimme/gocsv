@@ -14,7 +14,12 @@
 
     $installDir = $env:GOCSV_INSTALL_DIR
     if (-not $installDir) { $installDir = Join-Path $HOME '.local\bin' }
-    $installDir = [IO.Path]::GetFullPath($installDir)
+    $installProvider = $null
+    $installDrive = $null
+    $installDir = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($installDir, [ref]$installProvider, [ref]$installDrive)
+    if ($installProvider.Name -ne 'FileSystem') {
+        throw 'GOCSV_INSTALL_DIR must be a filesystem path.'
+    }
     $archive = "gocsv-windows-$arch"
     $version = $env:GOCSV_VERSION
     if (-not $version) { $version = 'latest' }
