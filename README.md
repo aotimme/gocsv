@@ -872,7 +872,8 @@ Remove-Item Env:GOCSV_VERSION
 
 Run `gocsv version` or `gocsv help` to verify the installation. Re-run the installer to upgrade to the latest release.
 
-If you installed GoCSV with the previous macOS installer, it put `gocsv` in `/usr/local/bin`. After upgrading to the new default location, make sure `$HOME/.local/bin` is on your `PATH`, then remove the old copy with `rm /usr/local/bin/gocsv`. Open a new terminal and run `command -v gocsv` to confirm it finds the copy in `~/.local/bin`.
+> [!NOTE] 
+> If you installed GoCSV with the previous macOS installer (`scripts/install-latest-darwin-amd64.sh`), it put `gocsv` in `/usr/local/bin`. After upgrading to the new default location, make sure `$HOME/.local/bin` is on your `PATH`, then remove the old copy with `rm /usr/local/bin/gocsv`. Open a new terminal and run `command -v gocsv` to confirm it finds the copy in `~/.local/bin`.
 
 You can inspect the [shell installer](scripts/install.sh) or [PowerShell installer](scripts/install.ps1) before running it. Alternatively, download the archive for your platform from the [Latest Release](https://github.com/aotimme/gocsv/releases/latest) page, extract it, and put `gocsv` (or `gocsv.exe`) in a directory on your `PATH`.
 
