@@ -87,7 +87,7 @@ Arguments:
 - `--name` (shorthand `-n`, optional) Specify a name for the new column. Defaults to the empty string.
 - `--template` (shorthand `-t`, optional) Template for column.
 
-Note that the `--template` argument for this subcommand is a string providing a template for the new column. Templates are parsed using the [html/template](https://golang.org/pkg/html/template/) package provided by Go and can reference any column by the _name_ of the column, along with a special variable `index` that represents the row number (starting at `1`).
+Note that the `--template` argument for this subcommand is a string providing a template for the new column. Templates are parsed using the [text/template](https://golang.org/pkg/text/template/) package provided by Go and can reference any column by the _name_ of the column, along with a special variable `index` that represents the row number (starting at `1`).
 
 For example, if your CSV has a column named `Name`, you can do
 

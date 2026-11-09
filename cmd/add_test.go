@@ -26,6 +26,13 @@ func TestRunAdd(t *testing.T) {
 			{"-1", "Minus One", "Row 3: -1 (Minus One)"},
 			{"2", "Another Two", "Row 4: 2 (Another Two)"},
 		}},
+		{"", `{{ printf "A&B" }} {{.Number}}`, false, [][]string{
+			{"Number", "String", ""},
+			{"1", "One", "A&B 1"},
+			{"2", "Two", "A&B 2"},
+			{"-1", "Minus One", "A&B -1"},
+			{"2", "Another Two", "A&B 2"},
+		}},
 		{"", "Row {{.index}}: {{.Number}} ({{.String}})", true, [][]string{
 			{"", "Number", "String"},
 			{"Row 1: 1 (One)", "1", "One"},
