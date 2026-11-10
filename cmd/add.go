@@ -3,9 +3,9 @@ package cmd
 import (
 	"bytes"
 	"flag"
-	"html/template"
 	"io"
 	"strconv"
+	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
 )
