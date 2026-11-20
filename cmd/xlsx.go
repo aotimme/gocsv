@@ -122,18 +122,20 @@ func ConvertXlsxSheet(filename, sheetName string) {
 
 func writeRowsToOutputCsv(outputCsv OutputCsvWriter, f *excelize.File, sheetName string) {
 	// excelize leaves out a row's trailing blank cells; pad every row to the
-	// widest one so the CSV has the same number of fields on each line.
+	// sheet's width so the CSV has the same number of fields on each line.
+	cols, err := f.Cols(sheetName)
+	if err != nil {
+		ExitWithError(err)
+	}
 	width := 0
-	eachXlsxRow(f, sheetName, func(row []string) { width = max(width, len(row)) })
-	eachXlsxRow(f, sheetName, func(row []string) {
-		for len(row) < width {
-			row = append(row, "")
-		}
-		outputCsv.Write(row)
-	})
-}
+	for cols.Next() {
+		width++
+	}
+	if err = cols.Error(); err != nil {
+		ExitWithError(err)
+	}
+	pad := make([]string, width)
 
-func eachXlsxRow(f *excelize.File, sheetName string, fn func(row []string)) {
 	rows, err := f.Rows(sheetName)
 	if err != nil {
 		ExitWithError(err)
@@ -143,7 +145,7 @@ func eachXlsxRow(f *excelize.File, sheetName string, fn func(row []string)) {
 		if err != nil {
 			ExitWithError(err)
 		}
-		fn(row)
+		outputCsv.Write(append(row, pad[:width-len(row)]...))
 	}
 	if err = rows.Close(); err != nil {
 		ExitWithError(err)

@@ -7,13 +7,21 @@ import (
 )
 
 func TestXlsxPadsTrailingBlankCells(t *testing.T) {
-	f := excelize.NewFile()
-	defer f.Close()
-	for cell, value := range map[string]string{
+	sheet := map[string]string{
 		"A1": "name", "B1": "email", "C1": "notes",
 		"A2": "Ann", "B2": "ann@example.com",
 		"A3": "Ben", "B3": "ben@example.com", "C3": "VIP",
-	} {
+	}
+
+	want := [][]string{
+		{"name", "email", "notes"},
+		{"Ann", "ann@example.com", ""},
+		{"Ben", "ben@example.com", "VIP"},
+	}
+
+	f := excelize.NewFile()
+	defer f.Close()
+	for cell, value := range sheet {
 		if err := f.SetCellValue("Sheet1", cell, value); err != nil {
 			t.Fatal(err)
 		}
@@ -21,12 +29,7 @@ func TestXlsxPadsTrailingBlankCells(t *testing.T) {
 
 	toc := new(testOutputCsv)
 	writeRowsToOutputCsv(toc, f, "Sheet1")
-	err := assertRowsEqual([][]string{
-		{"name", "email", "notes"},
-		{"Ann", "ann@example.com", ""},
-		{"Ben", "ben@example.com", "VIP"},
-	}, toc.rows)
-	if err != nil {
+	if err := assertRowsEqual(want, toc.rows); err != nil {
 		t.Error(err)
 	}
 }
