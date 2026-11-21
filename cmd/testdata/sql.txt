@@ -85,3 +85,17 @@ DeptName,    EmployeeCount
 DevOps,                  2
 Engineering,             4
 Finance,                 1
+
+
+-- fs: blank.csv --
+ID, Amount
+ 1,     10
+ 2,
+ 3,      4
+
+-- query_blank_is_null --
+["-q=SELECT AVG(Amount) AS Mean, COUNT(Amount) AS N, MAX(Amount) AS Max FROM blank", "blank.csv"]
+
+-- want --
+Mean, N, Max
+   7, 2,  10

@@ -466,6 +466,8 @@ This subcommand uses SQLite3 under the hood. It attempts to infer column types f
 
 See [Datatypes In SQLite Version 3](https://www.sqlite.org/datatype3.html) for more information.
 
+Empty cells are stored as `NULL`, so aggregates like `COUNT` and `AVG` skip them and `WHERE col IS NULL` finds them. This differs from SQLite's own `.import`, which stores them as empty strings.
+
 Also note that this subcommand makes no attempts to prevent SQL injection (either via the input CSVs or via the query).
 
 ### stack
