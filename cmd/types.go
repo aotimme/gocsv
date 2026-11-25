@@ -167,7 +167,7 @@ func IsNullType(elem string) bool {
 }
 
 func IsIntType(elem string) bool {
-	_, err := strconv.ParseInt(elem, 0, 0)
+	_, err := strconv.ParseInt(elem, 10, 64)
 	return err == nil
 }
 
@@ -267,5 +267,5 @@ func ParseInt64OrPanic(strVal string) int64 {
 }
 
 func ParseInt64(strVal string) (int64, error) {
-	return strconv.ParseInt(strVal, 0, 0)
+	return strconv.ParseInt(strVal, 10, 64)
 }
