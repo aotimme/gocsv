@@ -24,6 +24,24 @@ func (it *SliceStringIterator) Next() (string, bool) {
 	return val, true
 }
 
+func Test_PR100(t *testing.T) {
+	// assert that leading zeroes not interpreted as octal
+	for s, want := range map[string]int64{
+		"06": 6,
+		"07": 7,
+		"08": 8,
+		"09": 9,
+	} {
+		got, err := ParseInt64(s)
+		if err != nil {
+			t.Errorf("ParseInt64(%q), got non-nil error: %v", s, err)
+		}
+		if got != want {
+			t.Errorf("ParseInt64(%q), got %v; want %v", s, got, want)
+		}
+	}
+}
+
 func TestInferTypeFromStringIterator(t *testing.T) {
 	testCases := []struct {
 		values     []string
@@ -39,7 +57,7 @@ func TestInferTypeFromStringIterator(t *testing.T) {
 		{[]string{"", "hello"}, STRING_TYPE},
 		// all types are the same
 		{[]string{"1", "2", "3"}, INT_TYPE},
-		{[]string{"08", "09"}, INT_TYPE},
+		{[]string{"07", "08", "09"}, INT_TYPE},
 		{[]string{"1.0", "2.0", "3.0"}, FLOAT_TYPE},
 		{[]string{"true", "false"}, BOOLEAN_TYPE},
 		{[]string{"2023-01-01", "2023-01-02"}, DATE_TYPE},
